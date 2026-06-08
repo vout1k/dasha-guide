@@ -82,17 +82,32 @@ body {
 }
 
 /* ── REVEAL ANIMATIONS ── */
+/* No opacity:0 by default — content always visible without JS */
 .reveal {
-  opacity: 0;
-  transform: translateY(32px);
-  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+  transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
 }
-.reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-d1 { transition-delay: 0.1s; }
-.reveal-d2 { transition-delay: 0.2s; }
-.reveal-d3 { transition-delay: 0.3s; }
-.reveal-d4 { transition-delay: 0.4s; }
-.reveal-d5 { transition-delay: 0.5s; }
+/* Only hide if JS has loaded and initialised the observer */
+.js-anim .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+}
+.js-anim .reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.08s; }
+.reveal-d2 { transition-delay: 0.16s; }
+.reveal-d3 { transition-delay: 0.24s; }
+.reveal-d4 { transition-delay: 0.32s; }
+.reveal-d5 { transition-delay: 0.40s; }
+
+/* Hero direct animations (always run, no JS needed) */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-eyebrow { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+.hero-h1      { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s both; }
+.hero-sub     { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
+.hero-cta-row { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.4s both; }
+.hero-mockup  { animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) 0.55s both; }
 
 /* ══════════════════════════
    NAV
@@ -859,22 +874,22 @@ footer {
      HERO
 ═══════════════════════════ -->
 <section class="hero">
-  <div class="hero-eyebrow reveal">
+  <div class="hero-eyebrow">
     <span class="hero-eyebrow-dot"></span>
     Открытая позиция · Удалённо · 2–3 часа / день
   </div>
 
-  <h1 class="hero-h1 reveal reveal-d1">
+  <h1 class="hero-h1">
     <span class="line1">Ассистент</span>
     <span class="line2">по рассылкам</span>
   </h1>
 
-  <p class="hero-sub reveal reveal-d2">
+  <p class="hero-sub">
     Ты — первая точка контакта нашего агентства с клиентами.
     От твоей работы зависит оборот в 1 500 000 ₽ за лето.
   </p>
 
-  <div class="hero-cta-row reveal reveal-d3">
+  <div class="hero-cta-row">
     <a class="btn-primary" href="https://t.me/Kirill_konstantinvich">
       Написать в Telegram →
     </a>
@@ -884,7 +899,7 @@ footer {
   </div>
 
   <!-- Dashboard Mockup -->
-  <div class="hero-mockup reveal reveal-d4">
+  <div class="hero-mockup">
     <div class="mockup-glow"></div>
 
     <!-- Floating tags -->
@@ -1278,16 +1293,34 @@ footer {
 </footer>
 
 <script>
-// Scroll reveal
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-    }
-  });
-}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+// Progressive reveal: only hide elements if IntersectionObserver is supported
+// and works correctly. This guarantees content is ALWAYS visible as a fallback.
+(function() {
+  if (!('IntersectionObserver' in window)) return;
 
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  // Mark body so CSS hides .reveal elements
+  document.body.classList.add('js-anim');
+
+  const FALLBACK_MS = 1800; // force-show everything after this timeout
+
+  const revealEls = document.querySelectorAll('.reveal');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0, rootMargin: '0px 0px 0px 0px' });
+
+  revealEls.forEach(el => observer.observe(el));
+
+  // Hard fallback: if after FALLBACK_MS some elements are still hidden, show them
+  setTimeout(() => {
+    revealEls.forEach(el => el.classList.add('visible'));
+  }, FALLBACK_MS);
+})();
 
 // Mouse glow on bento cards
 function moveGlow(e, el) {
