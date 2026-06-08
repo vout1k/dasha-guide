@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ассистент по рассылкам — Агентство Кузнецова</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#ffffff;
+  --sidebar:#f7f7f5;
+  --text:#37352f;
+  --muted:rgba(55,53,47,.65);
+  --faint:rgba(55,53,47,.4);
+  --border:rgba(55,53,47,.09);
+  --hover:rgba(55,53,47,.07);
+  --sel:rgba(55,53,47,.08);
+
+  --blue-bg:rgba(231,243,248,1);
+  --blue-tx:rgba(24,51,71,1);
+  --yellow-bg:rgba(251,243,219,1);
+  --yellow-tx:rgba(69,52,0,1);
+  --green-bg:rgba(237,243,236,1);
+  --green-tx:rgba(28,56,41,1);
+  --red-bg:rgba(253,235,236,1);
+  --red-tx:rgba(93,23,21,1);
+  --purple-bg:rgba(244,240,247,0.8);
+  --purple-tx:rgba(65,36,84,1);
+  --gray-bg:rgba(241,241,239,1);
+  --gray-tx:rgba(55,53,47,.65);
+  --orange-bg:rgba(251,239,226,1);
+  --orange-tx:rgba(73,41,14,1);
+}
+
+html{height:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.5;height:100%;display:flex;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:240px;flex-shrink:0;height:100vh;
+  background:var(--sidebar);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:sticky;top:0;overflow-y:auto;
+  padding:8px 0 20px;
+  font-size:14px;
+}
+@media(max-width:768px){.sidebar{display:none}}
+.sb-workspace{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px 6px 14px;
+  margin-bottom:4px;
+  cursor:pointer;border-radius:4px;
+  margin:4px 8px;
+  transition:background .15s;
+}
+.sb-workspace:hover{background:var(--hover)}
+.sb-ws-icon{width:18px;height:18px;border-radius:4px;background:#191919;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.sb-ws-name{font-weight:600;font-size:14px;color:var(--text);flex:1}
+.sb-ws-caret{color:var(--faint);font-size:11px}
+.sb-section{padding:2px 0}
+.sb-item{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px 5px 24px;
+  color:var(--muted);cursor:pointer;
+  border-radius:4px;margin:1px 8px;
+  transition:background .15s;
+  font-size:14px;
+  text-decoration:none;
+}
+.sb-item:hover{background:var(--hover);color:var(--text)}
+.sb-item.active{background:var(--sel);color:var(--text)}
+.sb-item-icon{font-size:15px;flex-shrink:0;width:20px;text-align:center}
+.sb-label{font-size:11px;font-weight:600;color:var(--faint);letter-spacing:.07em;text-transform:uppercase;padding:14px 14px 4px 24px}
+.sb-divider{height:1px;background:var(--border);margin:8px 0}
+.sb-new{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px 5px 24px;
+  color:var(--faint);cursor:pointer;font-size:13px;
+  margin:1px 8px;border-radius:4px;
+  transition:background .15s;
+}
+.sb-new:hover{background:var(--hover);color:var(--muted)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;height:100vh}
+.topbar{
+  height:45px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px 0 20px;
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;background:var(--bg);z-index:10;
+}
+.breadcrumb{display:flex;align-items:center;gap:4px;font-size:14px;color:var(--muted)}
+.bc-sep{color:var(--faint);margin:0 2px}
+.bc-curr{color:var(--text);font-weight:500}
+.tb-actions{display:flex;align-items:center;gap:2px}
+.tb-btn{
+  padding:5px 8px;border-radius:4px;font-size:13px;color:var(--muted);
+  cursor:pointer;border:none;background:none;transition:background .15s;
+  display:flex;align-items:center;gap:5px;
+}
+.tb-btn:hover{background:var(--hover);color:var(--text)}
+
+/* ── PAGE ── */
+.page{max-width:720px;margin:0 auto;padding:40px 80px 200px;min-height:100%}
+@media(max-width:900px){.page{padding:32px 24px 120px}}
+@media(max-width:600px){.page{padding:24px 16px 80px}}
+
+.page-cover{
+  width:calc(100% + 160px);margin-left:-80px;height:200px;
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 70%,#533483 100%);
+  margin-top:-40px;margin-bottom:0;
+  position:relative;overflow:hidden;
+}
+.page-cover::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 60% 40%,rgba(83,52,131,.6),transparent),
+             radial-gradient(ellipse 40% 60% at 20% 60%,rgba(59,130,246,.3),transparent);
+}
+@media(max-width:900px){.page-cover{width:calc(100% + 48px);margin-left:-24px}}
+@media(max-width:600px){.page-cover{width:calc(100% + 32px);margin-left:-16px;height:140px}}
+
+.page-icon{font-size:60px;margin-bottom:6px;line-height:1;margin-top:-24px;position:relative;z-index:1}
+@media(max-width:600px){.page-icon{font-size:44px}}
+
+.page-title{
+  font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1.2;
+  color:var(--text);margin-bottom:4px;
+}
+@media(max-width:600px){.page-title{font-size:28px}}
+
+.page-subtitle{font-size:16px;color:var(--muted);margin-bottom:32px;line-height:1.5}
+
+/* properties */
+.props{border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:32px}
+.prop{display:flex;align-items:flex-start;gap:0;min-height:34px;padding:4px 0}
+.prop:not(:last-child){border-bottom:1px solid var(--border)}
+.prop-key{
+  width:180px;flex-shrink:0;
+  font-size:14px;color:var(--muted);font-weight:500;
+  display:flex;align-items:center;gap:7px;
+  padding:5px 8px 5px 0;
+}
+.prop-key-icon{font-size:13px;opacity:.7}
+.prop-val{flex:1;font-size:14px;color:var(--text);padding:5px 8px;display:flex;align-items:center;flex-wrap:wrap;gap:5px}
+
+/* tags/badges */
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:500}
+.tag-b{background:rgba(214,224,254,.8);color:#3730a3}
+.tag-g{background:rgba(187,247,208,.7);color:#14532d}
+.tag-y{background:rgba(254,243,199,.9);color:#78350f}
+.tag-r{background:rgba(254,202,202,.8);color:#7f1d1d}
+.tag-p{background:rgba(233,213,255,.8);color:#581c87}
+
+/* ── BLOCKS ── */
+h1.nb{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:40px 0 4px}
+h2.nb{font-size:24px;font-weight:600;letter-spacing:-.015em;margin:32px 0 4px}
+h3.nb{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:24px 0 4px}
+
+p.nb{color:var(--text);margin:2px 0;line-height:1.6}
+p.nb + p.nb{margin-top:0}
+
+.divider{height:1px;background:var(--border);margin:24px 0}
+
+/* callout */
+.callout{
+  display:flex;gap:10px;
+  border-radius:4px;padding:16px;
+  margin:8px 0;
+}
+.callout-icon{font-size:20px;flex-shrink:0;line-height:1.4;margin-top:-1px}
+.callout-body{flex:1;font-size:16px;line-height:1.6}
+.callout-body strong{font-weight:600}
+.co-blue{background:var(--blue-bg);color:var(--blue-tx)}
+.co-yellow{background:var(--yellow-bg);color:var(--yellow-tx)}
+.co-green{background:var(--green-bg);color:var(--green-tx)}
+.co-red{background:var(--red-bg);color:var(--red-tx)}
+.co-purple{background:var(--purple-bg);color:var(--purple-tx)}
+.co-gray{background:var(--gray-bg);color:var(--gray-tx)}
+.co-orange{background:var(--orange-bg);color:var(--orange-tx)}
+
+/* quote */
+.quote{
+  border-left:3px solid var(--text);
+  padding-left:16px;margin:10px 0;
+  font-size:16px;color:var(--text);line-height:1.65;
+}
+
+/* bulleted list */
+ul.nb{list-style:none;margin:4px 0}
+ul.nb li{display:flex;gap:8px;padding:3px 0;font-size:16px;line-height:1.6}
+ul.nb li::before{content:'•';color:var(--muted);flex-shrink:0;margin-top:0}
+
+/* numbered list */
+ol.nb{list-style:none;margin:4px 0;counter-reset:notion-ol}
+ol.nb li{display:flex;gap:8px;padding:3px 0;font-size:16px;line-height:1.6;counter-increment:notion-ol}
+ol.nb li::before{content:counter(notion-ol) ".";color:var(--muted);flex-shrink:0;min-width:20px}
+
+/* toggle */
+.toggle{margin:4px 0}
+.toggle-header{
+  display:flex;align-items:flex-start;gap:6px;
+  cursor:pointer;padding:3px 0;border-radius:4px;
+  font-size:16px;line-height:1.6;
+  user-select:none;
+  transition:background .1s;
+}
+.toggle-header:hover{background:var(--hover)}
+.toggle-arrow{
+  width:20px;height:24px;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:12px;flex-shrink:0;
+  transition:transform .15s;margin-top:1px;
+}
+.toggle-arrow.open{transform:rotate(90deg)}
+.toggle-body{
+  padding-left:26px;padding-top:2px;
+  display:none;
+}
+.toggle-body.open{display:block}
+
+/* table */
+.nb-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px}
+.nb-table th{
+  background:rgba(55,53,47,.04);
+  font-weight:600;font-size:12px;color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;
+  padding:8px 12px;border:1px solid var(--border);text-align:left;
+}
+.nb-table td{
+  padding:9px 12px;border:1px solid var(--border);
+  color:var(--text);vertical-align:top;line-height:1.5;
+}
+.nb-table tr:hover td{background:rgba(55,53,47,.02)}
+.td-center{text-align:center}
+.td-bold{font-weight:600}
+
+/* inline highlight */
+.hl-y{background:rgba(251,243,219,.8);border-radius:2px;padding:1px 3px}
+.hl-b{background:rgba(231,243,248,.9);border-radius:2px;padding:1px 3px}
+.hl-g{background:rgba(237,243,236,.9);border-radius:2px;padding:1px 3px}
+.hl-r{background:rgba(253,235,236,.9);border-radius:2px;padding:1px 3px}
+
+/* inline code */
+code{
+  background:rgba(135,131,120,.15);
+  border-radius:3px;padding:2px 5px;
+  font-family:SFMono-Regular,Consolas,monospace;font-size:85%;
+  color:rgb(235,87,87);
+}
+
+/* synced block / highlight card */
+.sync-block{
+  border:1px solid var(--border);border-radius:4px;
+  padding:16px;margin:10px 0;background:rgba(55,53,47,.02);
+}
+.sync-label{font-size:11px;color:var(--faint);font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px}
+
+/* mention / link */
+.mention{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(55,53,47,.06);border-radius:3px;padding:1px 6px;
+  font-size:14px;color:var(--text);cursor:pointer;
+  transition:background .15s;
+}
+.mention:hover{background:rgba(55,53,47,.12)}
+
+/* status */
+.status{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:500}
+.status-dot{width:8px;height:8px;border-radius:50%}
+.st-active .status-dot{background:#16a34a}
+.st-open .status-dot{background:#3b82f6;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* number highlight */
+.big-number{
+  font-size:48px;font-weight:700;letter-spacing:-.03em;line-height:1;
+  color:var(--text);
+}
+.big-sub{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* grid of 3 */
+.col3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0}
+@media(max-width:600px){.col3{grid-template-columns:1fr}}
+.col3-card{
+  border:1px solid var(--border);border-radius:8px;
+  padding:16px;background:rgba(55,53,47,.02);
+}
+.col3-card-num{font-size:32px;font-weight:700;letter-spacing:-.03em;margin-bottom:4px}
+.col3-card-lab{font-size:12px;color:var(--muted);font-weight:500}
+.c3-y .col3-card-num{color:#d97706}
+.c3-g .col3-card-num{color:#16a34a}
+.c3-r .col3-card-num{color:#dc2626}
+
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+@media(max-width:600px){.col2{grid-template-columns:1fr}}
+.col2-card{border:1px solid var(--border);border-radius:8px;padding:16px}
+
+/* progress / bar */
+.progress-wrap{margin:6px 0}
+.progress-label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px}
+.progress-bar{height:6px;border-radius:3px;background:rgba(55,53,47,.1)}
+.progress-fill{height:100%;border-radius:3px}
+
+/* salary calc */
+.salary-total{
+  display:flex;align-items:baseline;gap:8px;
+  padding:20px 0 8px;
+}
+.salary-num{font-size:56px;font-weight:700;letter-spacing:-.04em;color:#16a34a}
+.salary-period{font-size:18px;color:var(--muted);font-weight:500}
+
+/* spacing helpers */
+.mt8{margin-top:8px}.mt16{margin-top:16px}.mt24{margin-top:24px}.mt32{margin-top:32px}
+.mb8{margin-bottom:8px}.mb16{margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-workspace">
+    <div class="sb-ws-icon">K</div>
+    <span class="sb-ws-name">Агентство Кузнецова</span>
+    <span class="sb-ws-caret">▾</span>
+  </div>
+  <div class="sb-section">
+    <div class="sb-item"><span class="sb-item-icon">🔍</span>Поиск</div>
+    <div class="sb-item"><span class="sb-item-icon">🏠</span>Главная</div>
+    <div class="sb-item"><span class="sb-item-icon">📥</span>Входящие</div>
+  </div>
+  <div class="sb-divider"></div>
+  <div class="sb-label">Рабочее пространство</div>
+  <a class="sb-item" href="index.html"><span class="sb-item-icon">📋</span>Система ОД</a>
+  <a class="sb-item" href="roadmap/index.html"><span class="sb-item-icon">🗺️</span>Роадмап</a>
+  <a class="sb-item active" href="#"><span class="sb-item-icon">📲</span>Ассистент рассылок</a>
+  <div class="sb-divider"></div>
+  <div class="sb-label">Проекты</div>
+  <div class="sb-item"><span class="sb-item-icon">📊</span>Воронки клиентов</div>
+  <div class="sb-item"><span class="sb-item-icon">💼</span>Команда</div>
+  <div class="sb-item"><span class="sb-item-icon">📈</span>KPI дашборд</div>
+  <div class="sb-divider"></div>
+  <div class="sb-new">+ Новая страница</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="breadcrumb">
+      <span>Агентство Кузнецова</span>
+      <span class="bc-sep">/</span>
+      <span>Команда</span>
+      <span class="bc-sep">/</span>
+      <span class="bc-curr">Ассистент по рассылкам</span>
+    </div>
+    <div class="tb-actions">
+      <button class="tb-btn">↗ Поделиться</button>
+      <button class="tb-btn">💬 Комментировать</button>
+      <button class="tb-btn">⋯</button>
+    </div>
+  </div>
+
+  <!-- PAGE CONTENT -->
+  <div class="page">
+
+    <!-- COVER -->
+    <div class="page-cover"></div>
+
+    <!-- ICON + TITLE -->
+    <div class="page-icon">📲</div>
+    <h1 class="page-title">Ассистент по рассылкам</h1>
+    <p class="page-subtitle">Открытая позиция · Агентство Кузнецова · Лето 2025</p>
+
+    <!-- PROPERTIES -->
+    <div class="props">
+      <div class="prop">
+        <div class="prop-key"><span class="prop-key-icon">📌</span> Статус</div>
+        <div class="prop-val">
+          <span class="status st-open"><span class="status-dot"></span> Открыт набор</span>
+        </div>
+      </div>
+      <div class="prop">
+        <div class="prop-key"><span class="prop-key-icon">💰</span> Зарплата</div>
+        <div class="prop-val"><span class="hl-g">20 000 – 110 000 ₽ / мес</span></div>
+      </div>
+      <div class="prop">
+        <div class="prop-key"><span class="prop-key-icon">📍</span> Формат</div>
+        <div class="prop-val"><span class="tag tag-b">Удалённо</span> <span class="tag tag-g">2–3 часа/день</span></div>
+      </div>
+      <div class="prop">
+        <div class="prop-key"><span class="prop-key-icon">⚡</span> Тип</div>
+        <div class="prop-val"><span class="tag tag-p">Telegram-рассылки</span></div>
+      </div>
+      <div class="prop">
+        <div class="prop-key"><span class="prop-key-icon">👤</span> Контакт</div>
+        <div class="prop-val"><span class="mention">✉️ @Kirill_konstantinvich</span></div>
+      </div>
+      <div class="prop">
+        <div class="prop-key"><span class="prop-key-icon">📅</span> Старт</div>
+        <div class="prop-val" style="color:var(--muted);font-size:14px">Как можно скорее · июнь 2025</div>
+      </div>
+    </div>
+
+    <!-- CALLOUT INTRO -->
+    <div class="callout co-blue">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Коротко о позиции.</strong> Ты — первая точка контакта нашего агентства с клиентами. Ты пишешь людям в Telegram, прогреваешь, передаёшь заинтересованных на созвон. От твоей работы зависит оборот агентства в <strong>1 500 000 ₽ за лето</strong>.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 01 -->
+    <h1 class="nb">📋 Задача</h1>
+
+    <p class="nb" style="color:var(--muted);margin-bottom:12px">Что ты делаешь каждый день — конкретно и без воды.</p>
+
+    <ul class="nb">
+      <li><strong>50 ручных рассылок в Telegram</strong> по выданной базе. Каждый день. Строго по согласованному скрипту.</li>
+      <li><strong>Обработка входящих.</strong> Все ответы — в течение 1–2 часов. Выявляешь боль, задаёшь вопросы, прогреваешь.</li>
+      <li><strong>Передача лидов.</strong> Заинтересованный клиент → операционному директору. Продажа воронки за 150к+ — уже не твоя задача.</li>
+      <li><strong>Ежедневный отчёт.</strong> Сам, в конце дня. Не ждёшь пока спросят. Это базовое требование.</li>
+    </ul>
+
+    <div class="mt16">
+      <div class="callout co-purple">
+        <span class="callout-icon">💬</span>
+        <div class="callout-body">
+          «Ты не просто рассыльщик. Ты первая точка контакта клиента с агентством. От тебя зависит, выйдем ли мы на 1 млн за лето или нет.»
+          <div style="margin-top:8px;font-size:14px;opacity:.75">— Кирилл Кузнецов, основатель агентства</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 02 -->
+    <h1 class="nb">⚙️ Как это работает</h1>
+    <p class="nb" style="color:var(--muted);margin-bottom:12px">Три шага — каждый день, без выходных.</p>
+
+    <ol class="nb">
+      <li>
+        <div>
+          <strong>Рассылки.</strong> 50 сообщений по базе. Скрипт выдаётся и согласовывается с ОД. Самодеятельность в тексте — не приветствуется.
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+            <span class="tag tag-b">50 / день</span>
+            <span class="tag tag-p">По скрипту</span>
+            <span class="tag tag-g">Своя база</span>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div style="margin-top:4px">
+          <strong>Обработка входящих.</strong> Все ответы — в течение 1–2 часов. Прогрев: выявляешь боль, задаёшь вопросы, доводишь до записи на созвон. Тёплый лид передаёшь ОД.
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+            <span class="tag tag-b">1–2 часа</span>
+            <span class="tag tag-g">Прогрев</span>
+            <span class="tag tag-p">Передача ОД</span>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div style="margin-top:4px">
+          <strong>Отчёт каждый вечер.</strong> Отправлено / ответили / заинтересовались / на созвон. Сам, не ждёшь пока спросят.
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+            <span class="tag tag-b">Ежедневно</span>
+            <span class="tag tag-g">Без напоминаний</span>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <div class="mt16">
+      <div class="callout co-gray">
+        <span class="callout-icon">🕐</span>
+        <div class="callout-body"><strong>Твой рабочий день</strong> — 2–3 часа. Утром рассылки, в течение дня отвечаешь на входящие, вечером — отчёт. Всё остальное время — свободен.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 03 -->
+    <h1 class="nb">🎯 KPI и конверсия</h1>
+
+    <div class="col3 mt8">
+      <div class="col3-card c3-y">
+        <div class="col3-card-num">3</div>
+        <div class="col3-card-lab">продажи / мес — минимум</div>
+      </div>
+      <div class="col3-card c3-g">
+        <div class="col3-card-num">5</div>
+        <div class="col3-card-lab">продаж / мес — план</div>
+      </div>
+      <div class="col3-card c3-r">
+        <div class="col3-card-num">6+</div>
+        <div class="col3-card-lab">продаж / мес — бог-продажник</div>
+      </div>
+    </div>
+
+    <h2 class="nb">Математика</h2>
+    <table class="nb-table">
+      <thead>
+        <tr>
+          <th>Рассылок</th>
+          <th>Ответили (~8%)</th>
+          <th>Созвоны (~2 из 10)</th>
+          <th>Продажи (~1 из 3)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1 000</td>
+          <td>~80</td>
+          <td>~16</td>
+          <td class="td-bold"><span class="hl-y">1 продажа</span></td>
+        </tr>
+        <tr>
+          <td>3 000</td>
+          <td>~240</td>
+          <td>~48</td>
+          <td class="td-bold"><span class="hl-y">3 продажи</span></td>
+        </tr>
+        <tr>
+          <td>5 000</td>
+          <td>~400</td>
+          <td>~80</td>
+          <td class="td-bold"><span class="hl-g">5 продаж ✓</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout co-yellow mt8">
+      <span class="callout-icon">📊</span>
+      <div class="callout-body"><strong>Объём = деньги.</strong> 50 рассылок × 100 дней = 5 000 рассылок = ~5 продаж. Каждая продажа = воронка за 150 000 ₽. Всё честно и считается.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 04 -->
+    <h1 class="nb">💰 Зарплата</h1>
+    <p class="nb" style="color:var(--muted);margin-bottom:16px">Никаких серых схем. Считается прозрачно.</p>
+
+    <table class="nb-table">
+      <thead>
+        <tr>
+          <th>Уровень</th>
+          <th>Продажи / мес</th>
+          <th>Оклад</th>
+          <th>Бонус</th>
+          <th>Итого</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🟡 Минимум</td>
+          <td>3</td>
+          <td>20–30 000 ₽</td>
+          <td>—</td>
+          <td class="td-bold">20–30 000 ₽</td>
+        </tr>
+        <tr>
+          <td>🟢 План</td>
+          <td>5</td>
+          <td>30 000 ₽</td>
+          <td>+20 000 ₽/продажа сверх 3</td>
+          <td class="td-bold"><span class="hl-g">70 000 ₽</span></td>
+        </tr>
+        <tr>
+          <td>🔥 Бог</td>
+          <td>6+</td>
+          <td>30 000 ₽</td>
+          <td>Повышенная ставка</td>
+          <td class="td-bold"><span class="hl-g">110 000+ ₽</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="toggle mt16">
+      <div class="toggle-header" onclick="tog(this)">
+        <div class="toggle-arrow open">▶</div>
+        <strong>💰 Пример расчёта — 7 продаж за месяц</strong>
+      </div>
+      <div class="toggle-body open">
+        <div class="callout co-green" style="margin-top:8px">
+          <span class="callout-icon">🧮</span>
+          <div class="callout-body">
+            <table class="nb-table" style="margin:0">
+              <tr><td>Базовый оклад (3 продажи)</td><td class="td-bold">30 000 ₽</td></tr>
+              <tr><td>Доп. продажи: 4 × 20 000 ₽</td><td class="td-bold">80 000 ₽</td></tr>
+              <tr style="background:rgba(52,211,153,.1)"><td><strong>Итого за месяц</strong></td><td class="td-bold" style="color:#16a34a;font-size:18px"><strong>110 000 ₽</strong></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 05 -->
+    <h1 class="nb">📏 Правила</h1>
+    <p class="nb" style="color:var(--muted);margin-bottom:12px">Пять принципов, которые нельзя нарушать.</p>
+
+    <ol class="nb">
+      <li><strong>Отчёт каждый день.</strong> Сам, в конце дня. Не ждёшь пока спросят.</li>
+      <li><strong>Скорость ответа.</strong> Все входящие — в течение 1–2 часов. Каждый.</li>
+      <li><strong>Проблемы — сразу.</strong> Блок, нет базы, не получается — пишешь ОД немедленно. Не замалчиваешь.</li>
+      <li><strong>Скрипт согласован.</strong> Самодеятельность в переписке с клиентами не приветствуется.</li>
+      <li><strong>Дедлайны — свято.</strong> Не переносишь без предупреждения. Предупредил заранее — всегда можно решить.</li>
+    </ol>
+
+    <h2 class="nb mt24">🚫 Прощаемся, если</h2>
+
+    <div class="callout co-red">
+      <span class="callout-icon">❌</span>
+      <div class="callout-body">
+        <ul class="nb" style="margin:0">
+          <li>Несколько раз подряд не выполняется базовый минимум (3 продажи)</li>
+          <li>Переносишь дедлайны и не предупреждаешь</li>
+          <li>Недобросовестно относишься к отчётности</li>
+          <li>Теряешь тёплых клиентов из-за невнимательности</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout co-gray mt8">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">Это удалённая работа — но это не значит, что правил нет. Единственная разница с офисом: у нас высокостоящий продукт и мы работаем полностью удалённо.</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 06 -->
+    <h1 class="nb">🚀 Цель на лето 2025</h1>
+
+    <div class="col2 mt8">
+      <div class="col2-card" style="background:linear-gradient(135deg,rgba(59,130,246,.06),rgba(139,92,246,.06));border-color:rgba(59,130,246,.18)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3730a3;margin-bottom:10px">Цель агентства</div>
+        <div style="font-size:32px;font-weight:700;letter-spacing:-.03em;color:#1d4ed8">1 500 000 ₽</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">оборот за июнь–август</div>
+      </div>
+      <div class="col2-card" style="background:rgba(237,243,236,1);border-color:rgba(22,163,74,.2)">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#14532d;margin-bottom:10px">Нужно продаж</div>
+        <div style="font-size:32px;font-weight:700;letter-spacing:-.03em;color:#16a34a">10</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">воронок за 3 месяца</div>
+      </div>
+    </div>
+
+    <div class="mt16 mb8" style="font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase">Прогресс к цели</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Рассылки</span><span>0 / 15 000</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#3b82f6"></div></div>
+    </div>
+    <div class="progress-wrap mt8">
+      <div class="progress-label"><span>Продажи</span><span>0 / 10</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#16a34a"></div></div>
+    </div>
+
+    <div class="callout co-orange mt16">
+      <span class="callout-icon">🔑</span>
+      <div class="callout-body">
+        <strong>Ты — ключевое звено этой системы.</strong><br>
+        Без тебя нет рассылок. Без рассылок нет продаж. Без продаж нет агентства.<br>
+        Мы растём вместе — чем больше ты зарабатываешь, тем лучше агентству.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FAQ -->
+    <h1 class="nb">❓ Частые вопросы</h1>
+
+    <div class="toggle mt8">
+      <div class="toggle-header" onclick="tog(this)">
+        <div class="toggle-arrow open">▶</div>
+        <span>Нужен ли опыт в продажах или рассылках?</span>
+      </div>
+      <div class="toggle-body open">
+        <p class="nb" style="color:var(--muted)">Нет. Мы даём готовый скрипт и базу. Нужно уметь вести переписку вежливо и по инструкции. Всему остальному научим.</p>
+      </div>
+    </div>
+
+    <div class="toggle">
+      <div class="toggle-header" onclick="tog(this)">
+        <div class="toggle-arrow open">▶</div>
+        <span>Сколько реально занимает работа в день?</span>
+      </div>
+      <div class="toggle-body open">
+        <p class="nb" style="color:var(--muted)">50 рассылок — примерно 1–1.5 часа. Обработка входящих — зависит от активности базы, обычно ещё 30–60 мин. Итого 2–3 часа в спокойном режиме.</p>
+      </div>
+    </div>
+
+    <div class="toggle">
+      <div class="toggle-header" onclick="tog(this)">
+        <div class="toggle-arrow open">▶</div>
+        <span>Что такое воронка за 150 000 ₽?</span>
+      </div>
+      <div class="toggle-body open">
+        <p class="nb" style="color:var(--muted)">Агентство строит маркетинговые воронки продаж под ключ для бизнеса. Средний чек — от 150 000 ₽. Ты не продаёшь этот продукт — ты только доводишь заинтересованного до созвона с ОД.</p>
+      </div>
+    </div>
+
+    <div class="toggle">
+      <div class="toggle-header" onclick="tog(this)">
+        <div class="toggle-arrow open">▶</div>
+        <span>Когда и как платят?</span>
+      </div>
+      <div class="toggle-body open">
+        <p class="nb" style="color:var(--muted)">Детали обсуждаются на созвоне. Выплаты привязаны к KPI — количеству продаж, которые дошли до сделки.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CTA -->
+    <div class="callout co-blue" style="padding:24px 24px">
+      <span class="callout-icon" style="font-size:28px">✉️</span>
+      <div class="callout-body">
+        <div style="font-size:20px;font-weight:700;margin-bottom:8px">Готов попробовать?</div>
+        <p style="margin-bottom:14px">Напиши в Telegram: <strong>РАССЫЛКИ</strong> + пару слов о себе</p>
+        <div style="padding:10px 20px;background:#1d4ed8;color:#fff;border-radius:6px;display:inline-block;font-weight:600;font-size:15px;cursor:pointer">
+          → @Kirill_konstantinvich
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:48px;padding-top:24px;border-top:1px solid var(--border);font-size:12px;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span>Последнее изменение: июнь 2025</span>
+      <span>Агентство Кирилла Кузнецова · Воронки от 150 000 ₽</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function tog(header) {
+  var arrow = header.querySelector('.toggle-arrow');
+  var body = header.nextElementSibling;
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.classList.toggle('open', !isOpen);
+}
+</script>
+</body>
+</html>
