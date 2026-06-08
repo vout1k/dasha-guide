@@ -3,14 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Создать страницу в Notion</title>
+<title>Создать ТЗ в Notion</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,sans-serif;background:#f7f7f5;min-height:100vh;padding:20px;display:flex;align-items:flex-start;justify-content:center}
-.card{background:#fff;border-radius:16px;padding:28px;max-width:440px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.09);margin-top:20px}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f7f7f5;min-height:100vh;padding:20px;display:flex;align-items:flex-start;justify-content:center}
+.card{background:#fff;border-radius:16px;padding:28px;max-width:460px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.09);margin-top:20px}
 .logo{font-size:44px;text-align:center;margin-bottom:14px}
 h1{font-size:19px;font-weight:700;text-align:center;margin-bottom:6px;color:#37352f}
 .sub{font-size:13px;color:#999;text-align:center;margin-bottom:24px;line-height:1.5}
+label{font-size:13px;font-weight:600;color:#37352f;display:block;margin-bottom:6px}
+input{width:100%;padding:12px 14px;border:1.5px solid #e0e0e0;border-radius:10px;font-size:13px;font-family:monospace;color:#333;background:#fafafa;-webkit-appearance:none;outline:none;margin-bottom:16px}
+input:focus{border-color:#000;background:#fff}
+.hint{font-size:11px;color:#aaa;margin-top:-12px;margin-bottom:16px;line-height:1.5}
 .btn{width:100%;padding:15px;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;background:#000;transition:all .2s;-webkit-appearance:none}
 .btn:active{background:#333}
 .btn:disabled{background:#aaa;cursor:default}
@@ -24,14 +28,18 @@ a{color:#1565c0;font-weight:600}
 <body>
 <div class="card">
   <div class="logo">📲</div>
-  <h1>Создать страницу в Notion</h1>
-  <p class="sub">ТЗ для ассистента по рассылкам — все блоки, таблицы и оформление.</p>
+  <h1>Создать ТЗ в Notion</h1>
+  <p class="sub">Ассистент по рассылкам — все блоки, таблицы и оформление.</p>
+
+  <label>Notion Token</label>
+  <input type="text" id="token" placeholder="ntn_..." autocomplete="off" autocorrect="off" spellcheck="false">
+  <p class="hint">notion.so/my-integrations → скопируй Internal Integration Secret</p>
+
   <button class="btn" id="btn" onclick="go()">Создать страницу →</button>
   <div id="log"></div>
 </div>
 
 <script>
-var TOKEN  = "ВСТАВЬ_ТОКЕН";
 var PARENT = "377dded983ed8087b302d3419e9a00b8";
 
 function show(msg, cls) {
@@ -41,7 +49,6 @@ function show(msg, cls) {
   el.innerHTML = msg;
 }
 
-/* ── block helpers ── */
 function tx(c,bold){var r={type:"text",text:{content:c}};if(bold)r.annotations={bold:true};return r;}
 function bx(c){return tx(c,true);}
 function para(p,col){return{object:"block",type:"paragraph",paragraph:{rich_text:p,color:col||"default"}};}
@@ -110,27 +117,32 @@ function blocks(){return[
 ];}
 
 async function go() {
+  var token = document.getElementById('token').value.trim();
+  if (!token || token === 'ntn_...') {
+    show('❌ Вставь токен из Notion (notion.so/my-integrations)', 'err');
+    return;
+  }
+
   var btn = document.getElementById('btn');
   btn.disabled = true;
   btn.textContent = '⏳ Создаём...';
 
+  show('⏳ Подключаемся к Notion...', 'info');
+
   var payload = JSON.stringify({
     parent: {type:"page_id", page_id:PARENT},
     icon: {type:"emoji", emoji:"📲"},
-    properties: {title:{title:[{type:"text",text:{content:"Ассистент по рассылкам"}}]}},
+    properties: {title:{title:[{type:"text",text:{content:"Ассистент по рассылкам — ТЗ"}}]}},
     children: blocks()
   });
 
   var headers = {
-    "Authorization": "Bearer " + TOKEN,
+    "Authorization": "Bearer " + token,
     "Notion-Version": "2022-06-28",
     "Content-Type": "application/json"
   };
 
-  /* Try corsproxy.io — passes headers through as-is */
   var proxyUrl = "https://corsproxy.io/?https://api.notion.com/v1/pages";
-
-  show('⏳ Подключаемся к Notion...', 'info');
 
   try {
     var resp = await fetch(proxyUrl, {method:"POST", headers:headers, body:payload});
@@ -138,19 +150,22 @@ async function go() {
 
     var data;
     try { data = JSON.parse(raw); }
-    catch(e) { show('❌ Ответ не является JSON:<br>' + raw.slice(0,300), 'err'); btn.disabled=false; btn.textContent='Попробовать снова'; return; }
+    catch(e) {
+      show('❌ Ответ прокси не JSON:<br><small>' + raw.slice(0,400) + '</small>', 'err');
+      btn.disabled=false; btn.textContent='Попробовать снова'; return;
+    }
 
     if (data.id) {
       var url = "https://www.notion.so/" + data.id.replace(/-/g,"");
-      show('✅ Страница создана!<br><br><a href="' + url + '" target="_blank">👉 Открыть в Notion</a>', 'ok');
+      show('✅ Страница создана!<br><br><a href="' + url + '" target="_blank">👉 Открыть страницу в Notion</a>', 'ok');
       btn.textContent = '✅ Готово!';
     } else {
-      show('❌ Ошибка Notion: ' + (data.message || raw.slice(0,300)), 'err');
+      show('❌ Notion: ' + (data.message || JSON.stringify(data).slice(0,300)), 'err');
       btn.disabled = false;
       btn.textContent = 'Попробовать снова';
     }
   } catch(e) {
-    show('❌ Сеть: ' + e.message + '<br><br>Открой файл в Safari (не через Telegram).', 'err');
+    show('❌ Сеть: ' + e.message, 'err');
     btn.disabled = false;
     btn.textContent = 'Попробовать снова';
   }
