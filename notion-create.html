@@ -6,159 +6,174 @@
 <title>Создать страницу в Notion</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,sans-serif;background:#f7f7f5;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-.card{background:#fff;border-radius:16px;padding:32px;max-width:400px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.08)}
-.logo{font-size:40px;text-align:center;margin-bottom:16px}
-h1{font-size:20px;font-weight:700;text-align:center;margin-bottom:8px;color:#37352f}
-p{font-size:14px;color:#888;text-align:center;margin-bottom:28px;line-height:1.5}
-.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;color:#fff;background:#000}
-.btn:hover{background:#333;transform:translateY(-1px)}
-.btn:disabled{background:#ccc;cursor:not-allowed;transform:none}
-.result{margin-top:20px;padding:16px;border-radius:10px;font-size:14px;line-height:1.6;display:none}
-.result.ok{background:#e8f5e9;color:#1b5e20}
-.result.err{background:#fce4ec;color:#880e4f}
-.result a{color:#1565c0;word-break:break-all}
-.spinner{display:none;text-align:center;margin-top:16px;font-size:13px;color:#888}
+body{font-family:-apple-system,sans-serif;background:#f7f7f5;min-height:100vh;padding:20px;display:flex;align-items:flex-start;justify-content:center}
+.card{background:#fff;border-radius:16px;padding:28px;max-width:420px;width:100%;box-shadow:0 4px 24px rgba(0,0,0,.09);margin-top:20px}
+.logo{font-size:44px;text-align:center;margin-bottom:14px}
+h1{font-size:19px;font-weight:700;text-align:center;margin-bottom:6px;color:#37352f}
+.sub{font-size:13px;color:#999;text-align:center;margin-bottom:24px;line-height:1.5}
+.btn{width:100%;padding:15px;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;background:#000;transition:all .2s}
+.btn:active{background:#333;transform:scale(.98)}
+.btn:disabled{background:#aaa;cursor:not-allowed;transform:none}
+#log{margin-top:18px;font-size:13px;line-height:1.8;display:none;border-radius:10px;padding:16px}
+.ok{background:#e8f5e9;color:#1b5e20}
+.err{background:#fce4ec;color:#880e4f}
+.info{background:#e3f2fd;color:#0d47a1}
+a{color:#1565c0;word-break:break-all}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">📲</div>
   <h1>Создать страницу в Notion</h1>
-  <p>Нажми кнопку — скрипт создаст полное ТЗ для ассистента по рассылкам прямо в твоём Notion</p>
-  <button class="btn" onclick="createPage()">Создать страницу →</button>
-  <div class="spinner" id="spin">⏳ Создаём страницу...</div>
-  <div class="result" id="result"></div>
+  <p class="sub">Нажми кнопку. Создаётся ТЗ для ассистента по рассылкам прямо в твоём Notion-пространстве.</p>
+  <button class="btn" id="btn" onclick="go()">Создать страницу →</button>
+  <div id="log"></div>
 </div>
 
 <script>
-const TOKEN = "ВСТАВЬ_ТОКЕН";       // notion.so/my-integrations
-const PARENT_ID = "ВСТАВЬ_ID_СТРАНИЦЫ"; // из URL страницы Notion
+var TOKEN = "ВСТАВЬ_ТОКЕН";
+var PARENT = "377dded983ed8087b302d3419e9a00b8";
 
-function t(content, bold, color) {
-  var rt = {type:"text",text:{content:content}};
-  var ann = {};
-  if(bold) ann.bold = true;
-  if(color) ann.color = color;
-  if(Object.keys(ann).length) rt.annotations = ann;
-  return rt;
+function log(msg, cls) {
+  var el = document.getElementById('log');
+  el.style.display = 'block';
+  el.className = cls || 'info';
+  el.innerHTML = msg;
 }
-function b(c){return t(c,true)}
-function para(parts,color){return{object:"block",type:"paragraph",paragraph:{rich_text:parts,color:color||"default"}}}
-function h2(parts){return{object:"block",type:"heading_2",heading_2:{rich_text:parts,is_toggleable:false}}}
-function h3(parts){return{object:"block",type:"heading_3",heading_3:{rich_text:parts,is_toggleable:false}}}
-function div(){return{object:"block",type:"divider",divider:{}}}
-function bul(parts){return{object:"block",type:"bulleted_list_item",bulleted_list_item:{rich_text:parts}}}
-function num(parts){return{object:"block",type:"numbered_list_item",numbered_list_item:{rich_text:parts}}}
-function callout(emoji,color,parts){return{object:"block",type:"callout",callout:{rich_text:parts,icon:{type:"emoji",emoji:emoji},color:color+"_background"}}}
-function quote(parts){return{object:"block",type:"quote",quote:{rich_text:parts}}}
-function row(cells){return{object:"block",type:"table_row",table_row:{cells:cells.map(function(c){return[t(c)]})}}}
-function table(rows,hasHeader){return{object:"block",type:"table",table:{table_width:rows[0].length,has_column_header:hasHeader!==false,has_row_header:false},children:rows.map(function(r){return row(r)})}}
 
-var blocks = [
-  callout("💡","blue",[b("Коротко о позиции. "),t("Ты — первая точка контакта клиента с агентством. Пишешь людям в Telegram, прогреваешь и передаёшь заинтересованных на созвон. От твоей работы зависит оборот агентства в "),b("1 500 000 ₽ за лето"),t(".")]),
-  div(),
-  h2([b("🏷️ Общая информация")]),
-  table([["Параметр","Значение"],["📍 Формат","Удалённо, 2–3 часа в день"],["💰 Зарплата","20 000 – 110 000 ₽ / месяц"],["⚡ Тип задач","Telegram-рассылки, прогрев лидов"],["📅 Старт","Как можно скорее · июнь 2025"],["✉️ Контакт","@Kirill_konstantinvich"]]),
-  div(),
-  h2([b("📋 Задача")]),
-  para([t("Ты — первая точка контакта. Пишешь первым, прогреваешь, передаёшь тёплых лидов на созвон с операционным директором.")]),
-  bul([b("📲 50 ручных рассылок "),t("в Telegram по выданной базе — строго по согласованному скрипту")]),
-  bul([b("🔥 Прогрев входящих "),t("— выявляешь боль, задаёшь вопросы, доводишь до записи на созвон")]),
-  bul([b("🎯 Передача лидов "),t("— готового клиента передаёшь ОД. Продажа воронки за 150к+ — уже не твоя задача")]),
-  bul([b("💎 Не сливаешь ни одного ответа "),t("— каждый ответ потенциально 150 000 ₽, всё фиксируется")]),
-  bul([b("📊 Отчёт каждый вечер "),t("— сам, без напоминаний: отправлено / ответили / заинтересовались / на созвон")]),
-  quote([t("«Ты не просто рассыльщик. Ты первая точка контакта клиента с агентством. От тебя зависит, выйдем ли мы на 1 млн за лето или нет.»")]),
-  para([t("— Кирилл Кузнецов, основатель агентства")],"gray"),
-  div(),
-  h2([b("⚙️ Как это работает")]),
-  para([t("Три шага — каждый день, без выходных.")]),
-  num([b("Рассылки. "),t("50 сообщений по базе ежедневно. Скрипт выдаётся и согласовывается с ОД. Самодеятельность — не приветствуется.")]),
-  num([b("Обработка входящих. "),t("Все ответы — в течение 1–2 часов. Прогрев, вопросы, довести до созвона. Тёплый лид передаёшь ОД.")]),
-  num([b("Отчёт каждый вечер. "),t("Отправлено / ответили / заинтересовались / на созвон. Сам, без напоминаний.")]),
-  callout("🕐","gray",[b("Твой день: "),t("утром рассылки (~1.5 ч), днём входящие (~1 ч), вечером отчёт (5–10 мин). Всё остальное время — свободен.")]),
-  div(),
-  h2([b("🎯 KPI и конверсия")]),
-  table([["Уровень","Продажи / мес","Зарплата"],["🟡 Минимум","3 продажи","20–30 000 ₽"],["🟢 План","5 продаж","30 000 ₽ + 20 000 ₽ / доп. продажа"],["🔥 Бог-продажник","6+ продаж","110 000+ ₽"]]),
-  h3([b("Математика конверсии")]),
-  table([["Рассылок","Ответили ~8%","Созвоны","Продажи"],["1 000","~80","~16","1 продажа"],["3 000","~240","~48","3 продажи"],["5 000","~400","~80","5 продаж ✓"]]),
-  callout("📊","yellow",[b("Вывод: "),t("50 рассылок × 100 дней = 5 000 рассылок = ~5 продаж в месяц. Объём = деньги.")]),
-  div(),
-  h2([b("💰 Зарплата — подробно")]),
-  para([t("Никаких серых схем. Считается прозрачно.")]),
-  table([["Уровень","Продажи / мес","Оклад","Бонус","Итого"],["🟡 Минимум","3","20–30 000 ₽","—","20–30 000 ₽"],["🟢 План","5","30 000 ₽","+20 000 ₽ / продажа сверх 3","70 000 ₽"],["🔥 Бог","6+","30 000 ₽","Повышенная ставка","110 000+ ₽"]]),
-  h3([b("Пример расчёта — 7 продаж за месяц")]),
-  table([["Статья","Сумма"],["Базовый оклад (3 продажи)","30 000 ₽"],["4 доп. продажи × 20 000 ₽","80 000 ₽"],["Итого за месяц","110 000 ₽"]]),
-  div(),
-  h2([b("📏 Правила работы")]),
-  num([b("Отчёт каждый день "),t("— сам, в конце дня, без напоминаний")]),
-  num([b("Скорость ответа "),t("— все входящие в течение 1–2 часов")]),
-  num([b("Проблемы — сразу "),t("— блок, нет базы, не получается → пишешь ОД немедленно")]),
-  num([b("Скрипт согласован "),t("— самодеятельность в переписке с клиентами не приветствуется")]),
-  num([b("Дедлайны — свято "),t("— не переносишь без предупреждения")]),
-  h3([b("❌ Прощаемся, если")]),
-  callout("🚫","red",[t("• Несколько раз подряд не выполняется базовый минимум (3 продажи)\n• Переносишь дедлайны и не предупреждаешь\n• Недобросовестно относишься к отчётности\n• Теряешь тёплых клиентов из-за невнимательности")]),
-  callout("⚠️","gray",[t("Это удалённая работа — но это не значит, что правил нет. Единственная разница с офисом: у нас высокостоящий продукт и мы работаем полностью удалённо.")]),
-  div(),
-  h2([b("🚀 Цель на лето 2025")]),
-  table([["Метрика","Цель"],["Оборот агентства","1 500 000 ₽ за июнь–август"],["Продаж","10 воронок за 3 месяца"],["Рассылок","~15 000 за лето"]]),
-  callout("🔑","orange",[b("Ты — ключевое звено этой системы. "),t("Без тебя нет рассылок → нет продаж → нет агентства. Мы растём вместе.")]),
-  div(),
-  h2([b("✉️ Как откликнуться")]),
-  callout("✉️","blue",[b("Напиши в Telegram: РАССЫЛКИ + пару слов о себе\n\n"),t("→ @Kirill_konstantinvich")]),
-  para([t("Агентство Кирилла Кузнецова · Воронки продаж от 150 000 ₽ · Удалённо")],"gray")
-];
+function t(c,bold,color){var r={type:"text",text:{content:c}};var a={};if(bold)a.bold=true;if(color)a.color=color;if(Object.keys(a).length)r.annotations=a;return r;}
+function b(c){return t(c,true);}
+function para(p,color){return{object:"block",type:"paragraph",paragraph:{rich_text:p,color:color||"default"}};}
+function h2(p){return{object:"block",type:"heading_2",heading_2:{rich_text:p,is_toggleable:false}};}
+function h3(p){return{object:"block",type:"heading_3",heading_3:{rich_text:p,is_toggleable:false}};}
+function dv(){return{object:"block",type:"divider",divider:{}};}
+function bul(p){return{object:"block",type:"bulleted_list_item",bulleted_list_item:{rich_text:p}};}
+function num(p){return{object:"block",type:"numbered_list_item",numbered_list_item:{rich_text:p}};}
+function co(emoji,color,p){return{object:"block",type:"callout",callout:{rich_text:p,icon:{type:"emoji",emoji:emoji},color:color+"_background"}};}
+function qt(p){return{object:"block",type:"quote",quote:{rich_text:p}};}
+function row(cells){return{object:"block",type:"table_row",table_row:{cells:cells.map(function(c){return[t(c)];})}};}
+function tbl(rows,hdr){return{object:"block",type:"table",table:{table_width:rows[0].length,has_column_header:hdr!==false,has_row_header:false},children:rows.map(function(r){return row(r);})};}
 
-async function createPage() {
-  var btn = document.querySelector('.btn');
-  var spin = document.getElementById('spin');
-  var res = document.getElementById('result');
+function buildBlocks(){
+  return [
+    co("💡","blue",[b("Коротко о позиции. "),t("Ты — первая точка контакта клиента с агентством. Пишешь людям в Telegram, прогреваешь и передаёшь заинтересованных на созвон. От твоей работы зависит оборот агентства в "),b("1 500 000 ₽ за лето"),t(".")]),
+    dv(),
+    h2([b("🏷️ Общая информация")]),
+    tbl([["Параметр","Значение"],["📍 Формат","Удалённо, 2–3 часа в день"],["💰 Зарплата","20 000 – 110 000 ₽ / месяц"],["⚡ Тип задач","Telegram-рассылки, прогрев лидов"],["📅 Старт","Как можно скорее · июнь 2025"],["✉️ Контакт","@Kirill_konstantinvich"]]),
+    dv(),
+    h2([b("📋 Задача")]),
+    para([t("Ты — первая точка контакта. Пишешь первым, прогреваешь, передаёшь тёплых лидов на созвон с операционным директором.")]),
+    bul([b("📲 50 ручных рассылок "),t("в Telegram по выданной базе — строго по согласованному скрипту")]),
+    bul([b("🔥 Прогрев входящих "),t("— выявляешь боль, задаёшь вопросы, доводишь до записи на созвон")]),
+    bul([b("🎯 Передача лидов "),t("— готового клиента передаёшь ОД. Продажа воронки за 150к+ — уже не твоя задача")]),
+    bul([b("💎 Не сливаешь ни одного ответа "),t("— каждый ответ потенциально 150 000 ₽, всё фиксируется")]),
+    bul([b("📊 Отчёт каждый вечер "),t("— сам, без напоминаний: отправлено / ответили / заинтересовались / на созвон")]),
+    qt([t("«Ты не просто рассыльщик. Ты первая точка контакта клиента с агентством. От тебя зависит, выйдем ли мы на 1 млн за лето или нет.»")]),
+    para([t("— Кирилл Кузнецов, основатель агентства")],"gray"),
+    dv(),
+    h2([b("⚙️ Как это работает")]),
+    para([t("Три шага — каждый день, без выходных.")]),
+    num([b("Рассылки. "),t("50 сообщений по базе ежедневно. Скрипт выдаётся и согласовывается с ОД. Самодеятельность — не приветствуется.")]),
+    num([b("Обработка входящих. "),t("Все ответы — в течение 1–2 часов. Прогрев, вопросы, довести до созвона. Тёплый лид передаёшь ОД.")]),
+    num([b("Отчёт каждый вечер. "),t("Отправлено / ответили / заинтересовались / на созвон. Сам, без напоминаний.")]),
+    co("🕐","gray",[b("Твой день: "),t("утром рассылки (~1.5 ч), днём входящие (~1 ч), вечером отчёт (5–10 мин). Всё остальное время — свободен.")]),
+    dv(),
+    h2([b("🎯 KPI и конверсия")]),
+    tbl([["Уровень","Продажи / мес","Зарплата"],["🟡 Минимум","3 продажи","20–30 000 ₽"],["🟢 План","5 продаж","30 000 ₽ + 20 000 ₽ / доп. продажа"],["🔥 Бог-продажник","6+ продаж","110 000+ ₽"]]),
+    h3([b("Математика конверсии")]),
+    tbl([["Рассылок","Ответили ~8%","Созвоны","Продажи"],["1 000","~80","~16","1 продажа"],["3 000","~240","~48","3 продажи"],["5 000","~400","~80","5 продаж ✓"]]),
+    co("📊","yellow",[b("Вывод: "),t("50 рассылок × 100 дней = 5 000 рассылок = ~5 продаж в месяц. Объём = деньги.")]),
+    dv(),
+    h2([b("💰 Зарплата — подробно")]),
+    para([t("Никаких серых схем. Считается прозрачно.")]),
+    tbl([["Уровень","Продажи / мес","Оклад","Бонус","Итого"],["🟡 Минимум","3","20–30 000 ₽","—","20–30 000 ₽"],["🟢 План","5","30 000 ₽","+20 000 ₽ / продажа сверх 3","70 000 ₽"],["🔥 Бог","6+","30 000 ₽","Повышенная ставка","110 000+ ₽"]]),
+    h3([b("Пример расчёта — 7 продаж за месяц")]),
+    tbl([["Статья","Сумма"],["Базовый оклад (3 продажи)","30 000 ₽"],["4 доп. продажи × 20 000 ₽","80 000 ₽"],["Итого за месяц","110 000 ₽"]]),
+    dv(),
+    h2([b("📏 Правила работы")]),
+    num([b("Отчёт каждый день "),t("— сам, в конце дня, без напоминаний")]),
+    num([b("Скорость ответа "),t("— все входящие в течение 1–2 часов")]),
+    num([b("Проблемы — сразу "),t("— блок, нет базы, не получается → пишешь ОД немедленно")]),
+    num([b("Скрипт согласован "),t("— самодеятельность в переписке с клиентами не приветствуется")]),
+    num([b("Дедлайны — свято "),t("— не переносишь без предупреждения")]),
+    h3([b("❌ Прощаемся, если")]),
+    co("🚫","red",[t("• Несколько раз подряд не выполняется базовый минимум (3 продажи)\n• Переносишь дедлайны и не предупреждаешь\n• Недобросовестно относишься к отчётности\n• Теряешь тёплых клиентов из-за невнимательности")]),
+    co("⚠️","gray",[t("Это удалённая работа — но правил нет. Единственная разница с офисом: высокостоящий продукт, полностью удалённо.")]),
+    dv(),
+    h2([b("🚀 Цель на лето 2025")]),
+    tbl([["Метрика","Цель"],["Оборот агентства","1 500 000 ₽ за июнь–август"],["Продаж","10 воронок за 3 месяца"],["Рассылок","~15 000 за лето"]]),
+    co("🔑","orange",[b("Ты — ключевое звено этой системы. "),t("Без тебя нет рассылок → нет продаж → нет агентства.")]),
+    dv(),
+    h2([b("✉️ Как откликнуться")]),
+    co("✉️","blue",[b("Напиши в Telegram: РАССЫЛКИ + пару слов о себе\n\n"),t("→ @Kirill_konstantinvich")]),
+    para([t("Агентство Кирилла Кузнецова · Воронки продаж от 150 000 ₽ · Удалённо")],"gray")
+  ];
+}
 
+async function tryFetch(url, opts) {
+  var proxies = [
+    "https://corsproxy.io/?",
+    "https://api.allorigins.win/post?url="
+  ];
+
+  // Try direct first
+  try {
+    var r = await fetch(url, opts);
+    var d = await r.json();
+    if (d.id) return d;
+  } catch(e) {}
+
+  // Try proxies
+  for (var i = 0; i < proxies.length; i++) {
+    try {
+      var proxyUrl = proxies[i] + encodeURIComponent(url);
+      var r2 = await fetch(proxyUrl, opts);
+      var text = await r2.text();
+      var d2;
+      try { d2 = JSON.parse(text); } catch(e) {
+        // allorigins wraps response
+        var wrapped = JSON.parse(text);
+        d2 = JSON.parse(wrapped.contents);
+      }
+      if (d2.id) return d2;
+    } catch(e) { continue; }
+  }
+  throw new Error("Все методы не сработали. Проверь подключение интеграции к странице.");
+}
+
+async function go() {
+  var btn = document.getElementById('btn');
   btn.disabled = true;
-  btn.textContent = 'Создаём...';
-  spin.style.display = 'block';
-  res.style.display = 'none';
+  btn.textContent = '⏳ Создаём...';
+  log('⏳ Отправляем запрос в Notion...', 'info');
 
   var payload = {
-    parent: {type:"page_id", page_id:PARENT_ID},
+    parent: {type:"page_id", page_id:PARENT},
     icon: {type:"emoji", emoji:"📲"},
     properties: {title:{title:[{type:"text",text:{content:"Ассистент по рассылкам"}}]}},
-    children: blocks
+    children: buildBlocks()
+  };
+
+  var opts = {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + TOKEN,
+      "Notion-Version": "2022-06-28",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
   };
 
   try {
-    var resp = await fetch("https://api.notion.com/v1/pages", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + TOKEN,
-        "Notion-Version": "2022-06-28",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    var data = await resp.json();
-    spin.style.display = 'none';
-
-    if(data.url || data.id) {
-      var url = data.url || ("https://www.notion.so/" + data.id.replace(/-/g,""));
-      res.className = 'result ok';
-      res.innerHTML = '✅ Страница создана!<br><br><a href="' + url + '" target="_blank">' + url + '</a>';
-      btn.textContent = '✅ Готово!';
-    } else {
-      res.className = 'result err';
-      res.innerHTML = '❌ Ошибка: ' + (data.message || JSON.stringify(data));
-      btn.textContent = 'Попробовать снова';
-      btn.disabled = false;
-    }
-    res.style.display = 'block';
+    var data = await tryFetch("https://api.notion.com/v1/pages", opts);
+    var pageId = data.id.replace(/-/g,"");
+    var url = "https://www.notion.so/" + pageId;
+    log('✅ Страница создана!<br><br><a href="' + url + '" target="_blank">👉 Открыть в Notion</a>', 'ok');
+    btn.textContent = '✅ Готово';
   } catch(e) {
-    spin.style.display = 'none';
-    res.className = 'result err';
-    res.innerHTML = '❌ ' + e.message + '<br><br>Возможно, браузер блокирует запрос (CORS). Попробуй открыть в Safari или Chrome, а не в Telegram.';
-    res.style.display = 'block';
-    btn.textContent = 'Попробовать снова';
+    log('❌ Ошибка: ' + e.message + '<br><br>Убедись, что интеграция подключена к странице в Notion:<br>открой страницу → ⋯ → Add connections', 'err');
     btn.disabled = false;
+    btn.textContent = 'Попробовать снова';
   }
 }
 </script>
