@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ТЗ: Ассистент по рассылкам — Агентство Кирилла Кузнецова</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080810;
+    --card: #0f0f1a;
+    --card2: #141421;
+    --border: rgba(255,255,255,0.07);
+    --purple: #7c5cfc;
+    --purple2: #a78bfa;
+    --green: #10b981;
+    --green2: #34d399;
+    --yellow: #f59e0b;
+    --yellow2: #fcd34d;
+    --red: #ef4444;
+    --orange: #f97316;
+    --text: #f1f0ff;
+    --muted: rgba(241,240,255,0.5);
+    --r: 16px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(124,92,252,0.35), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(16,185,129,0.12), transparent);
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124,92,252,0.15);
+    border: 1px solid rgba(124,92,252,0.35);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 13px;
+    color: var(--purple2);
+    font-weight: 600;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .hero-badge .dot {
+    width: 7px; height: 7px;
+    background: var(--green2);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+  .hero h1 {
+    font-size: clamp(32px, 7vw, 64px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, #fff 20%, var(--purple2) 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: clamp(15px, 3vw, 19px);
+    color: var(--muted);
+    max-width: 560px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .hero-quote {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-left: 3px solid var(--purple);
+    border-radius: 0 var(--r) var(--r) 0;
+    padding: 18px 24px;
+    max-width: 540px;
+    font-size: 15px;
+    color: rgba(241,240,255,0.75);
+    font-style: italic;
+    text-align: left;
+    position: relative;
+  }
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    animation: bounce 2s infinite;
+  }
+  .scroll-hint::after {
+    content: '↓';
+    font-size: 18px;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+  }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 80px 24px; max-width: 720px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--purple2);
+    margin-bottom: 10px;
+  }
+  .section-title {
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 800;
+    margin-bottom: 32px;
+    line-height: 1.2;
+  }
+
+  /* ─── ЗАДАЧА ─── */
+  .task-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 18px 20px;
+  }
+  .task-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .task-text { font-size: 15px; }
+  .task-text strong { color: var(--text); display: block; font-size: 16px; margin-bottom: 2px; }
+  .task-text span { color: var(--muted); font-size: 14px; }
+
+  /* ─── KPI ─── */
+  .kpi-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px; }
+  .kpi-card {
+    border-radius: var(--r);
+    padding: 22px 24px;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+  }
+  .kpi-min { border-left: 3px solid var(--yellow); }
+  .kpi-min::before { background: var(--yellow); }
+  .kpi-plan { border-left: 3px solid var(--green); }
+  .kpi-plan::before { background: var(--green); }
+  .kpi-fire { border-left: 3px solid var(--orange); }
+  .kpi-fire::before { background: var(--orange); }
+  .kpi-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .kpi-emoji { font-size: 22px; }
+  .kpi-title { font-size: 17px; font-weight: 700; }
+  .kpi-min .kpi-title { color: var(--yellow2); }
+  .kpi-plan .kpi-title { color: var(--green2); }
+  .kpi-fire .kpi-title { color: var(--orange); }
+  .kpi-desc { color: var(--muted); font-size: 14px; }
+
+  .kpi-table {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .kpi-table-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .kpi-table-row:last-child { border-bottom: none; }
+  .kpi-sales { font-size: 15px; font-weight: 700; }
+  .kpi-result { font-size: 14px; color: var(--muted); text-align: right; }
+  .kpi-table-row:nth-child(1) .kpi-sales { color: var(--yellow2); }
+  .kpi-table-row:nth-child(2) .kpi-sales { color: var(--green2); }
+  .kpi-table-row:nth-child(3) .kpi-sales { color: var(--orange); }
+
+  /* ─── ОБЪЁМ / МАТЕМАТИКА ─── */
+  .math-big {
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 32px 24px;
+    margin-bottom: 20px;
+  }
+  .math-number {
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--purple2);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .math-label { color: var(--muted); font-size: 15px; }
+
+  .math-rows { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .math-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 14px;
+    gap: 12px;
+  }
+  .math-row-left { color: var(--muted); }
+  .math-row-right { font-weight: 700; white-space: nowrap; }
+  .math-row:nth-child(1) .math-row-right { color: var(--purple2); }
+  .math-row:nth-child(2) .math-row-right { color: var(--yellow2); }
+  .math-row:nth-child(3) .math-row-right { color: var(--green2); }
+
+  /* ─── ОБЯЗАННОСТИ ─── */
+  .duty-blocks { display: flex; flex-direction: column; gap: 20px; }
+  .duty-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .duty-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--card2);
+    border-bottom: 1px solid var(--border);
+  }
+  .duty-num {
+    width: 28px; height: 28px;
+    background: rgba(124,92,252,0.2);
+    border: 1px solid rgba(124,92,252,0.35);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: var(--purple2);
+    flex-shrink: 0;
+  }
+  .duty-title { font-size: 16px; font-weight: 700; }
+  .duty-items { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; }
+  .duty-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .duty-item::before {
+    content: '→';
+    color: var(--purple2);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .duty-note {
+    margin: 0 20px 16px;
+    background: rgba(124,92,252,0.08);
+    border: 1px solid rgba(124,92,252,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: rgba(241,240,255,0.7);
+    font-style: italic;
+  }
+
+  /* ─── ЗАРПЛАТА ─── */
+  .salary-cards { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+  .salary-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 22px 24px;
+  }
+  .salary-card h4 { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--purple2); margin-bottom: 8px; }
+  .salary-card p { font-size: 15px; color: var(--muted); }
+  .salary-card strong { color: var(--text); font-size: 20px; }
+
+  .salary-example {
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: var(--r);
+    padding: 20px 24px;
+  }
+  .salary-example .ex-label { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green2); margin-bottom: 10px; }
+  .salary-example .ex-text { font-size: 15px; color: var(--muted); line-height: 1.8; }
+  .salary-example .ex-total { font-size: 24px; font-weight: 800; color: var(--green2); margin-top: 8px; }
+
+  /* ─── ПРАВИЛА ─── */
+  .rules-must { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+  }
+  .rule-num {
+    width: 24px; height: 24px;
+    background: rgba(124,92,252,0.2);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800; color: var(--purple2);
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  .fire-list { display: flex; flex-direction: column; gap: 10px; }
+  .fire-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: rgba(239,68,68,0.07);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 14px;
+    color: rgba(241,240,255,0.75);
+  }
+  .fire-item::before { content: '✗'; color: var(--red); font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+
+  /* ─── CTA ─── */
+  .cta-section {
+    padding: 80px 24px 100px;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .cta-section h2 {
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 900;
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+  .cta-section p { color: var(--muted); font-size: 16px; margin-bottom: 36px; }
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--purple), #9b5cf6);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    padding: 18px 40px;
+    border-radius: 100px;
+    text-decoration: none;
+    box-shadow: 0 8px 32px rgba(124,92,252,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,92,252,0.5); }
+
+  /* ─── DIVIDER ─── */
+  .divider { height: 1px; background: var(--border); max-width: 720px; margin: 0 auto; }
+
+  /* ─── REMOTE NOTE ─── */
+  .remote-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: rgba(239,68,68,0.07);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: var(--r);
+    padding: 18px 20px;
+    margin-top: 20px;
+    font-size: 14px;
+    color: rgba(241,240,255,0.75);
+  }
+  .remote-icon { font-size: 20px; flex-shrink: 0; }
+
+  /* ─── SUMMER GOAL ─── */
+  .summer-goal {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(135deg, rgba(124,92,252,0.15), rgba(16,185,129,0.1));
+    border: 1px solid rgba(124,92,252,0.3);
+    border-radius: var(--r);
+    padding: 28px 28px;
+  }
+  .summer-icon { font-size: 40px; flex-shrink: 0; }
+  .summer-title { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--purple2); margin-bottom: 6px; }
+  .summer-desc { font-size: 16px; color: rgba(241,240,255,0.8); line-height: 1.6; }
+  .summer-desc strong { color: var(--text); }
+
+  /* ─── UTILS ─── */
+  .tag {
+    display: inline-block;
+    background: rgba(124,92,252,0.15);
+    border: 1px solid rgba(124,92,252,0.3);
+    color: var(--purple2);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Агентство Кирилла Кузнецова · Воронки от 150 000 ₽
+  </div>
+  <h1>📬 <span>Ассистент<br>по рассылкам</span></h1>
+  <p class="hero-sub">
+    Ручные рассылки в Telegram → заинтересованные клиенты → созвон → продажа воронки
+  </p>
+  <div class="hero-quote">
+    "Ты не просто рассыльщик. Ты первая точка контакта клиента с агентством. От тебя зависит, выйдем ли мы на 1 млн за лето или нет."
+  </div>
+  <div class="scroll-hint">листай вниз</div>
+</div>
+
+<!-- ═══ ЗАДАЧА ═══ -->
+<section>
+  <div class="section-label">01 — Задача</div>
+  <div class="section-title">Что ты делаешь</div>
+
+  <div class="task-list">
+    <div class="task-item">
+      <div class="task-icon">📲</div>
+      <div class="task-text">
+        <strong>Пишешь людям</strong>
+        <span>Ручные рассылки потенциальным клиентам в Telegram по выданной базе и скрипту</span>
+      </div>
+    </div>
+    <div class="task-item">
+      <div class="task-icon">🔥</div>
+      <div class="task-text">
+        <strong>Прогреваешь заинтересованных</strong>
+        <span>Выявляешь боль, задаёшь вопросы, доводишь до записи на созвон</span>
+      </div>
+    </div>
+    <div class="task-item">
+      <div class="task-icon">🎯</div>
+      <div class="task-text">
+        <strong>Передаёшь готового клиента</strong>
+        <span>Дальше переговоры ведёт операционный директор — твоя задача довести до созвона</span>
+      </div>
+    </div>
+    <div class="task-item">
+      <div class="task-icon">💰</div>
+      <div class="task-text">
+        <strong>Не сливаешь контакты</strong>
+        <span>Воронка стоит от 150 000 ₽ — каждый ответ на вес золота</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ ОБЪЁМ ═══ -->
+<section>
+  <div class="section-label">02 — Объём работы</div>
+  <div class="section-title">Цифры которые важны</div>
+
+  <div class="math-big">
+    <div class="math-number">50</div>
+    <div class="math-label">рассылок в день · ~2–3 часа работы</div>
+  </div>
+
+  <p style="color:var(--muted); font-size:14px; margin-bottom:6px;">Конверсия: <strong style="color:var(--text)">~1 продажа из 1 000 рассылок</strong> — поэтому объём критически важен.</p>
+
+  <div class="math-rows">
+    <div class="math-row">
+      <span class="math-row-left">1 000 рассылок / мес</span>
+      <span class="math-row-right">= 1 продажа</span>
+    </div>
+    <div class="math-row">
+      <span class="math-row-left">3 000 рассылок / мес</span>
+      <span class="math-row-right">= 3 продажи (минимум)</span>
+    </div>
+    <div class="math-row">
+      <span class="math-row-left">5 000 рассылок / мес</span>
+      <span class="math-row-right">= 5 продаж (план)</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ KPI ═══ -->
+<section>
+  <div class="section-label">03 — KPI</div>
+  <div class="section-title">План и результат</div>
+
+  <div class="kpi-cards">
+    <div class="kpi-card kpi-min">
+      <div class="kpi-head">
+        <span class="kpi-emoji">🟡</span>
+        <span class="kpi-title">3 продажи — базовый минимум</span>
+      </div>
+      <div class="kpi-desc">Нижняя планка. Только пришёл, входишь в ритм. Выполнил — стабильные 20 000 ₽ в кармане.</div>
+    </div>
+    <div class="kpi-card kpi-plan">
+      <div class="kpi-head">
+        <span class="kpi-emoji">🟢</span>
+        <span class="kpi-title">5 продаж — обычный план</span>
+      </div>
+      <div class="kpi-desc">Выполнил план — получаешь премию. Каждая продажа сверх минимума = +20 000 ₽ дополнительно.</div>
+    </div>
+    <div class="kpi-card kpi-fire">
+      <div class="kpi-head">
+        <span class="kpi-emoji">🔥</span>
+        <span class="kpi-title">6+ продаж — ты бог-продажник</span>
+      </div>
+      <div class="kpi-desc">Повышенная премия и уважение всей команды. К этому и стремимся.</div>
+    </div>
+  </div>
+
+  <div class="kpi-table">
+    <div class="kpi-table-row">
+      <span class="kpi-sales">3 продажи</span>
+      <span class="kpi-result">Страховой оклад 20–30 000 ₽</span>
+    </div>
+    <div class="kpi-table-row">
+      <span class="kpi-sales">5 продаж</span>
+      <span class="kpi-result">Оклад + премия (+20 000 ₽ / доп. продажа)</span>
+    </div>
+    <div class="kpi-table-row">
+      <span class="kpi-sales">6+ продаж</span>
+      <span class="kpi-result">Повышенная премия + рост в команде</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ ОБЯЗАННОСТИ ═══ -->
+<section>
+  <div class="section-label">04 — Обязанности</div>
+  <div class="section-title">Что входит в работу</div>
+
+  <div class="duty-blocks">
+    <div class="duty-block">
+      <div class="duty-head">
+        <div class="duty-num">1</div>
+        <div class="duty-title">Рассылки</div>
+      </div>
+      <div class="duty-items">
+        <div class="duty-item">Ежедневно делать плановое количество рассылок (50/день)</div>
+        <div class="duty-item">Работать строго по согласованному скрипту</div>
+        <div class="duty-item">Фиксировать все отклики — ни один ответ не теряем</div>
+        <div class="duty-item">Если заблокировали аккаунт — сразу сообщать ОД, не молчать</div>
+      </div>
+    </div>
+
+    <div class="duty-block">
+      <div class="duty-head">
+        <div class="duty-num">2</div>
+        <div class="duty-title">Отчётность</div>
+      </div>
+      <div class="duty-items">
+        <div class="duty-item">Сколько рассылок сделано</div>
+        <div class="duty-item">Сколько ответов получено / проигнорировали</div>
+        <div class="duty-item">Сколько заинтересовались</div>
+        <div class="duty-item">Сколько записей на созвон</div>
+      </div>
+      <div class="duty-note">📝 Отчёт присылаешь сам, в конце дня — не ждёшь пока спросят. Это базовое требование.</div>
+    </div>
+
+    <div class="duty-block">
+      <div class="duty-head">
+        <div class="duty-num">3</div>
+        <div class="duty-title">Обработка входящих</div>
+      </div>
+      <div class="duty-items">
+        <div class="duty-item">Обрабатывать все ответы оперативно — в течение 1–2 часов</div>
+        <div class="duty-item">Прогревать заинтересованных — выявлять боль, задавать вопросы</div>
+        <div class="duty-item">Доводить до записи на созвон</div>
+        <div class="duty-item">Передавать готового клиента операционному директору</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ ЗАРПЛАТА ═══ -->
+<section>
+  <div class="section-label">05 — Зарплата</div>
+  <div class="section-title">Как считаются деньги</div>
+
+  <div class="salary-cards">
+    <div class="salary-card">
+      <h4>Оклад</h4>
+      <p><strong>20–30 000 ₽</strong> — страховой минимум при выполнении 3 продаж в месяц</p>
+    </div>
+    <div class="salary-card">
+      <h4>Премия</h4>
+      <p>При выполнении плана (5 продаж) — премиальная часть сверху.<br>Каждая дополнительная продажа сверх 3 базовых = <strong>+20 000 ₽</strong></p>
+    </div>
+    <div class="salary-card">
+      <h4>Перевыполнение</h4>
+      <p>6+ продаж — повышенная премия. Обсуждается индивидуально.</p>
+    </div>
+  </div>
+
+  <div class="salary-example">
+    <div class="ex-label">💰 Пример расчёта</div>
+    <div class="ex-text">
+      Сделал 7 продаж за месяц:<br>
+      Оклад 30 000 ₽ + 4 доп. продажи × 20 000 ₽
+    </div>
+    <div class="ex-total">= 110 000 ₽ за месяц</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ ПРАВИЛА ═══ -->
+<section>
+  <div class="section-label">06 — Правила</div>
+  <div class="section-title">Как мы работаем</div>
+
+  <p style="color:var(--muted); margin-bottom:20px; font-size:14px;">Обязательно:</p>
+  <div class="rules-must">
+    <div class="rule-item">
+      <div class="rule-num">1</div>
+      Отчёт каждый день — сам, в конце дня
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">2</div>
+      Все входящие обрабатываешь в течение 1–2 часов
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">3</div>
+      Любую проблему (блок, нет базы, не получается) — сразу пишешь ОД
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">4</div>
+      Дедлайны не переносишь без предупреждения
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">5</div>
+      Скрипт согласовываешь с ОД — самодеятельность в сообщениях не приветствуется
+    </div>
+  </div>
+
+  <p style="color:var(--muted); margin: 24px 0 14px; font-size:14px;">Прощаемся, если:</p>
+  <div class="fire-list">
+    <div class="fire-item">Несколько раз подряд не выполняется базовый минимум (3 продажи)</div>
+    <div class="fire-item">Переносишь дедлайны и не предупреждаешь</div>
+    <div class="fire-item">Недобросовестно относишься к отчётности</div>
+    <div class="fire-item">Теряешь тёплых клиентов из-за невнимательности</div>
+  </div>
+
+  <div class="remote-note">
+    <span class="remote-icon">⚠️</span>
+    <div>Это удалённая работа — но это не значит, что правил нет. Единственная разница с офисом: у нас высокостоящий продукт и мы работаем полностью удалённо.</div>
+  </div>
+</section>
+
+<!-- ═══ ЦЕЛЬ НА ЛЕТО ═══ -->
+<div class="divider"></div>
+<section>
+  <div class="summer-goal">
+    <div class="summer-icon">🚀</div>
+    <div class="summer-text">
+      <div class="summer-title">Цель на лето</div>
+      <div class="summer-desc">10 продаж за июнь–август = ~1 500 000 ₽ оборота агентства.<br><strong>Ты — ключевое звено этой системы.</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<div class="divider"></div>
+<div class="cta-section">
+  <h2>Готов работать?</h2>
+  <p>База и скрипт — выдаём.<br>Нужны только твои руки и голова.</p>
+  <a class="cta-btn" href="https://t.me/Kirill_konstantinvich">
+    ✉️ Написать в Telegram
+  </a>
+</div>
+
+</body>
+</html>
