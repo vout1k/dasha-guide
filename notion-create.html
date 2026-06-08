@@ -60,7 +60,7 @@ function num(p){return{object:"block",type:"numbered_list_item",numbered_list_it
 function co(e,col,p){return{object:"block",type:"callout",callout:{rich_text:p,icon:{type:"emoji",emoji:e},color:col+"_background"}};}
 function qt(p){return{object:"block",type:"quote",quote:{rich_text:p}};}
 function trow(cells){return{object:"block",type:"table_row",table_row:{cells:cells.map(function(c){return[tx(c)]})}};}  
-function tbl(rows,hdr){return{object:"block",type:"table",table:{table_width:rows[0].length,has_column_header:hdr!==false,has_row_header:false},children:rows.map(function(r){return trow(r)})};}
+function tbl(rows,hdr){return{object:"block",type:"table",table:{table_width:rows[0].length,has_column_header:hdr!==false,has_row_header:false,children:rows.map(function(r){return trow(r)})}};}
 
 function blocks(){return[
   co("💡","blue",[bx("Коротко о позиции. "),tx("Ты — первая точка контакта клиента с агентством. Пишешь людям в Telegram, прогреваешь и передаёшь заинтересованных на созвон. От твоей работы зависит оборот агентства в "),bx("1 500 000 ₽ за лето"),tx(".")])  ,
