@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Система запуска — полный гайд</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080F;--sf:#0F0F1A;--sf2:#161625;--sf3:#1E1E30;
+  --bd:#252538;--bda:#3A3A55;
+  --tx:#E4E4F5;--tx2:#8A8AB0;--tx3:#4A4A62;
+  --ac:#7C6FFF;--ac2:#4ECDC4;--warn:#F59E0B;--ok:#10B981;--red:#FF6B6B;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;line-height:1.7;font-size:16px}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 80px}
+
+/* HERO */
+.hero{padding:72px 0 48px;text-align:left;position:relative}
+.hero .eyebrow{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ac);background:rgba(124,111,255,.12);
+  border:1px solid rgba(124,111,255,.25);border-radius:999px;padding:6px 14px;margin-bottom:20px}
+.hero h1{font-size:clamp(1.9rem,6vw,2.8rem);font-weight:800;letter-spacing:-.03em;line-height:1.15;
+  background:linear-gradient(135deg,#fff 30%,#8A8AB0);-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.hero p{color:var(--tx2);font-size:1rem;max-width:560px}
+
+/* MAP */
+.map{background:var(--sf);border:1px solid var(--bd);border-radius:20px;padding:24px;margin:8px 0 48px}
+.map-t{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin-bottom:16px}
+.map a{display:flex;align-items:center;gap:12px;color:var(--tx);text-decoration:none;
+  padding:10px 12px;border-radius:12px;transition:background .15s;font-size:.92rem;font-weight:500}
+.map a:hover{background:var(--sf2)}
+.map .n{display:flex;align-items:center;justify-content:center;width:26px;height:26px;flex-shrink:0;
+  border-radius:8px;background:var(--sf3);color:var(--ac);font-size:.72rem;font-weight:800}
+
+/* STAGE */
+.stage{margin:56px 0 0;scroll-margin-top:24px}
+.stage-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:8px}
+.stage-num{display:flex;align-items:center;justify-content:center;width:44px;height:44px;flex-shrink:0;
+  border-radius:14px;font-size:1.05rem;font-weight:800;color:#fff;
+  background:linear-gradient(135deg,var(--ac),#5B4FD9);box-shadow:0 4px 20px rgba(124,111,255,.35)}
+.stage h2{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;line-height:1.25;padding-top:6px}
+.stage .lead{color:var(--tx2);font-size:.92rem;margin:8px 0 20px;padding-left:60px}
+@media(max-width:600px){.stage .lead{padding-left:0}}
+
+/* WWH cards */
+.wwh{display:grid;gap:10px;margin-bottom:16px}
+.wwh-c{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:18px 20px}
+.wwh-c .l{font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.wwh-c.why .l{color:var(--warn)}
+.wwh-c.what .l{color:var(--ac2)}
+.wwh-c.how .l{color:var(--ac)}
+.wwh-c p{font-size:.9rem;color:var(--tx)}
+.wwh-c ul,.wwh-c ol{margin:4px 0 0 18px;font-size:.9rem}
+.wwh-c li{margin:6px 0}
+.wwh-c li b{color:#fff}
+.wwh-c .sub{color:var(--tx2);font-size:.82rem}
+
+/* result strip */
+.result{display:flex;gap:10px;align-items:flex-start;background:rgba(16,185,129,.08);
+  border:1px solid rgba(16,185,129,.25);border-radius:14px;padding:14px 16px;font-size:.86rem;margin-bottom:10px}
+.result .i{color:var(--ok);font-weight:800;flex-shrink:0}
+.result b{color:#fff}
+
+/* funnel diagram */
+.funnel{margin:20px 0;display:flex;flex-direction:column;align-items:center;gap:0}
+.fstep{width:100%;border-radius:14px;padding:14px 18px;text-align:center;position:relative;border:1px solid}
+.fstep .t{font-weight:800;font-size:.92rem}
+.fstep .d{font-size:.76rem;color:var(--tx2);margin-top:2px}
+.farrow{color:var(--tx3);font-size:1.1rem;line-height:1;padding:6px 0}
+.f1{background:rgba(124,111,255,.10);border-color:rgba(124,111,255,.35);width:100%}
+.f2{background:rgba(78,205,196,.09);border-color:rgba(78,205,196,.3);width:94%}
+.f3{background:rgba(245,158,11,.09);border-color:rgba(245,158,11,.3);width:88%}
+.f4{background:rgba(255,107,107,.09);border-color:rgba(255,107,107,.3);width:82%}
+.f5{background:rgba(16,185,129,.10);border-color:rgba(16,185,129,.35);width:76%}
+.f6{background:var(--sf2);border-color:var(--bda);width:70%}
+
+/* table */
+.tblwrap{overflow-x:auto;margin:14px 0;border-radius:14px;border:1px solid var(--bd)}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:480px}
+th{background:var(--sf2);text-align:left;padding:11px 14px;font-weight:700;color:var(--tx);white-space:nowrap}
+td{padding:10px 14px;border-top:1px solid var(--bd);color:var(--tx2);vertical-align:top}
+td b{color:var(--tx)}
+tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+
+/* checklist */
+.check{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:18px 20px;margin:14px 0}
+.check .t{font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:12px}
+.check label{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:.88rem;cursor:pointer}
+.check input{width:18px;height:18px;margin-top:2px;accent-color:var(--ac);flex-shrink:0}
+.check input:checked+span{color:var(--tx3);text-decoration:line-through}
+
+/* callout */
+.callout{border-left:3px solid var(--ac);background:var(--sf);border-radius:0 14px 14px 0;
+  padding:14px 18px;margin:14px 0;font-size:.88rem;color:var(--tx2)}
+.callout b{color:#fff}
+.callout.warn{border-color:var(--warn)}
+.callout.red{border-color:var(--red)}
+
+/* divider */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--bd),transparent);margin:48px 0 0}
+
+/* footer */
+.foot{text-align:center;padding:64px 0 0;color:var(--tx3);font-size:.78rem}
+
+@media(prefers-color-scheme:light){
+  /* дизайн сознательно тёмный — единый визуальный мир гайда */
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">Playbook · Запуск эксперта</div>
+  <h1>Система запуска:<br>от ниши до масштаба</h1>
+  <p>Полная карта процессов: что делать, в каком порядке, зачем каждый шаг и как его выполнить. Воронка — это только один блок. Здесь — вся система.</p>
+</div>
+
+<!-- MAP -->
+<div class="map">
+  <div class="map-t">Карта запуска — 8 этапов</div>
+  <a href="#s1"><span class="n">1</span> Фундамент: ниша, аудитория, анализ</a>
+  <a href="#s2"><span class="n">2</span> Оффер и продуктовая линейка</a>
+  <a href="#s3"><span class="n">3</span> Воронка: структура и сборка</a>
+  <a href="#s4"><span class="n">4</span> Контент и прогрев</a>
+  <a href="#s5"><span class="n">5</span> Трафик: как наполнять воронку</a>
+  <a href="#s6"><span class="n">6</span> Продажи: диагностики и переписки</a>
+  <a href="#s7"><span class="n">7</span> Календарь запуска по неделям</a>
+  <a href="#s8"><span class="n">8</span> Аналитика, KPI и масштабирование</a>
+</div>
+
+<!-- STAGE 1 -->
+<div class="stage" id="s1">
+  <div class="stage-head">
+    <div class="stage-num">1</div>
+    <h2>Фундамент: ниша, аудитория, анализ</h2>
+  </div>
+  <p class="lead">Всё, что сломается дальше, ломается здесь. Слабый фундамент = слабый оффер = мёртвая воронка.</p>
+
+  <div class="wwh">
+    <div class="wwh-c why">
+      <div class="l">⚡ Зачем</div>
+      <p>Продаёт не воронка и не рилсы — продаёт попадание в боль конкретного человека. Пока не знаешь, кому и что болит, любой контент — стрельба в темноту. 80% провальных запусков умирают на этом этапе, просто это выясняется позже.</p>
+    </div>
+    <div class="wwh-c what">
+      <div class="l">◆ Что делать</div>
+      <ul>
+        <li><b>Сегмент аудитории</b> — не «женщины 25–45», а «мамы после родов, которые не могут вернуть форму и злятся на себя»</li>
+        <li><b>Карта болей и желаний</b> — минимум 10 болей, 10 желаемых результатов, 10 возражений</li>
+        <li><b>Анализ 5–7 конкурентов</b> — их офферы, цены, воронки, контент, что у них покупают</li>
+        <li><b>Уровень осознанности аудитории</b> — знает ли она о проблеме, о решении, о продукте</li>
+      </ul>
+    </div>
+    <div class="wwh-c how">
+      <div class="l">→ Как</div>
+      <ol>
+        <li><b>Кастдев: 5–10 интервью</b> с текущими/бывшими клиентами. Вопросы: «что было последней каплей, когда решила обратиться?», «что пробовала до этого?», «чего боялась?»</li>
+        <li><b>Комменты и директ конкурентов</b> — читаешь, выписываешь дословные формулировки болей. Слова аудитории = будущие хуки</li>
+        <li><b>Таблица конкурентов</b>: аккаунт / оффер / цена / лид-магнит / CTA / что можно взять</li>
+        <li>Прогоняешь всё через агента <b>Growth Producer</b> — он структурирует и найдёт дыры</li>
+      </ol>
+    </div>
+  </div>
+  <div class="result"><span class="i">✓</span><span><b>Артефакт этапа:</b> документ на 1–2 страницы — сегмент, топ-5 болей словами клиента, топ-5 желаний, список возражений, таблица конкурентов.</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STAGE 2 -->
+<div class="stage" id="s2">
+  <div class="stage-head">
+    <div class="stage-num">2</div>
+    <h2>Оффер и продуктовая линейка</h2>
+  </div>
+  <p class="lead">Оффер — это не продукт. Это обещание конкретного результата за конкретный срок с понятной причиной поверить.</p>
+
+  <div class="wwh">
+    <div class="wwh-c why">
+      <div class="l">⚡ Зачем</div>
+      <p>Сильный оффер прощает слабую воронку. Слабый оффер убивает даже идеальную. Линейка продуктов нужна, чтобы человек мог войти дёшево (или бесплатно) и дорасти до основного продукта — так LTV растёт без роста трафика.</p>
+    </div>
+    <div class="wwh-c what">
+      <div class="l">◆ Что делать</div>
+      <ul>
+        <li><b>Лид-магнит (бесплатно)</b> — гайд, чек-лист, разбор, мини-урок. Решает одну узкую боль за 10 минут</li>
+        <li><b>Трипваер (300–2000₽)</b> — недорогой продукт для перевода из «подписчик» в «покупатель». Опционально, но сильно греет</li>
+        <li><b>Основной продукт</b> — курс, наставничество, ведение. Здесь основные деньги</li>
+        <li><b>Апселл / продление</b> — следующий шаг для тех, кто купил: поддержка, клуб, VIP-тариф</li>
+      </ul>
+    </div>
+    <div class="wwh-c how">
+      <div class="l">→ Как</div>
+      <ol>
+        <li>Формула оффера: <b>[Результат] за [срок] без [главный страх/возражение]</b>. «Минус 5 кг за 6 недель без запретов и срывов»</li>
+        <li>Добавь <b>механизм</b> — почему это сработает: авторская методика, личный контроль, план под человека</li>
+        <li>Добавь <b>гарантию или снижение риска</b> — возврат, бесплатная диагностика, первый модуль бесплатно</li>
+        <li>Лид-магнит делай ПОСЛЕ оффера — он должен вести к продукту, а не просто «быть полезным»</li>
+        <li>Проверь оффер агентом <b>Funnel Copywriter</b>: даёт ли он ясность, желание, причину верить</li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout warn"><b>Ошибка №1:</b> лид-магнит «обо всём» — «10 советов по питанию». Правильно — узко и к продукту: «Чек-лист: почему вес стоит, хотя ты ешь мало» → ведёт к диагностике.</div>
+  <div class="result"><span class="i">✓</span><span><b>Артефакт этапа:</b> сформулированный оффер (1 абзац), линейка: лид-магнит → (трипваер) → основной продукт → апселл, с ценами.</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STAGE 3 -->
+<div class="stage" id="s3">
+  <div class="stage-head">
+    <div class="stage-num">3</div>
+    <h2>Воронка: структура и сборка</h2>
+  </div>
+  <p class="lead">Воронка — это путь человека от «впервые тебя увидел» до «оплатил». Каждый шаг либо двигает вперёд, либо теряет людей.</p>
+
+  <div class="funnel">
+    <div class="fstep f1"><div class="t">1 · Трафик</div><div class="d">Рилсы · сторис · таргет · коллаборации</div></div>
+    <div class="farrow">↓</div>
+    <div class="fstep f2"><div class="t">2 · Точка входа</div><div class="d">CTA «напиши слово в директ» / клик по ссылке</div></div>
+    <div class="farrow">↓</div>
+    <div class="fstep f3"><div class="t">3 · Лид-магнит</div><div class="d">Выдача в директ или телеграм-бот → человек в базе</div></div>
+    <div class="farrow">↓</div>
+    <div class="fstep f4"><div class="t">4 · Прогрев</div><div class="d">Серия касаний: польза → кейсы → закрытие возражений</div></div>
+    <div class="farrow">↓</div>
+    <div class="fstep f5"><div class="t">5 · Оффер и продажа</div><div class="d">Диагностика / продающая переписка / вебинар</div></div>
+    <div class="farrow">↓</div>
+    <div class="fstep f6"><div class="t">6 · Удержание</div><div class="d">Результат → отзыв → продление → рекомендации</div></div>
+  </div>
+
+  <div class="wwh">
+    <div class="wwh-c why">
+      <div class="l">⚡ Зачем</div>
+      <p>Без воронки продажи случайны: пост «купите» раз в месяц. С воронкой каждый новый зритель попадает в управляемый путь, и продажи становятся предсказуемыми — их можно считать и чинить по шагам.</p>
+    </div>
+    <div class="wwh-c what">
+      <div class="l">◆ Что входит в воронку</div>
+      <ul>
+        <li><b>Кодовое слово</b> — «напиши ГАЙД в директ» (комментарий или личное сообщение)</li>
+        <li><b>Автоответ в директ</b> — выдача лид-магнита + первый вопрос-вовлечение</li>
+        <li><b>Серия прогревающих сообщений</b> — 5–7 касаний за 5–7 дней (директ или телеграм)</li>
+        <li><b>Мост к продаже</b> — приглашение на диагностику / анкета / оффер</li>
+        <li><b>Скрипт продающей переписки</b> — вопросы, презентация, работа с возражениями</li>
+        <li><b>Дожим</b> — 2–3 сообщения тем, кто «думает» (дедлайн, кейс, ответ на страх)</li>
+      </ul>
+    </div>
+    <div class="wwh-c how">
+      <div class="l">→ Как собрать за 5 шагов</div>
+      <ol>
+        <li>Выбери <b>одну</b> механику входа: кодовое слово в директ (проще всего для старта)</li>
+        <li>Настрой автоответ: ManyChat / SendPulse, или вручную, если охваты небольшие</li>
+        <li>Напиши цепочку прогрева агентом <b>Funnel Copywriter</b>: День 1 польза → День 2 история → День 3 кейс → День 4 разбор возражения → День 5 оффер + дедлайн</li>
+        <li>Подготовь скрипт диагностики/переписки (этап 6 этого гайда)</li>
+        <li>Прогони тестового человека по всей цепочке — сам пройди путь клиента</li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout"><b>Принцип:</b> одна воронка = один сегмент = один оффер = одно целевое действие. Не пытайся продать всё всем в одной цепочке.</div>
+  <div class="result"><span class="i">✓</span><span><b>Артефакт этапа:</b> схема воронки + все тексты (автоответ, 5–7 сообщений прогрева, оффер, дожим) + настроенная автоматизация.</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STAGE 4 -->
+<div class="stage" id="s4">
+  <div class="stage-head">
+    <div class="stage-num">4</div>
+    <h2>Контент и прогрев</h2>
+  </div>
+  <p class="lead">Контент — топливо воронки. Рилсы приводят новых, сторис греют своих, и всё это ведёт к одному целевому действию.</p>
+
+  <div class="wwh">
+    <div class="wwh-c why">
+      <div class="l">⚡ Зачем</div>
+      <p>Холодный человек не покупает. Между «увидел рилс» и «оплатил» — доверие, которое строится касаниями: экспертность (знает, о чём говорит), личность (живой человек), кейсы (у других получилось). Контент делает эту работу массово и бесплатно.</p>
+    </div>
+    <div class="wwh-c what">
+      <div class="l">◆ Что делать</div>
+      <ul>
+        <li><b>Рилсы 3–5 в неделю</b> — привлечение: 60% экспертные под боли, 20% личные, 20% под кодовое слово (прямой заход в воронку)</li>
+        <li><b>Сторис ежедневно</b> — прогрев: рутина эксперта, кейсы, «вопрос-ответ», говорящая голова, подводки к лид-магниту</li>
+        <li><b>Прогревные серии</b> — перед открытием продаж: 7–14 дней сторителлинга (путь, ошибки, методика, результаты, открытие окна)</li>
+        <li><b>Хайлайты</b> — «Начни тут», «Кейсы», «Отзывы», «Продукт» — витрина для новых подписчиков</li>
+      </ul>
+    </div>
+    <div class="wwh-c how">
+      <div class="l">→ Как</div>
+      <ol>
+        <li>Каждый рилс начинай с хука из <b>дословных формулировок болей</b> (этап 1). Скрипты — агентом <b>Reels Strategist</b>: он даст 10 хуков с оценками, структуру с таймкодами и CTA</li>
+        <li>В сторис чередуй форматы: 30% польза, 30% личное, 20% соцдоказательства, 20% продающее</li>
+        <li>Говорящая голова — минимум 2–3 раза в неделю: именно она строит доверие быстрее всего</li>
+        <li>Контент-план на неделю собирай заранее: 1 час планирования = 7 дней без хаоса</li>
+        <li>Каждый 3–4-й рилс — с кодовым словом, чтобы постоянно наполнять воронку</li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout warn"><b>Ошибка:</b> контент ради контента — красивые рилсы без CTA и без связи с воронкой. Каждая единица контента отвечает на вопрос: «какое действие должен сделать зритель?»</div>
+  <div class="result"><span class="i">✓</span><span><b>Артефакт этапа:</b> контент-план на 2–4 недели: темы рилсов с хуками, сетка сторис, план прогревной серии.</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STAGE 5 -->
+<div class="stage" id="s5">
+  <div class="stage-head">
+    <div class="stage-num">5</div>
+    <h2>Трафик: как наполнять воронку</h2>
+  </div>
+  <p class="lead">Воронка без трафика — труба без воды. Сначала выжимаем бесплатное, потом докупаем платное.</p>
+
+  <div class="wwh">
+    <div class="wwh-c why">
+      <div class="l">⚡ Зачем</div>
+      <p>Даже идеальная воронка с конверсией 10% даст ноль продаж при нуле входящих. Трафик — единственная переменная, которую можно масштабировать почти бесконечно, когда воронка уже окупается.</p>
+    </div>
+    <div class="wwh-c what">
+      <div class="l">◆ Каналы по приоритету (для эксперта)</div>
+      <ol>
+        <li><b>Рилсы (органика)</b> — бесплатно, масштабно, основной канал на старте</li>
+        <li><b>Коллаборации и гостевые эфиры</b> — выход на чужую тёплую аудиторию бесплатно</li>
+        <li><b>Таргет на лид-магнит</b> — когда воронка проверена и конвертит: платно, но управляемо</li>
+        <li><b>Телеграм-канал</b> — не источник, а накопитель: туда сливается вся аудитория из Instagram</li>
+      </ol>
+    </div>
+    <div class="wwh-c how">
+      <div class="l">→ Как</div>
+      <ol>
+        <li>Первые 4–6 недель — только органика: 3–5 рилсов в неделю, замеряй какие темы дают подписки и слова в директ</li>
+        <li>Найди 5–10 смежных экспертов такого же размера — предложи взаимные эфиры/упоминания</li>
+        <li>Таргет подключай только когда знаешь цифры воронки: сколько стоит лид и сколько приносит клиент. Иначе сольёшь бюджет вслепую</li>
+        <li>Стратегию под конкретный бюджет и нишу собирай агентом <b>Traffic Director</b></li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout"><b>Правило масштабирования:</b> платный трафик включаем только на воронку, которая уже окупается на органике. Реклама усиливает то, что работает — и то, что не работает, тоже.</div>
+  <div class="result"><span class="i">✓</span><span><b>Артефакт этапа:</b> план трафика: каналы, частота, список коллабораций, условия включения таргета.</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STAGE 6 -->
+<div class="stage" id="s6">
+  <div class="stage-head">
+    <div class="stage-num">6</div>
+    <h2>Продажи: диагностики и переписки</h2>
+  </div>
+  <p class="lead">Воронка приводит тёплого человека. Продажа — это разговор, в котором он принимает решение. Здесь теряется больше всего денег.</p>
+
+  <div class="wwh">
+    <div class="wwh-c why">
+      <div class="l">⚡ Зачем</div>
+      <p>Для чеков выше 10–15 тыс. ₽ человеку почти всегда нужен личный контакт — диагностика или переписка. Скрипт нужен не для роботизации, а чтобы не терять оплаты из-за хаоса: незаданный вопрос = незакрытое возражение = «я подумаю».</p>
+    </div>
+    <div class="wwh-c what">
+      <div class="l">◆ Структура продающей диагностики</div>
+      <ol>
+        <li><b>Раппорт</b> — 2–3 минуты человеческого контакта</li>
+        <li><b>Точка А</b> — где сейчас: ситуация, что пробовала, что не сработало</li>
+        <li><b>Точка Б</b> — чего хочет на самом деле (копай до эмоции: не «похудеть», а «перестать стесняться»)</li>
+        <li><b>Разрыв</b> — что мешает дойти самой, цена бездействия</li>
+        <li><b>Презентация</b> — продукт как мост из А в Б, через её же слова</li>
+        <li><b>Оффер + цена</b> — спокойно, без извинений, с дедлайном</li>
+        <li><b>Возражения</b> — «дорого / подумаю / посоветуюсь» — на каждое готовый ответ</li>
+      </ol>
+    </div>
+    <div class="wwh-c how">
+      <div class="l">→ Как</div>
+      <ol>
+        <li>Скрипты под свой продукт пиши агентом <b>Funnel Copywriter</b> — и для созвона, и для переписки</li>
+        <li>Возражения бери из этапа 1 — их уже собрали на кастдеве</li>
+        <li>Веди <b>таблицу лидов</b>: имя / откуда пришёл / статус / следующий шаг / сумма. Без неё лиды теряются молча</li>
+        <li>Дожим через 24–48 часов тем, кто ушёл «думать»: кейс + вопрос, не давление</li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout red"><b>Главная утечка денег:</b> непрожатые «я подумаю». 30–40% таких закрываются с одного-двух правильных дожимов. Ноль дожимов = минус треть выручки.</div>
+  <div class="result"><span class="i">✓</span><span><b>Артефакт этапа:</b> скрипт диагностики, скрипт переписки, банк ответов на возражения, таблица лидов.</span></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STAGE 7 -->
+<div class="stage" id="s7">
+  <div class="stage-head">
+    <div class="stage-num">7</div>
+    <h2>Календарь запуска по неделям</h2>
+  </div>
+  <p class="lead">Всё выше — детали конструктора. Вот в каком порядке его собирать, если стартуешь с нуля.</p>
+
+  <div class="tblwrap">
+  <table>
+    <tr><th>Неделя</th><th>Фокус</th><th>Что делаем</th></tr>
+    <tr><td><b>1</b></td><td><b>Фундамент</b></td><td>Кастдев, анализ конкурентов, карта болей. Параллельно — упаковка профиля (шапка, хайлайты)</td></tr>
+    <tr><td><b>2</b></td><td><b>Оффер + продукт</b></td><td>Формулируем оффер, линейку, создаём лид-магнит. Начинаем регулярный контент</td></tr>
+    <tr><td><b>3</b></td><td><b>Сборка воронки</b></td><td>Кодовое слово, автоответ, цепочка прогрева, скрипты продаж. Тестовый прогон</td></tr>
+    <tr><td><b>4–5</b></td><td><b>Наполнение</b></td><td>Рилсы 3–5/нед с заходами в воронку, сторис ежедневно, первые лиды и диагностики</td></tr>
+    <tr><td><b>6</b></td><td><b>Прогревная серия</b></td><td>7–10 дней сторителлинг-прогрева к открытию продаж основного продукта</td></tr>
+    <tr><td><b>7</b></td><td><b>Окно продаж</b></td><td>Открытие, кейсы, дедлайны, дожимы. Максимум диагностик</td></tr>
+    <tr><td><b>8</b></td><td><b>Разбор полётов</b></td><td>Считаем цифры по каждому шагу, чиним слабое звено, планируем следующий цикл</td></tr>
+  </table>
+  </div>
+
+  <div class="check">
+    <div class="t">Чек-лист готовности к запуску</div>
+    <label><input type="checkbox"><span>Сегмент и карта болей описаны словами клиентов</span></label>
+    <label><input type="checkbox"><span>Оффер сформулирован по формуле результат/срок/без страха</span></label>
+    <label><input type="checkbox"><span>Лид-магнит создан и ведёт к продукту</span></label>
+    <label><input type="checkbox"><span>Кодовое слово + автовыдача работают (проверено на себе)</span></label>
+    <label><input type="checkbox"><span>Цепочка прогрева 5–7 касаний написана</span></label>
+    <label><input type="checkbox"><span>Скрипт диагностики и банк возражений готовы</span></label>
+    <label><input type="checkbox"><span>Контент-план на 2 недели свёрстан</span></label>
+    <label><input type="checkbox"><span>Таблица лидов заведена</span></label>
+    <label><input type="checkbox"><span>Профиль упакован: шапка, хайлайты, закреп</span></label>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- STAGE 8 -->
+<div class="stage" id="s8">
+  <div class="stage-head">
+    <div class="stage-num">8</div>
+    <h2>Аналитика, KPI и масштабирование</h2>
+  </div>
+  <p class="lead">Что не измеряется — не растёт. Считаем немного, но каждую неделю.</p>
+
+  <div class="wwh">
+    <div class="wwh-c why">
+      <div class="l">⚡ Зачем</div>
+      <p>Цифры показывают, ГДЕ именно течёт воронка. «Мало продаж» — не диагноз. Диагноз — «люди берут лид-магнит, но не доходят до диагностики»: значит, чиним прогрев, а не переделываем рилсы.</p>
+    </div>
+    <div class="wwh-c what">
+      <div class="l">◆ Минимальный дашборд (раз в неделю)</div>
+      <div class="tblwrap">
+      <table>
+        <tr><th>Метрика</th><th>Что показывает</th><th>Ориентир</th></tr>
+        <tr><td><b>Охват рилсов</b></td><td>Работают ли хуки и темы</td><td>рост от недели к неделе</td></tr>
+        <tr><td><b>Слов в директ / лидов</b></td><td>Конверсия контента в воронку</td><td>1–3% от охвата</td></tr>
+        <tr><td><b>Дошло до диагностики</b></td><td>Качество прогрева</td><td>20–40% от лидов</td></tr>
+        <tr><td><b>Конверсия в оплату</b></td><td>Качество оффера и продажи</td><td>20–50% с диагностик</td></tr>
+        <tr><td><b>Выручка / средний чек</b></td><td>Итог системы</td><td>план vs факт</td></tr>
+        <tr><td><b>CPL (при таргете)</b></td><td>Цена лида</td><td>окупается с LTV минимум ×3</td></tr>
+      </table>
+      </div>
+    </div>
+    <div class="wwh-c how">
+      <div class="l">→ Как масштабировать</div>
+      <ol>
+        <li><b>Найди узкое место</b> — самый большой % потерь между соседними шагами воронки. Чини только его, по одному за раз</li>
+        <li><b>Больше того, что работает</b> — топ-3 рилса по лидам → снять 5 вариаций каждого</li>
+        <li><b>Подними чек / добавь апселл</b> — рост выручки без роста трафика</li>
+        <li><b>Включи платный трафик</b> — когда органическая воронка окупается и цифры известны</li>
+        <li><b>Делегируй операционку</b> — монтаж, ответы в директ по скриптам, ведение таблиц</li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout"><b>Ритм системы:</b> запуск — это не событие, а цикл. Неделя разбора → две-три недели улучшений → новое окно продаж. Каждый цикл цифры лучше предыдущего.</div>
+  <div class="result"><span class="i">✓</span><span><b>Артефакт этапа:</b> таблица с 6 метриками, обновляемая раз в неделю, и одно выбранное узкое место для работы.</span></div>
+</div>
+
+<div class="foot">Система запуска · Playbook<br>Агенты для каждого этапа — в AI Agent Workspace</div>
+
+</div>
+</body>
+</html>
