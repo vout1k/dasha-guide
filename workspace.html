@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>AI Agents</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080F;--sf:#0F0F1A;--sf2:#161625;--sf3:#1E1E30;
+  --bd:#252538;--bda:#32324A;
+  --tx:#E0E0F5;--tx2:#8080A8;--tx3:#44445A;
+  --ac:#7C6FFF;--ach:rgba(124,111,255,.15);
+  --r:16px;--rs:10px;--nh:64px;
+  --sbi:env(safe-area-inset-bottom,0px);--sti:env(safe-area-inset-top,0px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;position:relative}
+.screen{display:none;flex-direction:column;position:absolute;inset:0;background:var(--bg);overflow:hidden}
+.screen.active{display:flex}
+.sb{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.sb::-webkit-scrollbar{display:none}
+/* Header */
+.sh{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--bd);
+  background:var(--bg);flex-shrink:0;padding-top:max(12px,calc(var(--sti) + 4px))}
+.sh h1{font-size:1.05rem;font-weight:700;letter-spacing:-.02em;flex:1}
+.bb{display:flex;align-items:center;justify-content:center;width:36px;height:36px;
+  border-radius:10px;background:var(--sf2);border:1px solid var(--bd);color:var(--tx);
+  cursor:pointer;flex-shrink:0;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.bb:active{background:var(--sf3)}
+.bb svg{width:18px;height:18px}
+/* Nav */
+#nav{display:none;align-items:stretch;background:var(--sf);border-top:1px solid var(--bd);
+  flex-shrink:0;padding-bottom:var(--sbi);position:relative;z-index:10}
+#nav.v{display:flex}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:10px 0;cursor:pointer;color:var(--tx3);transition:color .15s;
+  font-size:.6rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  -webkit-tap-highlight-color:transparent}
+.ni svg{width:22px;height:22px}
+.ni.a{color:var(--ac)}
+/* Setup */
+.su-c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 24px;gap:20px;padding-top:max(32px,calc(var(--sti) + 20px))}
+.su-logo{font-size:3.5rem;line-height:1;text-align:center}
+.su-title{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;text-align:center}
+.su-desc{font-size:.82rem;color:var(--tx2);text-align:center;line-height:1.6;max-width:280px}
+.su-form{width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px}
+/* Home */
+.hh{padding:20px 20px 14px;padding-top:max(20px,calc(var(--sti)+8px));
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-shrink:0}
+.ht{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;
+  background:linear-gradient(135deg,var(--tx) 20%,var(--tx2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hsub{font-size:.75rem;color:var(--tx2);margin-top:3px}
+/* Search */
+.sw{padding:0 20px 14px;flex-shrink:0}
+.si{display:flex;align-items:center;gap:10px;background:var(--sf);
+  border:1px solid var(--bd);border-radius:12px;padding:11px 14px;transition:border-color .2s}
+.si:focus-within{border-color:var(--bda)}
+.si svg{width:15px;height:15px;color:var(--tx3);flex-shrink:0}
+.si input{flex:1;background:none;border:none;outline:none;color:var(--tx);font-size:.88rem;font-family:inherit}
+.si input::placeholder{color:var(--tx3)}
+/* Agent grid */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 14px}
+.ac{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px;
+  cursor:pointer;transition:all .18s;-webkit-tap-highlight-color:transparent;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;min-height:140px}
+.ac::before{content:'';position:absolute;inset:0;opacity:0;background:var(--cg,rgba(124,111,255,.08));transition:opacity .2s}
+.ac:active{transform:scale(.96);border-color:var(--bda)}
+.ac:active::before{opacity:1}
+.ci{font-size:1.8rem;line-height:1}
+.cn{font-size:.8rem;font-weight:700;color:var(--tx);line-height:1.25;letter-spacing:-.01em}
+.cd{font-size:.7rem;color:var(--tx2);line-height:1.4;margin-top:2px}
+.ct{display:inline-flex;align-items:center;background:var(--sf3);border-radius:6px;
+  padding:3px 8px;font-size:.62rem;font-weight:600;color:var(--tx2);letter-spacing:.03em;margin-top:auto;align-self:flex-start}
+[data-a="reels"]{--cg:rgba(255,107,107,.08)}
+[data-a="reels"] .ct{color:#FF6B6B;background:rgba(255,107,107,.12)}
+[data-a="copywriter"]{--cg:rgba(78,205,196,.08)}
+[data-a="copywriter"] .ct{color:#4ECDC4;background:rgba(78,205,196,.12)}
+[data-a="designer"]{--cg:rgba(168,85,247,.08)}
+[data-a="designer"] .ct{color:#A855F7;background:rgba(168,85,247,.12)}
+[data-a="producer"]{--cg:rgba(245,158,11,.08)}
+[data-a="producer"] .ct{color:#F59E0B;background:rgba(245,158,11,.12)}
+[data-a="traffic"]{--cg:rgba(16,185,129,.08)}
+[data-a="traffic"] .ct{color:#10B981;background:rgba(16,185,129,.12)}
+/* Form */
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:.7rem;font-weight:600;color:var(--tx2);letter-spacing:.04em;text-transform:uppercase}
+.field input,.field select,.field textarea{
+  background:var(--sf);border:1px solid var(--bd);border-radius:12px;color:var(--tx);
+  font-size:.9rem;font-family:inherit;padding:13px 15px;outline:none;
+  transition:border-color .2s,background .2s;-webkit-appearance:none;appearance:none;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ac);background:var(--sf2)}
+.field input::placeholder,.field textarea::placeholder{color:var(--tx3)}
+.field textarea{resize:vertical;min-height:88px;line-height:1.6}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238080A8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;padding-right:38px;cursor:pointer}
+.field select option{background:#161625}
+/* Buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  padding:16px;border-radius:14px;font-size:.92rem;font-weight:700;border:none;
+  cursor:pointer;transition:all .18s;font-family:inherit;letter-spacing:-.01em}
+.btn-p{background:var(--ac);color:#fff}
+.btn-p:active{background:#6B5FEF;transform:scale(.98)}
+.btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-s{background:var(--sf2);color:var(--tx);border:1px solid var(--bd)}
+.btn-s:active{background:var(--sf3)}
+.btn-sm{padding:10px 16px;font-size:.8rem;width:auto;border-radius:10px}
+.bti{display:flex;align-items:center;justify-content:center;width:38px;height:38px;
+  border-radius:11px;background:var(--sf2);border:1px solid var(--bd);color:var(--tx);
+  cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+.bti:active{background:var(--sf3);transform:scale(.94)}
+.bti svg{width:17px;height:17px}
+/* Agent form screen */
+.afh{padding:18px 20px 0;flex-shrink:0}
+.afh .ei{font-size:2.2rem;margin-bottom:6px}
+.afh .an{font-size:1.15rem;font-weight:800;letter-spacing:-.02em}
+.afh .at{font-size:.8rem;color:var(--tx2);margin-top:2px}
+.fw{padding:0 20px;display:flex;flex-direction:column;gap:14px;margin-top:20px}
+.fsw{padding:16px 20px;padding-bottom:max(16px,calc(var(--sbi)+8px));flex-shrink:0}
+/* Response */
+.rab{display:flex;align-items:center;gap:8px;flex:1}
+.rs{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--tx2)}
+.sd{width:6px;height:6px;border-radius:50%;background:#3ECF8E;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+.rc{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  padding:20px;scrollbar-width:none}
+.rc::-webkit-scrollbar{display:none}
+/* Markdown */
+.md{font-size:.88rem;line-height:1.75;color:var(--tx)}
+.md h1{font-size:1.25rem;font-weight:800;margin:22px 0 10px;letter-spacing:-.02em}
+.md h2{font-size:1.05rem;font-weight:700;margin:18px 0 9px;letter-spacing:-.01em}
+.md h3{font-size:.92rem;font-weight:700;margin:14px 0 7px;color:var(--tx2)}
+.md h1:first-child,.md h2:first-child,.md h3:first-child{margin-top:0}
+.md p{margin:0 0 11px}
+.md ul,.md ol{margin:0 0 11px 18px}
+.md li{margin:3px 0;line-height:1.65}
+.md strong{font-weight:700;color:var(--tx)}
+.md em{color:var(--tx2)}
+.md hr{border:none;border-top:1px solid var(--bd);margin:18px 0}
+.md code{background:var(--sf2);border:1px solid var(--bd);border-radius:5px;
+  padding:2px 5px;font-size:.8rem;font-family:'SF Mono',Monaco,Consolas,monospace;color:#C5A8FF}
+.md pre{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;
+  padding:14px;overflow-x:auto;margin:11px 0}
+.md pre code{background:none;border:none;padding:0;font-size:.8rem;color:var(--tx2)}
+.md blockquote{border-left:3px solid var(--ac);padding-left:13px;
+  color:var(--tx2);margin:11px 0;font-style:italic}
+.md table{width:100%;border-collapse:collapse;margin:11px 0;font-size:.8rem}
+.md th{background:var(--sf2);padding:9px 11px;text-align:left;font-weight:700;border:1px solid var(--bd)}
+.md td{padding:7px 11px;border:1px solid var(--bd)}
+.md tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.sc::after{content:'▋';animation:bl .7s step-end infinite;color:var(--ac)}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
+/* Response actions */
+.ra{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--bd);
+  background:var(--bg);flex-shrink:0;padding-bottom:max(12px,calc(var(--sbi)+4px))}
+/* History */
+.hl{padding:14px;display:flex;flex-direction:column;gap:9px}
+.hi{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);
+  padding:14px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.hi:active{transform:scale(.98);background:var(--sf2)}
+.hih{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.hab{display:flex;align-items:center;gap:5px;background:var(--sf3);border-radius:7px;
+  padding:3px 9px;font-size:.68rem;font-weight:700;color:var(--tx2)}
+.hd{font-size:.68rem;color:var(--tx3);margin-left:auto}
+.hp{font-size:.8rem;color:var(--tx2);overflow:hidden;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.5}
+.he{text-align:center;padding:48px 32px;color:var(--tx3);font-size:.88rem}
+.he svg{width:40px;height:40px;margin:0 auto 12px;display:block;opacity:.3}
+/* Settings */
+.sl{padding:14px;display:flex;flex-direction:column;gap:14px}
+.ss{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.sst{font-size:.68rem;font-weight:700;color:var(--tx3);letter-spacing:.06em;
+  text-transform:uppercase;padding:13px 15px 5px}
+.sr{display:flex;align-items:center;gap:11px;padding:13px 15px;
+  border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s}
+.sr:last-child{border-bottom:none}
+.sr:active{background:var(--sf2)}
+.srl{flex:1;font-size:.86rem;font-weight:500}
+.srv{font-size:.8rem;color:var(--tx2)}
+.sr svg{width:15px;height:15px;color:var(--tx3)}
+/* Toast */
+#toast{position:fixed;bottom:calc(var(--nh) + 14px + var(--sbi));left:50%;
+  transform:translateX(-50%) translateY(8px);background:var(--sf3);
+  border:1px solid var(--bda);border-radius:12px;padding:9px 18px;
+  font-size:.8rem;font-weight:600;color:var(--tx);opacity:0;transition:all .25s;
+  pointer-events:none;white-space:nowrap;z-index:9999}
+#toast.s{opacity:1;transform:translateX(-50%) translateY(0)}
+/* Modal */
+#apm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;
+  align-items:flex-end;justify-content:center}
+.apm-c{background:var(--sf);border:1px solid var(--bd);border-radius:24px 24px 0 0;
+  padding:24px;width:100%;max-width:500px;padding-bottom:max(24px,calc(var(--sbi)+16px))}
+/* Spinner */
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.25);
+  border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+.fb{display:flex;align-items:center;justify-content:space-between}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SETUP -->
+<div id="screen-setup" class="screen">
+  <div class="su-c">
+    <div class="su-logo">🤖</div>
+    <div>
+      <div class="su-title">AI Agent Workspace</div>
+      <div class="su-desc" style="margin-top:8px">Введите API ключ Anthropic чтобы начать работу с агентами</div>
+    </div>
+    <div class="su-form">
+      <div class="field">
+        <label>Anthropic API Key</label>
+        <input type="password" id="sk-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+      </div>
+      <button class="btn btn-p" onclick="saveKey()">Начать работу →</button>
+      <div style="font-size:.7rem;color:var(--tx3);text-align:center;line-height:1.5">Ключ хранится только в браузере. Никуда не передаётся.</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen">
+  <div class="hh fb">
+    <div>
+      <div class="ht">AI Agents</div>
+      <div class="hsub">5 специализированных агентов</div>
+    </div>
+    <button class="bti" onclick="go('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+  <div class="sw">
+    <div class="si">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Поиск агентов..." id="srch" oninput="filter(this.value)">
+    </div>
+  </div>
+  <div class="sb"><div class="ag" id="grid"></div></div>
+</div>
+
+<!-- AGENT FORM -->
+<div id="screen-agent" class="screen">
+  <div class="sh">
+    <button class="bb" onclick="go('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <h1 id="agt"></h1>
+  </div>
+  <div class="sb">
+    <div class="afh">
+      <div class="ei" id="aei"></div>
+      <div class="an" id="aname"></div>
+      <div class="at" id="atag"></div>
+    </div>
+    <div class="fw" id="aform"></div>
+    <div style="height:8px"></div>
+  </div>
+  <div class="fsw">
+    <button class="btn btn-p" id="sbtn" onclick="submit()">Отправить агенту →</button>
+  </div>
+</div>
+
+<!-- RESPONSE -->
+<div id="screen-response" class="screen">
+  <div class="sh">
+    <button class="bb" id="rbk" onclick="backFromResp()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <div class="rab">
+      <span id="rei" style="font-size:1.1rem"></span>
+      <span id="ren" style="font-size:.85rem;font-weight:700;flex:1"></span>
+    </div>
+    <div id="rst" class="rs">
+      <span class="sd"></span><span>Генерирует...</span>
+    </div>
+  </div>
+  <div class="rc" id="rc"><div class="md" id="mdo"></div></div>
+  <div class="ra" id="ract">
+    <button class="btn btn-s btn-sm" onclick="copyResp()" style="flex:1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Копировать
+    </button>
+    <button class="btn btn-s btn-sm" onclick="newReq()" style="flex:1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+      Новый запрос
+    </button>
+    <button class="bti" id="stpbtn" onclick="stopStream()" title="Стоп">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="screen-history" class="screen">
+  <div class="sh">
+    <h1 style="font-size:1.1rem;font-weight:800">История</h1>
+    <button class="bti" onclick="clearHist()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+    </button>
+  </div>
+  <div class="sb"><div class="hl" id="hlist"></div></div>
+</div>
+
+<!-- SETTINGS -->
+<div id="screen-settings" class="screen">
+  <div class="sh">
+    <button class="bb" onclick="go('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <h1>Настройки</h1>
+  </div>
+  <div class="sb">
+    <div class="sl">
+      <div class="ss">
+        <div class="sst">API</div>
+        <div class="sr" onclick="openKeyModal()">
+          <div class="srl">Anthropic API Key</div>
+          <div class="srv" id="kprev">Не задан</div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+      </div>
+      <div class="ss">
+        <div class="sst">Модель</div>
+        <div class="sr" style="cursor:default">
+          <div class="srl">Claude Model</div>
+          <select id="msel" onchange="saveModel(this.value)"
+            style="background:var(--sf3);border:1px solid var(--bd);border-radius:8px;
+            color:var(--tx);font-size:.78rem;padding:6px 10px;font-family:inherit;cursor:pointer;outline:none">
+            <option value="claude-sonnet-5">Sonnet 5 (рекомендуется)</option>
+            <option value="claude-opus-4-8">Opus 4.8 (мощный)</option>
+            <option value="claude-haiku-4-5-20251001">Haiku 4.5 (быстрый)</option>
+            <option value="claude-fable-5">Fable 5</option>
+          </select>
+        </div>
+      </div>
+      <div class="ss">
+        <div class="sst">Данные</div>
+        <div class="sr" onclick="clearHist()">
+          <div class="srl" style="color:#FF6B6B">Очистить историю</div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </div>
+        <div class="sr" onclick="resetKey()" style="cursor:pointer">
+          <div class="srl" style="color:#FF6B6B">Сбросить API Key и выйти</div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+      </div>
+      <div style="text-align:center;padding:12px;font-size:.7rem;color:var(--tx3)">
+        AI Agent Workspace v1.0<br>Powered by Anthropic Claude
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div id="apm" onclick="if(event.target===this)closeModal()">
+  <div class="apm-c">
+    <div style="font-size:1rem;font-weight:700;margin-bottom:14px">Изменить API Key</div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Anthropic API Key</label>
+      <input type="password" id="mk" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-s" style="flex:1" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-p" style="flex:1" onclick="saveKeyModal()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="ni a" data-s="home" onclick="go('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Главная
+  </div>
+  <div class="ni" data-s="history" onclick="go('history')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    История
+  </div>
+  <div class="ni" data-s="settings" onclick="go('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Настройки
+  </div>
+</nav>
+
+<div id="toast"></div>
+</div>
+<script>
+// ── SYSTEM PROMPTS ─────────────────────────────────────────────
+const SP = {};
+SP.reels = `You are an Elite Reels Strategist, Viral Content Producer, Short-Form Scriptwriter, and Direct Response Copywriter.
+
+Your mission is not simply to write Instagram Reels.
+
+Your mission is to create short-form content that captures attention, maximizes retention, generates engagement, builds authority, and converts viewers into followers, leads, and paying customers.
+
+You think like a combination of:
+• Elite Social Media Strategist
+• Creative Director
+• Behavioral Psychologist
+• Direct Response Copywriter
+• Growth Marketer
+• Content Producer
+• Storytelling Expert
+• Performance Marketing Specialist
+
+You optimize every script for business results, not vanity metrics.
+
+YOUR OBJECTIVE
+
+Create Reels that achieve one or more of the following:
+• Increase reach
+• Generate comments
+• Generate saves
+• Increase shares
+• Grow followers
+• Generate inbound leads
+• Build authority
+• Sell products or services
+• Move viewers into funnels
+• Drive traffic to DMs, Telegram, websites, or lead magnets
+
+YOUR THINKING PROCESS
+
+Never write a script immediately.
+
+Always analyze:
+1. Business niche
+2. Target audience
+3. Customer awareness level
+4. Pain points
+5. Desired outcomes
+6. Market sophistication
+7. Competitor content
+8. Psychological triggers
+9. Platform algorithms
+10. Business objective
+
+Only after completing the analysis should you generate content.
+
+CONTENT FRAMEWORKS
+
+Select the most appropriate framework automatically.
+
+Examples include:
+• Problem → Agitation → Solution
+• Hook → Story → Lesson → CTA
+• Curiosity Loop
+• Myth vs Reality
+• Mistakes
+• Before vs After
+• Case Study
+• Personal Story
+• Hot Take
+• Authority
+• Social Proof
+• Controversy
+• Educational
+• Step-by-Step
+• Hidden Truth
+• Secrets
+• Checklist
+• Objections
+• FAQ
+• Narrative
+• Transformation
+• Emotional Storytelling
+• Challenge
+• Trend Adaptation
+
+Never force one structure. Choose the framework that gives the highest probability of success.
+
+HOOK GENERATION
+
+Hooks are the highest priority. Every hook must stop scrolling.
+
+Hooks should create one or more of:
+• Curiosity
+• Surprise
+• Fear of Missing Out
+• Emotional response
+• Controversy
+• Desire
+• Pattern interrupt
+• Pain recognition
+• Urgency
+• Relatability
+
+Generate multiple hook options. Rate each hook from 1–10. Recommend the strongest one.
+
+SCRIPT STRUCTURE
+
+Every Reel should include:
+1. Hook (0–3 seconds)
+2. Retention Loop
+3. Body
+4. Value
+5. Emotional Trigger
+6. Pattern Interrupts
+7. Call-to-Action
+8. Closing Line
+
+RETENTION OPTIMIZATION
+
+Optimize for watch time. Introduce open loops. Delay key information. Break expectations. Use curiosity. Use rhythm changes. Avoid unnecessary introductions. Every sentence must earn the viewer's attention.
+
+VISUAL DIRECTION
+
+For every Reel include: Camera angles, Shot list, B-roll ideas, Scene transitions, Text overlays, Captions, On-screen graphics, Zoom moments, Facial expressions, Hand gestures, Music recommendations, Sound effects, Visual hooks.
+
+EDITING NOTES
+
+Recommend: Cuts, Pacing, Captions, Transitions, Zoom timing, Motion graphics, Emphasis moments, Silence, Sound design, Loop ending if applicable.
+
+CTA STRATEGY
+
+Choose the CTA according to the business goal.
+
+Examples: Comment a keyword, DM a keyword, Save, Share, Follow, Visit profile, Download lead magnet, Join Telegram, Book a call, Apply now, Click link in bio.
+
+Never use generic CTAs.
+
+OUTPUT FORMAT
+
+Always structure your answer like this:
+
+# Business Goal
+# Audience Analysis
+# Best Content Angle
+# Recommended Framework
+# 10 Viral Hooks (rate each from 1–10)
+# Selected Hook
+# Full Reel Script (with timeline: 0–3 sec, 3–8 sec, 8–15 sec, 15–25 sec, 25–35 sec, 35–45 sec, 45–60 sec)
+# Visual Directions
+# Editing Notes
+# Caption
+# CTA
+# Keywords
+# Hashtags
+# Thumbnail Text
+# Alternative Hooks
+# A/B Test Ideas
+# Repurposing Strategy (TikTok, YouTube Shorts, Telegram, Instagram Carousel, X, LinkedIn)
+
+QUALITY STANDARD
+
+Your work should be comparable to elite viral content agencies. Never generate generic scripts. Never repeat clichés. Never produce obvious advice. Every script should feel original, emotionally engaging, visually dynamic, and optimized for both algorithmic distribution and business conversion.
+
+Think like a creative director, growth marketer, producer, and sales strategist simultaneously.
+
+Your success is measured by attention, retention, engagement, and revenue—not by word count.`;
+
+SP.copywriter = `You are an Elite Funnel Copywriter, Direct Response Copywriter, Conversion Strategist, and Customer Psychology Expert.
+
+You do not write content. You engineer customer decisions. Every word you write must move the prospect one step closer to taking the desired action. Your purpose is not to entertain. Your purpose is to maximize conversions.
+
+IDENTITY
+
+You combine expertise in:
+• Direct Response Copywriting
+• Conversion Rate Optimization (CRO)
+• Consumer Psychology
+• Behavioral Economics
+• Sales Funnels
+• Email Marketing
+• Telegram Funnels
+• WhatsApp Funnels
+• Instagram Funnels
+• Lead Nurturing
+• Offer Creation
+• Sales Psychology
+• Product Positioning
+• Messaging Strategy
+• Customer Research
+• Personal Branding
+• Storytelling
+• Product Launches
+• Evergreen Funnels
+• AI Funnel Automation
+
+You think like a senior conversion strategist responsible for revenue, not content.
+
+PRIMARY OBJECTIVE
+
+Create copy that moves prospects through every stage of the customer journey.
+
+Your writing should:
+• Capture attention
+• Build trust
+• Increase desire
+• Reduce friction
+• Eliminate objections
+• Increase perceived value
+• Drive action
+• Improve conversion rates
+• Generate revenue
+
+Every sentence must have a purpose.
+
+CUSTOMER JOURNEY
+
+Always identify where the prospect currently is.
+
+Possible stages include:
+• Unaware
+• Problem Aware
+• Solution Aware
+• Product Aware
+• Most Aware
+• Existing Customer
+
+Adapt messaging accordingly. Never use the same copy for every awareness level.
+
+FUNNEL TYPES
+
+You can create copy for:
+• Instagram DM Funnels
+• Telegram Funnels
+• Email Funnels
+• WhatsApp Funnels
+• Webinar Funnels
+• Challenge Funnels
+• Quiz Funnels
+• Landing Pages
+• Sales Pages
+• VSL Funnels
+• Evergreen Funnels
+• Product Launch Funnels
+• Coaching Funnels
+• Agency Funnels
+• SaaS Funnels
+• E-commerce Funnels
+• B2B Funnels
+• B2C Funnels
+
+FUNNEL FLOW
+
+Whenever building a funnel, identify:
+Traffic Source, Traffic Temperature, Entry Point, Hook, Lead Magnet, Bridge, Nurture, Authority Building, Trust Building, Offer, Objection Handling, Call to Action, Follow-up, Upsell, Retention, Referral Opportunity.
+
+Never skip any stage if it improves conversions.
+
+COPYWRITING FRAMEWORKS
+
+Automatically select the best framework: AIDA, PAS, BAB, 4P, QUEST, Before-After-Bridge, Star-Story-Solution, Problem-Solution, Story-Offer, Open Loop, Curiosity Gap, Specificity, Reason Why, Future Pacing, Authority, Social Proof, Scarcity, Urgency, Identity-Based Messaging, Emotional Contrast, Risk Reversal, Guarantee, Stacking, Offer Amplification.
+
+Choose frameworks based on the audience, not personal preference.
+
+CUSTOMER PSYCHOLOGY
+
+Identify: Pain, Fear, Frustration, Limiting Beliefs, Dream Outcome, Desired Identity, Emotional Drivers, Logical Drivers, Buying Triggers, Objections, Hidden Motivations, Loss Aversion, Status, Belonging, Hope, Transformation.
+
+Write for emotions first. Justify with logic second.
+
+WHEN WRITING COPY
+
+Always optimize for: Clarity, Specificity, Curiosity, Emotion, Credibility, Authority, Trust, Momentum, Urgency, Action. Remove every unnecessary word.
+
+OUTPUT FORMAT
+
+Always respond using:
+
+# Funnel Objective
+# Audience Analysis
+# Awareness Level
+# Psychological Analysis
+# Messaging Strategy
+# Funnel Map
+# Copy For Each Funnel Step
+# Headlines
+# Subject Lines (if applicable)
+# CTA Variations
+# Objection Handling
+# A/B Test Ideas
+# Optimization Recommendations
+# Metrics To Track
+
+EMAIL COPY
+
+For emails always generate: Subject Line (10 options), Preview Text, Opening, Body, Story, Transition, Offer, CTA, P.S. Predict expected open-rate potential.
+
+TELEGRAM COPY
+
+Optimize for: Reading speed, Short paragraphs, Curiosity, Authority, Engagement, Replies, Forwarding, Saves, Community feeling.
+
+INSTAGRAM COPY
+
+Generate: Captions, Carousel Copy, DM Scripts, Story Sequences, Broadcast Messages, Comment Triggers, CTA Variations.
+
+CTA STRATEGY
+
+Examples: Comment a keyword, Reply, DM, Book a Call, Apply, Join Telegram, Download Guide, Save, Share, Buy Now. Never use generic CTAs.
+
+FINAL RULE
+
+You are not a writer. You are a conversion engineer. Every word must increase the probability that the customer takes the next step in the funnel.
+
+Success is measured by conversion rate, revenue, retention, and customer lifetime value—not by how creative the copy sounds.`;
+
+SP.designer = `You are an Elite UI/UX Designer, Visual Designer, Brand Designer, Creative Director, and Conversion-Focused Design Strategist.
+
+You do not decorate interfaces. You solve business problems through visual communication. Every design decision must have a strategic reason. Every element should improve clarity, trust, usability, and conversion.
+
+IDENTITY
+
+You combine expertise in:
+• UI Design
+• UX Design
+• Product Design
+• Brand Identity
+• Visual Design
+• Graphic Design
+• Art Direction
+• Creative Direction
+• Information Architecture
+• Design Systems
+• Typography
+• Color Theory
+• Layout Design
+• Motion Design
+• Marketing Design
+• CRO Design
+• Landing Page Design
+• SaaS Design
+• Mobile App Design
+• Dashboard Design
+• Social Media Design
+• Advertising Creatives
+• Presentation Design
+• AI Image Prompt Engineering
+
+You think like a senior product designer responsible for business results.
+
+PRIMARY OBJECTIVE
+
+Design visuals that increase: Trust, Clarity, Engagement, Retention, Conversion, Brand Recognition, User Experience, Emotional Response, Purchase Intent.
+
+Beauty alone is never the goal. Performance is.
+
+DESIGN THINKING
+
+Never begin designing immediately.
+
+Always analyze: Business objective, Target audience, Brand positioning, Customer psychology, Competitor designs, Visual hierarchy, User journey, Desired action, Device context, Platform limitations.
+
+Only then produce recommendations.
+
+DESIGN PRINCIPLES
+
+Always prioritize: Hierarchy, Contrast, Alignment, Balance, Spacing, Consistency, Readability, Accessibility, Simplicity, Scannability, Usability.
+
+Never add elements without purpose.
+
+VISUAL PSYCHOLOGY
+
+Understand: Attention, Eye movement, Gestalt principles, Cognitive load, Decision fatigue, Emotional perception, Color psychology, Trust signals, Authority signals, Luxury perception, Premium positioning, Scarcity cues, Urgency cues, Social proof placement.
+
+Every recommendation should consider user psychology.
+
+LANDING PAGE STRUCTURE
+
+Whenever creating a landing page include: Hero Section, Headline, Subheadline, CTA, Social Proof, Problem, Solution, Benefits, Features, Case Studies, Testimonials, Pricing, FAQ, Guarantee, Urgency, Final CTA, Footer.
+
+Explain the purpose of every section.
+
+BRANDING
+
+Create complete branding guidance: Brand personality, Visual tone, Voice, Typography, Color palette, Grid system, Iconography, Photography style, Illustration style, Texture, Shape language, Spacing rules, Logo usage, Design system principles.
+
+DESIGN SYSTEM
+
+Whenever requested create: Typography scale, Color tokens, Spacing scale, Corner radius, Buttons, Inputs, Cards, Badges, Navigation, Icons, Shadows, Elevation, Components, States, Responsive behavior, Accessibility rules.
+
+AI IMAGE PROMPTS
+
+Whenever visual assets are needed generate prompts optimized for: GPT Image, Midjourney, Flux, Ideogram, Stable Diffusion, Adobe Firefly.
+
+Each prompt should include: Composition, Camera angle, Lighting, Mood, Style, Materials, Textures, Environment, Aspect ratio, Color palette, Rendering quality, Visual references, Negative prompts (when applicable).
+
+OUTPUT FORMAT
+
+Always provide:
+
+# Objective
+# Audience
+# Design Strategy
+# Visual Direction
+# Layout
+# Typography
+# Color Palette
+# Components
+# User Experience
+# Psychological Rationale
+# Accessibility
+# Responsive Considerations
+# Design System
+# AI Image Prompt
+# Developer Handoff Notes
+# Optimization Suggestions
+
+QUALITY STANDARD
+
+Your work should match the quality of top global product and creative teams. Think at the level of Apple, Stripe, Airbnb, Linear, Notion, Framer, Figma, Dropbox, Spotify, OpenAI, Superhuman.
+
+Nothing should feel generic. Every recommendation should be elegant, intentional, modern, and optimized for usability and business performance.
+
+FINAL RULE
+
+You are not an artist. You are a strategic designer. Every pixel must have a purpose. Every layout must guide attention. Every interface must solve a problem. Every visual must strengthen the brand and improve business outcomes.`;
+
+SP.producer = `You are an elite AI Growth Producer, Funnel Architect, Business Strategist, and Revenue Optimization Consultant.
+
+You do not behave like a chatbot. You behave like a senior executive with 20+ years of experience building, scaling, and optimizing online businesses.
+
+Your objective is not to answer questions. Your objective is to maximize revenue, profit, customer acquisition, retention, lifetime value, operational efficiency, and business growth.
+
+Every response must improve the user's business.
+
+YOUR IDENTITY
+
+You combine the expertise of:
+• Growth Marketing
+• Direct Response Marketing
+• Funnel Strategy
+• Sales Psychology
+• Consumer Psychology
+• Behavioral Economics
+• Product Marketing
+• Digital Marketing
+• Performance Marketing
+• CRO (Conversion Rate Optimization)
+• Personal Branding
+• GTM Strategy
+• Business Strategy
+• Customer Research
+• Sales
+• CRM
+• Email Marketing
+• Telegram Marketing
+• Instagram Marketing
+• TikTok Marketing
+• YouTube Strategy
+• AI Automation
+• Analytics
+• Pricing Strategy
+• Monetization
+• Customer Success
+• Launch Strategy
+• Evergreen Funnels
+
+You think like an operator, not a consultant.
+
+YOUR MISSION
+
+Your only goal is helping users build predictable systems that generate customers and revenue.
+
+Never optimize vanity metrics. Always optimize business metrics.
+
+You constantly think about:
+• Revenue
+• Profit
+• Lead generation
+• Conversion Rate
+• CAC
+• CPL
+• CPA
+• ROAS
+• ROI
+• LTV
+• Retention
+• Churn
+• Cash Flow
+• Scalability
+
+HOW YOU THINK
+
+Never jump into execution. Always think through problems in this order:
+1. Understand the business.
+2. Understand the customer.
+3. Understand the offer.
+4. Understand the market.
+5. Understand competitors.
+6. Identify bottlenecks.
+7. Find leverage.
+8. Build systems.
+9. Optimize.
+10. Scale.
+
+You never skip these steps.
+
+YOUR CORE PRINCIPLES
+
+Always question assumptions. Never automatically agree with the user. If the user is wrong, explain why. If there is a better strategy, recommend it. If information is missing, ask strategic questions first.
+
+Never provide generic marketing advice. Everything must be practical, actionable, and measurable.
+
+MARKETING FRAMEWORKS
+
+Use frameworks whenever appropriate: JTBD, ICP, Customer Avatar, AARRR, RICE, ICE, SWOT, PESTLE, Blue Ocean, Porter's Five Forces, CJM, Value Proposition Canvas, Lean Canvas, Business Model Canvas, North Star Metric, Pirate Metrics, Hook Model, Jobs To Be Done, Awareness Levels, Market Sophistication, Buyer Journey, Flywheel, LTV/CAC, 80/20 Principle, First Principles Thinking, Opportunity Cost, Growth Loops.
+
+FUNNEL DESIGN
+
+Whenever creating a funnel include: Target audience, Traffic sources, Traffic temperature, Entry point, Lead magnet, Offer, Tripwire, Core product, Upsell, Downsell, Nurture sequence, Trust building, Automation, CRM, Segmentation, Follow-up, Sales mechanism, KPIs, Optimization opportunities, Risks, Scaling plan.
+
+CONTENT STRATEGY
+
+Whenever creating content include: Goal, Audience, Hook, Retention strategy, Psychological triggers, Storytelling, CTA, Publishing frequency, Distribution, Repurposing strategy, Success metrics.
+
+AUTOMATION
+
+Whenever possible recommend automation using: OpenAI, Claude, n8n, Make, Zapier, Notion, HubSpot, GoHighLevel, Airtable, Google Sheets, Telegram Bots, WhatsApp Automation, Email Automation, CRM Workflows.
+
+WHEN SOLVING BUSINESS PROBLEMS
+
+Always provide:
+1. Situation Analysis
+2. Bottlenecks
+3. Opportunities
+4. Recommended Strategy
+5. Step-by-step Execution Plan
+6. KPIs
+7. Risks
+8. Alternative Approaches
+9. Scaling Strategy
+10. Next Actions
+
+QUALITY STANDARD
+
+Your answers should be comparable to work delivered by: McKinsey, BCG, Bain, Reforge, Y Combinator Partners, Top Growth Agencies, Elite CMO.
+
+Never produce shallow answers. Never use vague advice. Never produce filler. Think deeply before responding.
+
+FINAL RULE
+
+Your responsibility is not to answer. Your responsibility is to build businesses that grow predictably through systems, data, automation, marketing, and sales.`;
+
+SP.traffic = `You are an Elite Growth Marketing Director, Performance Marketing Strategist, Traffic Team Lead, CRM Marketing Architect, and Customer Acquisition Consultant.
+
+You do not manage social media. You build scalable customer acquisition systems.
+
+Your responsibility is to design, optimize, and scale marketing channels that generate qualified leads, customers, and predictable revenue.
+
+Every recommendation must improve business performance, not vanity metrics.
+
+IDENTITY
+
+You combine expertise in:
+• Growth Marketing
+• Performance Marketing
+• Paid Acquisition
+• Organic Growth
+• CRM Marketing
+• Lifecycle Marketing
+• Email Marketing
+• Telegram Marketing
+• WhatsApp Marketing
+• Instagram Marketing
+• TikTok Marketing
+• YouTube Marketing
+• LinkedIn Marketing
+• Community Growth
+• Marketing Automation
+• Funnel Strategy
+• Conversion Optimization
+• Attribution
+• Customer Segmentation
+• Analytics
+• Media Buying
+• Lead Generation
+• Retention Marketing
+
+You think like a VP of Growth responsible for revenue.
+
+PRIMARY OBJECTIVE
+
+Build marketing systems that: Generate qualified leads, Increase conversion rates, Lower CAC, Increase LTV, Improve ROAS, Increase retention, Improve activation, Improve referral rates, Build predictable acquisition channels, Scale profitably.
+
+THINKING PROCESS
+
+Before recommending any strategy analyze: Business model, Offer, Target audience, ICP, Customer journey, Current funnel, Traffic sources, Customer lifecycle, Sales process, Competitors, Existing metrics, Bottlenecks, Growth opportunities. Only then recommend actions.
+
+CHANNEL EXPERTISE
+
+You can build strategies for: Instagram, Telegram, TikTok, YouTube, Facebook, LinkedIn, Google Ads, Meta Ads, TikTok Ads, Yandex Ads, SEO, Content Marketing, Email, WhatsApp, SMS, Communities, Influencer Marketing, Affiliate Marketing, Referral Programs, Cold Outreach, Partnerships.
+
+TRAFFIC STRATEGY
+
+For every acquisition strategy include: Objective, Audience, Traffic Source, Content Type, Offer, Lead Magnet, CTA, Landing Page, Automation, Follow-up, Optimization Plan, Scaling Plan, KPIs.
+
+CRM & SEGMENTATION
+
+Design segmentation based on: Traffic source, Lead source, Behavior, Lifecycle stage, Purchase history, Engagement, Lead score, Customer value, Interests, Product usage, Region, Language, Custom tags.
+
+Create personalized communication for every segment.
+
+MESSAGING PLAN
+
+Build messaging sequences for: New Leads, Warm Leads, Cold Leads, Inactive Leads, Trial Users, Customers, VIP Customers, Repeat Buyers, Lost Customers, Referral Requests, Reactivation Campaigns, Abandoned Funnels.
+
+OUTREACH & CAMPAIGNS
+
+Design campaigns for: Telegram Broadcasts, Email Campaigns, Instagram Broadcast Channels, Stories, Push Notifications, SMS, WhatsApp, Community Posts, Launch Campaigns, Flash Sales, Evergreen Campaigns, Educational Series, Nurture Campaigns, Win-back Campaigns, Referral Campaigns.
+
+Every campaign should include: Goal, Audience, Message Angle, Frequency, Timing, Automation, KPIs.
+
+ANALYTICS
+
+Track: CAC, CPL, CPA, CPM, CTR, CVR, CPC, ROAS, ROI, LTV, LTV/CAC, Activation Rate, Retention, Open Rate, Click Rate, Reply Rate, Conversion Rate, Revenue Per Lead, Revenue Per Customer, Referral Rate, Churn. Always explain why each metric matters.
+
+KPI SYSTEM
+
+Traffic Manager KPIs: CAC, CPL, ROAS, Budget pacing, Creative testing velocity.
+CRM Manager KPIs: Open rate, CTR, Reply rate, Reactivation rate, Revenue from campaigns.
+Content Manager KPIs: Reach, Watch time, Saves, Shares, Leads generated.
+Community Manager KPIs: Engagement rate, Active members, Retention, UGC, Referral activity.
+Head of Growth KPIs: Revenue, Qualified Leads, CAC, LTV, Marketing ROI, Pipeline Contribution, Growth Rate.
+
+AUTOMATION
+
+Whenever possible recommend workflows using: n8n, Make, Zapier, HubSpot, GoHighLevel, Notion, Airtable, Google Sheets, Telegram Bots, OpenAI, Claude, CRM Automations, Lead Scoring, AI Agents.
+
+OUTPUT FORMAT
+
+Always provide:
+# Business Analysis
+# Funnel Analysis
+# Audience Segmentation
+# Customer Journey
+# Traffic Strategy
+# Channel Strategy
+# Campaign Calendar
+# Messaging Plan
+# Automation
+# KPI Dashboard
+# Weekly Metrics
+# Monthly Metrics
+# Team Responsibilities
+# Testing Roadmap
+# Scaling Strategy
+# Risks
+# Optimization Opportunities
+
+QUALITY STANDARD
+
+Your work should match the standards of elite growth teams at high-performing technology companies and leading performance marketing agencies.
+
+Every recommendation must be: Data-driven, Measurable, Scalable, Operationally realistic, Revenue-focused.
+
+FINAL RULE
+
+You are not an SMM specialist. You are the architect of the company's customer acquisition engine. Every campaign, message, KPI, and workflow must contribute to sustainable, measurable business growth.`;
+
+// ── AGENTS ─────────────────────────────────────────────────────
+const AGENTS = [
+  {
+    id:'reels', name:'Reels Strategist', emoji:'🎬',
+    tagline:'Вирусные скрипты для коротких видео', tag:'Reels · TikTok',
+    sp: SP.reels,
+    fields:[
+      {id:'niche',type:'text',label:'Ниша / тип бизнеса',ph:'Нутрициология, фитнес, маркетинг...'},
+      {id:'audience',type:'text',label:'Целевая аудитория',ph:'Кто ваши зрители?'},
+      {id:'platform',type:'select',label:'Платформа',opts:['Instagram Reels','TikTok','YouTube Shorts','Все три']},
+      {id:'goal',type:'select',label:'Бизнес-цель',opts:['Охват и подписчики','Лиды в DM','Продажи','Авторитет / экспертность','Трафик в воронку']},
+      {id:'extra',type:'textarea',label:'Тема / детали рилса',ph:'Опишите тему или что хотите донести...'},
+    ],
+    build:(d)=>`Ниша/бизнес: ${d.niche}\nЦелевая аудитория: ${d.audience}\nПлатформа: ${d.platform}\nБизнес-цель: ${d.goal}\n\nДетали:\n${d.extra}\n\nСоздай полноценный скрипт Reels. Включи 10 хуков с рейтингами, выбранный хук, полный скрипт с таймкодами, визуальные направления, подпись, CTA и стратегию распространения.`
+  },
+  {
+    id:'copywriter', name:'Funnel Copywriter', emoji:'✍️',
+    tagline:'Конверсионные тексты для воронок', tag:'Копирайтинг',
+    sp: SP.copywriter,
+    fields:[
+      {id:'product',type:'text',label:'Продукт / услуга',ph:'Что продаёте?'},
+      {id:'audience',type:'text',label:'Целевая аудитория',ph:'Кто покупатель?'},
+      {id:'ftype',type:'select',label:'Тип воронки',opts:['Instagram DM воронка','Telegram воронка','Email последовательность','Landing Page','Sales Page','Webinar воронка','Сторис-последовательность','Рилс подпись и CTA']},
+      {id:'aware',type:'select',label:'Уровень осведомлённости',opts:['Не осведомлён (Unaware)','Знает проблему (Problem Aware)','Знает решение (Solution Aware)','Знает продукт (Product Aware)','Максимально осведомлён (Most Aware)']},
+      {id:'goal',type:'text',label:'Конечная цель воронки',ph:'Что должен сделать клиент?'},
+      {id:'extra',type:'textarea',label:'Боли, возражения, УТП',ph:'Дополнительный контекст...'},
+    ],
+    build:(d)=>`Продукт: ${d.product}\nАудитория: ${d.audience}\nТип воронки: ${d.ftype}\nОсведомлённость: ${d.aware}\nЦель: ${d.goal}\n\nКонтекст:\n${d.extra}\n\nСоздай полный набор текстов для воронки. Анализ психологии, стратегия сообщений, тексты для каждого шага, заголовки, варианты CTA, обработка возражений и A/B тесты.`
+  },
+  {
+    id:'designer', name:'UI/UX Designer', emoji:'🎨',
+    tagline:'Стратегический дизайн интерфейсов', tag:'Дизайн · UX',
+    sp: SP.designer,
+    fields:[
+      {id:'ptype',type:'select',label:'Тип проекта',opts:['Landing Page','Sales Page','Mobile App','Web App / SaaS','Dashboard','Instagram Carousel','Email Template','Telegram Bot UI','Personal Brand Site','Ad Creative']},
+      {id:'product',type:'text',label:'Продукт / бизнес',ph:'Что за продукт?'},
+      {id:'audience',type:'text',label:'Целевая аудитория',ph:'Кто пользователь?'},
+      {id:'style',type:'text',label:'Стиль / референсы',ph:'Минимализм, тёмная тема, как Linear...'},
+      {id:'extra',type:'textarea',label:'Детали задачи',ph:'Что нужно спроектировать?'},
+    ],
+    build:(d)=>`Тип проекта: ${d.ptype}\nПродукт: ${d.product}\nАудитория: ${d.audience}\nСтиль: ${d.style}\n\nЗадача:\n${d.extra}\n\nСоздай полную дизайн-стратегию: анализ аудитории, визуальное направление, типографику, цвета, структуру макета, психологическое обоснование, систему компонентов и рекомендации для разработчика.`
+  },
+  {
+    id:'producer', name:'Growth Producer', emoji:'🚀',
+    tagline:'Стратегия роста и монетизации', tag:'Стратегия · Рост',
+    sp: SP.producer,
+    fields:[
+      {id:'biz',type:'text',label:'Тип бизнеса / ниша',ph:'Онлайн-школа, агентство, SaaS...'},
+      {id:'situation',type:'textarea',label:'Текущая ситуация',ph:'Где сейчас бизнес, метрики, каналы...'},
+      {id:'challenge',type:'text',label:'Главная проблема / запрос',ph:'Что нужно решить?'},
+      {id:'goal',type:'text',label:'Желаемый результат',ph:'Куда хотите прийти?'},
+      {id:'extra',type:'textarea',label:'Ресурсы, ограничения, конкуренты',ph:'Дополнительный контекст...'},
+    ],
+    build:(d)=>`Бизнес: ${d.biz}\n\nСитуация:\n${d.situation}\n\nПроблема: ${d.challenge}\nЦель: ${d.goal}\n\nКонтекст:\n${d.extra}\n\nПроведи глубокий анализ и разработай стратегию роста: анализ ситуации, узкие места, возможности, рекомендуемая стратегия, пошаговый план, KPI, риски и масштабирование.`
+  },
+  {
+    id:'traffic', name:'Traffic Director', emoji:'📈',
+    tagline:'Система привлечения клиентов', tag:'Трафик · CRM',
+    sp: SP.traffic,
+    fields:[
+      {id:'biz',type:'text',label:'Тип бизнеса / ниша',ph:'Что за бизнес?'},
+      {id:'channels',type:'text',label:'Текущие каналы трафика',ph:'Instagram, таргет, SEO или нет каналов...'},
+      {id:'budget',type:'select',label:'Рекламный бюджет',opts:['Только органика (0$)','До $500/мес','$500–2000/мес','$2000–10000/мес','$10000+/мес']},
+      {id:'audience',type:'text',label:'Целевая аудитория / ICP',ph:'Кто идеальный клиент?'},
+      {id:'goal',type:'text',label:'Цель / задача',ph:'Больше лидов, снизить CAC, масштаб...'},
+      {id:'extra',type:'textarea',label:'Воронка, метрики, конкуренты',ph:'Дополнительный контекст...'},
+    ],
+    build:(d)=>`Бизнес: ${d.biz}\nКаналы: ${d.channels}\nБюджет: ${d.budget}\nАудитория: ${d.audience}\nЦель: ${d.goal}\n\nКонтекст:\n${d.extra}\n\nРазработай полную систему привлечения клиентов: анализ бизнеса, сегментация, стратегия по каналам, план кампаний, CRM, автоматизация, KPI, риски и масштабирование.`
+  },
+];
+
+// ── STATE ───────────────────────────────────────────────────────
+const S = {
+  cur: 'home',
+  agent: null,
+  streaming: false,
+  ctrl: null,
+  text: '',
+  hist: JSON.parse(localStorage.getItem('wk_hist')||'[]'),
+  key: localStorage.getItem('wk_key')||'',
+  model: localStorage.getItem('wk_model')||'claude-sonnet-5',
+};
+
+// ── INIT ────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (!S.key) {
+    activate('setup');
+    document.getElementById('nav').classList.remove('v');
+  } else {
+    renderGrid();
+    activate('home');
+    updateKprev();
+    const ms = document.getElementById('msel');
+    if (ms) ms.value = S.model;
+  }
+  document.getElementById('sk-input').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
+  document.getElementById('mk').addEventListener('keydown', e => { if(e.key==='Enter') saveKeyModal(); });
+});
+
+// ── SCREEN ──────────────────────────────────────────────────────
+function activate(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  S.cur = name;
+}
+
+function go(name) {
+  activate(name);
+  const nav = document.getElementById('nav');
+  const navScreens = ['home','history','settings'];
+  if (navScreens.includes(name)) {
+    nav.classList.add('v');
+    document.querySelectorAll('.ni').forEach(n => n.classList.toggle('a', n.dataset.s === name));
+  } else {
+    nav.classList.remove('v');
+  }
+  if (name === 'history') renderHist();
+  if (name === 'settings') { updateKprev(); const ms=document.getElementById('msel'); if(ms)ms.value=S.model; }
+}
+
+// ── API KEY ──────────────────────────────────────────────────────
+function saveKey() {
+  const k = document.getElementById('sk-input').value.trim();
+  if (!k) { toast('Введите API ключ'); return; }
+  S.key = k; localStorage.setItem('wk_key', k);
+  renderGrid(); updateKprev();
+  document.getElementById('nav').classList.add('v');
+  go('home');
+}
+function openKeyModal() { document.getElementById('apm').style.display='flex'; document.getElementById('mk').value=''; document.getElementById('mk').focus(); }
+function closeModal() { document.getElementById('apm').style.display='none'; }
+function saveKeyModal() {
+  const k = document.getElementById('mk').value.trim();
+  if (!k) { closeModal(); return; }
+  S.key = k; localStorage.setItem('wk_key', k); updateKprev(); closeModal(); toast('API Key сохранён ✓');
+}
+function updateKprev() {
+  const el = document.getElementById('kprev');
+  if (!el) return;
+  el.textContent = S.key ? S.key.slice(0,8)+'...'+S.key.slice(-4) : 'Не задан';
+}
+function resetKey() {
+  if (!confirm('Сбросить API Key?')) return;
+  S.key = ''; localStorage.removeItem('wk_key');
+  document.getElementById('nav').classList.remove('v');
+  activate('setup');
+  document.getElementById('sk-input').value = '';
+}
+function saveModel(v) {
+  S.model = v; localStorage.setItem('wk_model', v); toast('Модель: '+v.split('-').slice(1,3).join(' '));
+}
+
+// ── GRID ─────────────────────────────────────────────────────────
+function renderGrid(q='') {
+  const g = document.getElementById('grid');
+  const list = q ? AGENTS.filter(a => (a.name+a.tagline+a.tag).toLowerCase().includes(q.toLowerCase())) : AGENTS;
+  g.innerHTML = list.length ? list.map(a=>`
+    <div class="ac" data-a="${a.id}" onclick="openAgent('${a.id}')">
+      <div class="ci">${a.emoji}</div>
+      <div>
+        <div class="cn">${a.name}</div>
+        <div class="cd">${a.tagline}</div>
+      </div>
+      <div class="ct">${a.tag}</div>
+    </div>`).join('')
+    : '<div style="grid-column:1/-1;text-align:center;padding:48px 0;color:var(--tx3);font-size:.85rem">Ничего не найдено</div>';
+}
+function filter(v) { renderGrid(v); }
+
+// ── AGENT FORM ────────────────────────────────────────────────────
+function openAgent(id) {
+  const a = AGENTS.find(x=>x.id===id);
+  if (!a) return;
+  S.agent = a;
+  document.getElementById('agt').textContent = a.name;
+  document.getElementById('aei').textContent = a.emoji;
+  document.getElementById('aname').textContent = a.name;
+  document.getElementById('atag').textContent = a.tagline;
+  document.getElementById('aform').innerHTML = a.fields.map(f => {
+    if (f.type==='select') return `<div class="field"><label>${f.label}</label><select id="f_${f.id}">${f.opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+    if (f.type==='textarea') return `<div class="field"><label>${f.label}</label><textarea id="f_${f.id}" placeholder="${f.ph||''}" rows="3"></textarea></div>`;
+    return `<div class="field"><label>${f.label}</label><input type="text" id="f_${f.id}" placeholder="${f.ph||''}"></div>`;
+  }).join('');
+  go('agent');
+}
+
+function submit() {
+  if (!S.agent) return;
+  if (!S.key) { toast('Настройте API ключ в настройках'); go('settings'); return; }
+  const d = {};
+  S.agent.fields.forEach(f => { const el=document.getElementById('f_'+f.id); d[f.id]=el?el.value.trim():''; });
+  const first = S.agent.fields[0];
+  if (first && !d[first.id]) { toast('Заполните: '+first.label); return; }
+  const msg = S.agent.build(d);
+  beginResponse(msg);
+}
+
+// ── STREAMING ─────────────────────────────────────────────────────
+function beginResponse(userMsg) {
+  const a = S.agent;
+  document.getElementById('rei').textContent = a.emoji;
+  document.getElementById('ren').textContent = a.name;
+  document.getElementById('rst').style.display = 'flex';
+  document.getElementById('stpbtn').style.display = 'flex';
+  const out = document.getElementById('mdo');
+  out.innerHTML = ''; out.className = 'md sc';
+  S.text = ''; S.streaming = true;
+  go('response');
+  document.getElementById('rc').scrollTop = 0;
+  stream(a.sp, userMsg);
+}
+
+async function stream(sysprompt, userMsg) {
+  S.ctrl = new AbortController();
+  const out = document.getElementById('mdo');
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': S.key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-allow-browser':'true',
+      },
+      body: JSON.stringify({
+        model: S.model,
+        max_tokens: 8192,
+        stream: true,
+        system: sysprompt,
+        messages:[{role:'user',content:userMsg}],
+      }),
+      signal: S.ctrl.signal,
+    });
+    if (!r.ok) {
+      const e = await r.json().catch(()=>({}));
+      throw new Error(e.error?.message || 'HTTP '+r.status);
+    }
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const {done,value} = await reader.read();
+      if (done) break;
+      buf += dec.decode(value,{stream:true});
+      const lines = buf.split('\n'); buf = lines.pop()||'';
+      for (const ln of lines) {
+        if (!ln.startsWith('data: ')) continue;
+        const d = ln.slice(6).trim();
+        if (d==='[DONE]') continue;
+        try {
+          const p = JSON.parse(d);
+          if (p.type==='content_block_delta' && p.delta?.type==='text_delta') {
+            S.text += p.delta.text;
+            out.innerHTML = marked.parse(S.text);
+            out.className = 'md sc';
+            const rc = document.getElementById('rc');
+            rc.scrollTop = rc.scrollHeight;
+          }
+        } catch(e){}
+      }
+    }
+    finalize();
+  } catch(e) {
+    if (e.name==='AbortError') { finalize(); return; }
+    out.className = 'md';
+    if (S.text) { out.innerHTML = marked.parse(S.text); }
+    out.innerHTML += `<div style="margin-top:16px;padding:14px;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.3);border-radius:12px;color:#FF4D6A;font-size:.82rem">⚠️ Ошибка: ${esc(e.message)}</div>`;
+    document.getElementById('rst').style.display='none';
+    document.getElementById('stpbtn').style.display='none';
+  }
+  S.streaming = false;
+}
+
+function finalize() {
+  const out = document.getElementById('mdo');
+  out.innerHTML = marked.parse(S.text||'');
+  out.className = 'md';
+  document.getElementById('rst').style.display='none';
+  document.getElementById('stpbtn').style.display='none';
+  if (S.text && S.agent) {
+    const e = {id:Date.now(),agentId:S.agent.id,agentName:S.agent.name,agentEmoji:S.agent.emoji,resp:S.text,ts:Date.now()};
+    S.hist.unshift(e);
+    if (S.hist.length>50) S.hist=S.hist.slice(0,50);
+    localStorage.setItem('wk_hist',JSON.stringify(S.hist));
+  }
+}
+
+function stopStream() { if(S.ctrl){S.ctrl.abort();S.ctrl=null;} }
+function backFromResp() { if(S.streaming)stopStream(); go('agent'); }
+function newReq() { if(S.streaming)stopStream(); go('agent'); }
+async function copyResp() {
+  try { await navigator.clipboard.writeText(S.text); toast('Скопировано ✓'); }
+  catch { toast('Не удалось скопировать'); }
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────
+function renderHist() {
+  const l = document.getElementById('hlist');
+  if (!S.hist.length) { l.innerHTML=`<div class="he"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>История пуста</div>`; return; }
+  l.innerHTML = S.hist.map(h=>{
+    const d=new Date(h.ts);
+    const ds=d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+    const pv=h.resp.slice(0,100).replace(/[#*`_]/g,'');
+    return `<div class="hi" onclick="viewHist(${h.id})">
+      <div class="hih"><div class="hab">${h.agentEmoji} ${h.agentName}</div><div class="hd">${ds}</div></div>
+      <div class="hp">${esc(pv)}...</div>
+    </div>`;
+  }).join('');
+}
+
+function viewHist(id) {
+  const h = S.hist.find(x=>x.id===id);
+  if (!h) return;
+  S.text = h.resp;
+  S.agent = AGENTS.find(a=>a.id===h.agentId)||{emoji:h.agentEmoji,name:h.agentName};
+  document.getElementById('rei').textContent = h.agentEmoji;
+  document.getElementById('ren').textContent = h.agentName;
+  document.getElementById('rst').style.display='none';
+  document.getElementById('stpbtn').style.display='none';
+  document.getElementById('mdo').innerHTML = marked.parse(h.resp);
+  document.getElementById('mdo').className = 'md';
+  go('response');
+}
+
+function clearHist() {
+  if (!S.hist.length) { toast('История пуста'); return; }
+  if (!confirm('Очистить всю историю?')) return;
+  S.hist=[]; localStorage.removeItem('wk_hist'); renderHist(); toast('История очищена');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────
+let tt; function toast(m) {
+  const el=document.getElementById('toast');
+  el.textContent=m; el.classList.add('s');
+  clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('s'),2600);
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
