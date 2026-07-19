@@ -29,7 +29,7 @@ a{color:#1565c0;font-weight:600}
 <div class="card">
   <div class="logo">📲</div>
   <h1>Создать ТЗ в Notion</h1>
-  <p class="sub">Ассистент по рассылкам — основное ТЗ.</p>
+  <p class="sub">Ассистент по рассылкам — все блоки, таблицы и оформление.</p>
 
   <label>Notion Token</label>
   <input type="text" id="token" placeholder="ntn_..." autocomplete="off" autocorrect="off" spellcheck="false">
@@ -53,11 +53,13 @@ function tx(c,bold){var r={type:"text",text:{content:c}};if(bold)r.annotations={
 function bx(c){return tx(c,true);}
 function para(p,col){return{object:"block",type:"paragraph",paragraph:{rich_text:p,color:col||"default"}};}
 function h2(p){return{object:"block",type:"heading_2",heading_2:{rich_text:p,is_toggleable:false}};}
+function h3(p){return{object:"block",type:"heading_3",heading_3:{rich_text:p,is_toggleable:false}};}
 function dv(){return{object:"block",type:"divider",divider:{}};}
 function bul(p){return{object:"block",type:"bulleted_list_item",bulleted_list_item:{rich_text:p}};}
 function num(p){return{object:"block",type:"numbered_list_item",numbered_list_item:{rich_text:p}};}
 function co(e,col,p){return{object:"block",type:"callout",callout:{rich_text:p,icon:{type:"emoji",emoji:e},color:col+"_background"}};}
-function trow(cells){return{object:"block",type:"table_row",table_row:{cells:cells.map(function(c){return[tx(c)]})}};}  
+function qt(p){return{object:"block",type:"quote",quote:{rich_text:p}};}
+function trow(cells){return{object:"block",type:"table_row",table_row:{cells:cells.map(function(c){return[tx(c)]})}};}
 function tbl(rows,hdr){return{object:"block",type:"table",table:{table_width:rows[0].length,has_column_header:hdr!==false,has_row_header:false,children:rows.map(function(r){return trow(r)})}};}
 
 function blocks(){return[
@@ -73,8 +75,8 @@ function blocks(){return[
   co("🕐","gray",[bx("Твой день: "),tx("утром рассылки (~1.5 ч), днём входящие (~1 ч), вечером отчёт (5 мин).")]),
   dv(),
   h2([bx("💰 Зарплата")]),
-  tbl([["Результат","Оплат"],["⚠️ 0 продаж","2 500 ₽"],["🟡 1 продажа","10 000 ₽ (поощрительные)"],["🟢 3 продажи — план","40 000 ₽"],["🔥 4 продажи","60 000 ₽"]]),
-  co("📊","yellow",[bx("Система: "),tx("выполняешь план (3 продажи) — получаешь 40к. Каждая продажа сверх — ещё +10к.")]),
+  tbl([["Результат","Оплата"],["0 продаж","2 500 ₽"],["1 продажа","10 000 ₽ (поощрительные)"],["3 продажи — план","40 000 ₽"],["4 продажи","60 000 ₽"]]),
+  co("📊","yellow",[bx("Система простая: "),tx("выполняешь план (3 продажи) — получаешь 40к. Каждая продажа сверх — ещё +10к.")]),
   dv(),
   h2([bx("📏 Правила")]),
   num([bx("Отчёт каждый день "),tx("— сам, без напоминаний")]),
