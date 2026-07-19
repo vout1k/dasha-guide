@@ -364,6 +364,20 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
         </div>
       </div>
       <div class="ss">
+        <div class="sst">Мой контекст</div>
+        <div style="padding:12px 15px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:.75rem;color:var(--tx2);line-height:1.5">Заполни один раз — агенты будут знать о тебе автоматически в каждом запросе</div>
+          <textarea id="ctx-input" rows="5" placeholder="Например: я нутрициолог, веду Instagram @username, целевая аудитория — женщины 25-40 лет, продаю онлайн-курсы по питанию за 15 000₽, есть Telegram-канал на 2000 подписчиков..."
+            style="background:var(--sf3);border:1px solid var(--bd);border-radius:12px;color:var(--tx);
+            font-size:.82rem;font-family:inherit;padding:12px 14px;outline:none;resize:vertical;
+            line-height:1.6;width:100%;transition:border-color .2s"
+            oninput="this.style.borderColor='var(--ac)'"
+            onblur="this.style.borderColor='var(--bd)'"
+          ></textarea>
+          <button class="btn btn-p" onclick="saveCtx()" style="padding:12px">Сохранить контекст ✓</button>
+        </div>
+      </div>
+      <div class="ss">
         <div class="sst">Данные</div>
         <div class="sr" onclick="clearHist()">
           <div class="srl" style="color:#FF6B6B">Очистить историю</div>
@@ -1177,6 +1191,7 @@ const S = {
   key: localStorage.getItem('wk_key')||'',
   model: localStorage.getItem('wk_model')||'llama-3.3-70b-versatile',
   provider: localStorage.getItem('wk_prov')||'groq',
+  ctx: localStorage.getItem('wk_ctx')||'',
 };
 
 // ── INIT ────────────────────────────────────────────────────────
@@ -1215,7 +1230,7 @@ function go(name) {
     nav.classList.remove('v');
   }
   if (name === 'history') renderHist();
-  if (name === 'settings') { updateKprev(); updateModelSelect(); updateSettingsProvider(); }
+  if (name === 'settings') { updateKprev(); updateModelSelect(); updateSettingsProvider(); loadCtx(); }
 }
 
 // ── API KEY ──────────────────────────────────────────────────────
@@ -1270,6 +1285,14 @@ function updateSettingsProvider() {
   const kl = document.getElementById('key-label'); if (kl) kl.textContent = S.provider==='groq' ? 'Groq API Key' : 'Anthropic API Key';
   const mkl = document.getElementById('mk-label'); if (mkl) mkl.textContent = S.provider==='groq' ? 'Groq API Key' : 'Anthropic API Key';
   const mki = document.getElementById('mk'); if (mki) mki.placeholder = S.provider==='groq' ? 'gsk_...' : 'sk-ant-...';
+}
+function saveCtx() {
+  const v = (document.getElementById('ctx-input')?.value||'').trim();
+  S.ctx = v; localStorage.setItem('wk_ctx', v);
+  toast(v ? 'Контекст сохранён ✓' : 'Контекст очищен');
+}
+function loadCtx() {
+  const el = document.getElementById('ctx-input'); if (el) el.value = S.ctx;
 }
 function updateSetupHint(prov) {
   const kl = document.getElementById('su-klabel');
@@ -1329,7 +1352,8 @@ function submit() {
   S.agent.fields.forEach(f => { const el=document.getElementById('f_'+f.id); d[f.id]=el?el.value.trim():''; });
   const first = S.agent.fields[0];
   if (first && !d[first.id]) { toast('Заполните: '+first.label); return; }
-  const msg = S.agent.build(d);
+  let msg = S.agent.build(d);
+  if (S.ctx) msg = `О себе / мой бизнес:\n${S.ctx}\n\n---\n\n${msg}`;
   beginResponse(msg);
 }
 
