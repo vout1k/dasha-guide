@@ -212,15 +212,29 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
     <div class="su-logo">🤖</div>
     <div>
       <div class="su-title">AI Agent Workspace</div>
-      <div class="su-desc" style="margin-top:8px">Введите API ключ Anthropic чтобы начать работу с агентами</div>
+      <div class="su-desc" style="margin-top:8px">Выберите провайдера и введите API ключ.<br>Groq — <strong style="color:#10B981">бесплатно</strong>, Anthropic — платно.</div>
     </div>
     <div class="su-form">
       <div class="field">
-        <label>Anthropic API Key</label>
-        <input type="password" id="sk-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+        <label>Провайдер</label>
+        <select id="su-prov" onchange="updateSetupHint(this.value)"
+          style="background:var(--sf);border:1px solid var(--bd);border-radius:12px;color:var(--tx);
+          font-size:.9rem;font-family:inherit;padding:13px 15px;outline:none;
+          -webkit-appearance:none;appearance:none;width:100%;cursor:pointer;
+          background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238080A8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 13px center;padding-right:38px">
+          <option value="groq">⚡ Groq — бесплатно (Llama 3.3 70B)</option>
+          <option value="anthropic">🤖 Anthropic — платно (Claude)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label id="su-klabel">API Key (Groq)</label>
+        <input type="password" id="sk-input" placeholder="gsk_..." autocomplete="off" spellcheck="false">
+      </div>
+      <div id="su-hint" style="font-size:.72rem;color:var(--ac);line-height:1.6;text-align:center;background:var(--ach);border-radius:10px;padding:8px 12px">
+        Получить бесплатно: <strong>console.groq.com</strong> → API Keys
       </div>
       <button class="btn btn-p" onclick="saveKey()">Начать работу →</button>
-      <div style="font-size:.7rem;color:var(--tx3);text-align:center;line-height:1.5">Ключ хранится только в браузере. Никуда не передаётся.</div>
+      <div style="font-size:.7rem;color:var(--tx3);text-align:center;line-height:1.5">Ключ хранится только в браузере.</div>
     </div>
   </div>
 </div>
@@ -319,9 +333,18 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
   <div class="sb">
     <div class="sl">
       <div class="ss">
-        <div class="sst">API</div>
+        <div class="sst">Провайдер</div>
+        <div class="sr" style="cursor:default">
+          <div class="srl">Источник AI</div>
+          <select id="prov-sel" onchange="saveProvider(this.value)"
+            style="background:var(--sf3);border:1px solid var(--bd);border-radius:8px;
+            color:var(--tx);font-size:.78rem;padding:6px 10px;font-family:inherit;cursor:pointer;outline:none">
+            <option value="groq">⚡ Groq (бесплатно)</option>
+            <option value="anthropic">🤖 Anthropic (платно)</option>
+          </select>
+        </div>
         <div class="sr" onclick="openKeyModal()">
-          <div class="srl">Anthropic API Key</div>
+          <div class="srl" id="key-label">API Key</div>
           <div class="srv" id="kprev">Не задан</div>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
         </div>
@@ -329,14 +352,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
       <div class="ss">
         <div class="sst">Модель</div>
         <div class="sr" style="cursor:default">
-          <div class="srl">Claude Model</div>
+          <div class="srl">Модель</div>
           <select id="msel" onchange="saveModel(this.value)"
             style="background:var(--sf3);border:1px solid var(--bd);border-radius:8px;
             color:var(--tx);font-size:.78rem;padding:6px 10px;font-family:inherit;cursor:pointer;outline:none">
-            <option value="claude-sonnet-5">Sonnet 5 (рекомендуется)</option>
-            <option value="claude-opus-4-8">Opus 4.8 (мощный)</option>
-            <option value="claude-haiku-4-5-20251001">Haiku 4.5 (быстрый)</option>
-            <option value="claude-fable-5">Fable 5</option>
+            <option value="llama-3.3-70b-versatile">Llama 3.3 70B (лучший)</option>
+            <option value="llama-3.1-70b-versatile">Llama 3.1 70B</option>
+            <option value="llama-3.1-8b-instant">Llama 3.1 8B (быстрый)</option>
+            <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
           </select>
         </div>
       </div>
@@ -352,7 +375,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
         </div>
       </div>
       <div style="text-align:center;padding:12px;font-size:.7rem;color:var(--tx3)">
-        AI Agent Workspace v1.0<br>Powered by Anthropic Claude
+        AI Agent Workspace v1.1<br>Groq · Anthropic Claude
       </div>
     </div>
   </div>
@@ -363,8 +386,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
   <div class="apm-c">
     <div style="font-size:1rem;font-weight:700;margin-bottom:14px">Изменить API Key</div>
     <div class="field" style="margin-bottom:14px">
-      <label>Anthropic API Key</label>
-      <input type="password" id="mk" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+      <label id="mk-label">API Key</label>
+      <input type="password" id="mk" placeholder="gsk_..." autocomplete="off" spellcheck="false">
     </div>
     <div style="display:flex;gap:10px">
       <button class="btn btn-s" style="flex:1" onclick="closeModal()">Отмена</button>
@@ -1127,6 +1150,22 @@ const AGENTS = [
   },
 ];
 
+// ── MODELS ──────────────────────────────────────────────────────
+const MODELS = {
+  groq:[
+    {id:'llama-3.3-70b-versatile',name:'Llama 3.3 70B (лучший)'},
+    {id:'llama-3.1-70b-versatile',name:'Llama 3.1 70B'},
+    {id:'llama-3.1-8b-instant',name:'Llama 3.1 8B (быстрый)'},
+    {id:'mixtral-8x7b-32768',name:'Mixtral 8x7B'},
+  ],
+  anthropic:[
+    {id:'claude-sonnet-5',name:'Sonnet 5 (рекомендуется)'},
+    {id:'claude-opus-4-8',name:'Opus 4.8 (мощный)'},
+    {id:'claude-haiku-4-5-20251001',name:'Haiku 4.5 (быстрый)'},
+    {id:'claude-fable-5',name:'Fable 5'},
+  ],
+};
+
 // ── STATE ───────────────────────────────────────────────────────
 const S = {
   cur: 'home',
@@ -1136,7 +1175,8 @@ const S = {
   text: '',
   hist: JSON.parse(localStorage.getItem('wk_hist')||'[]'),
   key: localStorage.getItem('wk_key')||'',
-  model: localStorage.getItem('wk_model')||'claude-sonnet-5',
+  model: localStorage.getItem('wk_model')||'llama-3.3-70b-versatile',
+  provider: localStorage.getItem('wk_prov')||'groq',
 };
 
 // ── INIT ────────────────────────────────────────────────────────
@@ -1144,12 +1184,14 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!S.key) {
     activate('setup');
     document.getElementById('nav').classList.remove('v');
+    const sp = document.getElementById('su-prov');
+    if (sp) sp.value = S.provider;
+    updateSetupHint(S.provider);
   } else {
     renderGrid();
     activate('home');
     updateKprev();
-    const ms = document.getElementById('msel');
-    if (ms) ms.value = S.model;
+    updateModelSelect();
   }
   document.getElementById('sk-input').addEventListener('keydown', e => { if(e.key==='Enter') saveKey(); });
   document.getElementById('mk').addEventListener('keydown', e => { if(e.key==='Enter') saveKeyModal(); });
@@ -1173,13 +1215,18 @@ function go(name) {
     nav.classList.remove('v');
   }
   if (name === 'history') renderHist();
-  if (name === 'settings') { updateKprev(); const ms=document.getElementById('msel'); if(ms)ms.value=S.model; }
+  if (name === 'settings') { updateKprev(); updateModelSelect(); updateSettingsProvider(); }
 }
 
 // ── API KEY ──────────────────────────────────────────────────────
 function saveKey() {
   const k = document.getElementById('sk-input').value.trim();
   if (!k) { toast('Введите API ключ'); return; }
+  const prov = document.getElementById('su-prov')?.value || S.provider;
+  S.provider = prov; localStorage.setItem('wk_prov', prov);
+  if (!S.model || !MODELS[prov].find(m=>m.id===S.model)) {
+    S.model = MODELS[prov][0].id; localStorage.setItem('wk_model', S.model);
+  }
   S.key = k; localStorage.setItem('wk_key', k);
   renderGrid(); updateKprev();
   document.getElementById('nav').classList.add('v');
@@ -1205,7 +1252,40 @@ function resetKey() {
   document.getElementById('sk-input').value = '';
 }
 function saveModel(v) {
-  S.model = v; localStorage.setItem('wk_model', v); toast('Модель: '+v.split('-').slice(1,3).join(' '));
+  S.model = v; localStorage.setItem('wk_model', v); toast('Модель сохранена');
+}
+function saveProvider(v) {
+  S.provider = v; localStorage.setItem('wk_prov', v);
+  S.model = MODELS[v][0].id; localStorage.setItem('wk_model', S.model);
+  updateModelSelect(); updateSettingsProvider();
+  toast(v==='groq' ? '⚡ Groq (бесплатно) ✓' : '🤖 Anthropic ✓');
+}
+function updateModelSelect() {
+  const sel = document.getElementById('msel'); if (!sel) return;
+  const opts = MODELS[S.provider]||[];
+  sel.innerHTML = opts.map(m=>`<option value="${m.id}"${m.id===S.model?' selected':''}>${m.name}</option>`).join('');
+}
+function updateSettingsProvider() {
+  const ps = document.getElementById('prov-sel'); if (ps) ps.value = S.provider;
+  const kl = document.getElementById('key-label'); if (kl) kl.textContent = S.provider==='groq' ? 'Groq API Key' : 'Anthropic API Key';
+  const mkl = document.getElementById('mk-label'); if (mkl) mkl.textContent = S.provider==='groq' ? 'Groq API Key' : 'Anthropic API Key';
+  const mki = document.getElementById('mk'); if (mki) mki.placeholder = S.provider==='groq' ? 'gsk_...' : 'sk-ant-...';
+}
+function updateSetupHint(prov) {
+  const kl = document.getElementById('su-klabel');
+  const ph = document.getElementById('sk-input');
+  const hint = document.getElementById('su-hint');
+  if (prov==='groq') {
+    if (kl) kl.textContent = 'API Key (Groq)';
+    if (ph) ph.placeholder = 'gsk_...';
+    if (hint) hint.innerHTML = 'Получить бесплатно: <strong>console.groq.com</strong> → API Keys';
+  } else {
+    if (kl) kl.textContent = 'API Key (Anthropic)';
+    if (ph) ph.placeholder = 'sk-ant-...';
+    if (hint) hint.innerHTML = 'Получить: <strong>console.anthropic.com</strong> → API Keys';
+  }
+  S.provider = prov; localStorage.setItem('wk_prov', prov);
+  S.model = MODELS[prov][0].id; localStorage.setItem('wk_model', S.model);
 }
 
 // ── GRID ─────────────────────────────────────────────────────────
@@ -1271,24 +1351,19 @@ function beginResponse(userMsg) {
 async function stream(sysprompt, userMsg) {
   S.ctrl = new AbortController();
   const out = document.getElementById('mdo');
+  const isGroq = S.provider === 'groq';
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'x-api-key': S.key,
-        'anthropic-version':'2023-06-01',
-        'anthropic-dangerous-allow-browser':'true',
-      },
-      body: JSON.stringify({
-        model: S.model,
-        max_tokens: 8192,
-        stream: true,
-        system: sysprompt,
-        messages:[{role:'user',content:userMsg}],
-      }),
-      signal: S.ctrl.signal,
-    });
+    const url = isGroq
+      ? 'https://api.groq.com/openai/v1/chat/completions'
+      : 'https://api.anthropic.com/v1/messages';
+    const headers = isGroq
+      ? {'Content-Type':'application/json','Authorization':'Bearer '+S.key}
+      : {'Content-Type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true'};
+    const body = isGroq
+      ? {model:S.model,max_tokens:8192,stream:true,messages:[{role:'system',content:sysprompt},{role:'user',content:userMsg}]}
+      : {model:S.model,max_tokens:8192,stream:true,system:sysprompt,messages:[{role:'user',content:userMsg}]};
+
+    const r = await fetch(url, {method:'POST',headers,body:JSON.stringify(body),signal:S.ctrl.signal});
     if (!r.ok) {
       const e = await r.json().catch(()=>({}));
       throw new Error(e.error?.message || 'HTTP '+r.status);
@@ -1307,12 +1382,17 @@ async function stream(sysprompt, userMsg) {
         if (d==='[DONE]') continue;
         try {
           const p = JSON.parse(d);
-          if (p.type==='content_block_delta' && p.delta?.type==='text_delta') {
-            S.text += p.delta.text;
+          let chunk = '';
+          if (isGroq) {
+            chunk = p.choices?.[0]?.delta?.content || '';
+          } else {
+            if (p.type==='content_block_delta' && p.delta?.type==='text_delta') chunk = p.delta.text;
+          }
+          if (chunk) {
+            S.text += chunk;
             out.innerHTML = marked.parse(S.text);
             out.className = 'md sc';
-            const rc = document.getElementById('rc');
-            rc.scrollTop = rc.scrollHeight;
+            document.getElementById('rc').scrollTop = document.getElementById('rc').scrollHeight;
           }
         } catch(e){}
       }
