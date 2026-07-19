@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Андрей — Транскрибация + Роадмап</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1a1a24;
+    --surface3: #20202e;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6c5ce7;
+    --accent2: #a29bfe;
+    --green: #00b894;
+    --green2: #55efc4;
+    --red: #e17055;
+    --red2: #ff7675;
+    --yellow: #fdcb6e;
+    --blue: #74b9ff;
+    --text: #dfe6e9;
+    --muted: rgba(223,230,233,0.45);
+    --radius: 14px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'Segoe UI', BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0;
+    width: 230px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-brand {
+    padding: 24px 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-brand h2 {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 4px;
+  }
+  .sidebar-brand p { font-size: 11px; color: var(--muted); }
+
+  .nav-group-label {
+    padding: 14px 18px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(162,155,254,0.4);
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 18px;
+    font-size: 12.5px;
+    color: var(--muted);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .nav-link:hover, .nav-link.active {
+    color: var(--text);
+    background: rgba(108,92,231,0.1);
+    border-left-color: var(--accent);
+  }
+  .nav-icon { font-size: 13px; opacity: 0.8; width: 16px; text-align: center; }
+
+  /* MAIN */
+  .main {
+    margin-left: 230px;
+    padding: 40px 52px 80px;
+    max-width: 1000px;
+  }
+
+  /* SECTIONS */
+  .section { margin-bottom: 72px; scroll-margin-top: 20px; }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 32px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    background: rgba(108,92,231,0.15);
+    border: 1px solid rgba(108,92,231,0.25);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .section-meta { flex: 1; }
+  .section-num {
+    font-size: 10px; font-weight: 700;
+    color: var(--accent2); letter-spacing: 0.15em;
+    text-transform: uppercase; display: block; margin-bottom: 4px;
+  }
+  .section-title { font-size: 22px; font-weight: 800; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, rgba(108,92,231,0.18) 0%, rgba(162,155,254,0.06) 100%);
+    border: 1px solid rgba(108,92,231,0.25);
+    border-radius: var(--radius);
+    padding: 40px;
+    margin-bottom: 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(108,92,231,0.2), transparent 70%);
+  }
+  .hero h1 {
+    font-size: 30px; font-weight: 900;
+    background: linear-gradient(135deg, #fff 30%, var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 10px;
+  }
+  .hero p { color: var(--muted); font-size: 14px; max-width: 500px; }
+  .hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  }
+  .badge-purple { background: rgba(108,92,231,0.2); color: var(--accent2); border: 1px solid rgba(108,92,231,0.3); }
+  .badge-green  { background: rgba(0,184,148,0.15); color: var(--green2); border: 1px solid rgba(0,184,148,0.25); }
+  .badge-red    { background: rgba(225,112,85,0.15); color: var(--red2); border: 1px solid rgba(225,112,85,0.25); }
+  .badge-yellow { background: rgba(253,203,110,0.15); color: var(--yellow); border: 1px solid rgba(253,203,110,0.25); }
+  .badge-blue   { background: rgba(116,185,255,0.15); color: var(--blue); border: 1px solid rgba(116,185,255,0.25); }
+
+  /* QUOTE */
+  .quote {
+    border-left: 3px solid var(--accent);
+    padding: 14px 20px;
+    background: rgba(108,92,231,0.07);
+    border-radius: 0 10px 10px 0;
+    margin: 18px 0;
+    font-size: 14px;
+    color: rgba(223,230,233,0.85);
+    font-style: italic;
+  }
+  .quote cite { display: block; margin-top: 8px; font-size: 12px; color: var(--accent2); font-style: normal; font-weight: 700; }
+
+  /* CARDS */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin: 16px 0; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .card:hover { border-color: rgba(108,92,231,0.4); transform: translateY(-1px); }
+  .card-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .card-body { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    background: var(--surface2);
+    color: var(--accent2); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 10px 16px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(108,92,231,0.04); }
+
+  /* FORMULA */
+  .formula {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px; margin: 14px 0;
+  }
+  .formula-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 12px;
+  }
+  .formula-row:last-child { border-bottom: none; }
+  .formula-label { color: var(--muted); font-size: 13px; flex: 1; }
+  .formula-math { font-family: monospace; font-size: 13px; color: rgba(223,230,233,0.7); }
+  .formula-result { font-weight: 800; min-width: 70px; text-align: right; font-size: 15px; }
+  .fr-red { color: var(--red2); }
+  .fr-yellow { color: var(--yellow); }
+  .fr-green { color: var(--green2); }
+  .fr-purple { color: var(--accent2); }
+
+  /* CODE */
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 22px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 12.5px;
+    color: var(--accent2);
+    overflow-x: auto; margin: 14px 0; line-height: 1.8;
+  }
+
+  /* DO/DONT */
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .do-block, .dont-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .do-block { border-top: 3px solid var(--green); }
+  .dont-block { border-top: 3px solid var(--red); }
+  .block-head {
+    padding: 12px 16px; font-size: 11px; font-weight: 800;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .do-block .block-head { color: var(--green2); }
+  .dont-block .block-head { color: var(--red2); }
+  .block-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px;
+  }
+  .block-item:last-child { border-bottom: none; }
+  .block-item .bi { flex-shrink: 0; margin-top: 1px; }
+
+  /* TIMELINE / ROADMAP */
+  .roadmap { position: relative; }
+  .rm-month {
+    display: grid; grid-template-columns: 100px 1fr; gap: 0;
+    margin-bottom: 0;
+  }
+  .rm-label {
+    padding: 0 24px 0 0;
+    position: relative;
+  }
+  .rm-label::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 2px; background: var(--border);
+  }
+  .rm-label-text {
+    position: sticky; top: 20px;
+    font-size: 11px; font-weight: 800;
+    color: var(--accent2); letter-spacing: 0.12em;
+    text-transform: uppercase; text-align: right;
+  }
+  .rm-content { padding: 0 0 40px 32px; }
+
+  .week-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .week-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .week-head:hover { background: var(--surface3); }
+  .week-num { font-size: 11px; font-weight: 800; color: var(--accent2); letter-spacing: 0.1em; text-transform: uppercase; }
+  .week-title { font-size: 14px; font-weight: 700; flex: 1; }
+  .week-arrow { font-size: 12px; color: var(--muted); transition: transform 0.2s; }
+  .week-arrow.open { transform: rotate(90deg); }
+  .week-body { padding: 16px 18px; display: block; }
+  .week-body.closed { display: none; }
+
+  .day-task {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+  }
+  .day-task:last-child { border-bottom: none; }
+  .day-task .dt-bullet {
+    width: 20px; height: 20px; flex-shrink: 0;
+    background: rgba(108,92,231,0.15);
+    border: 1px solid rgba(108,92,231,0.3);
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--accent2); font-weight: 700;
+    margin-top: 1px;
+  }
+  .dt-text { flex: 1; color: var(--text); }
+  .dt-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* DAY SCHEDULE */
+  .day-schedule { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+  .day-slot {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .slot-time {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 12px;
+    padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  }
+  .slot-morning .slot-time { color: var(--yellow); }
+  .slot-day .slot-time { color: var(--blue); }
+  .slot-evening .slot-time { color: var(--accent2); }
+  .slot-item { display: flex; gap: 8px; margin-bottom: 8px; font-size: 13px; color: var(--muted); }
+  .slot-item:last-child { margin-bottom: 0; }
+  .slot-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; margin-top: 7px; }
+
+  /* METRIC */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 16px;
+    text-align: center;
+  }
+  .metric-val { font-size: 32px; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+  .metric-label { font-size: 12px; color: var(--muted); }
+  .metric-sub { font-size: 11px; color: var(--accent2); margin-top: 6px; font-weight: 600; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 13.5px; cursor: pointer; transition: opacity 0.2s;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li.done { opacity: 0.4; text-decoration: line-through; color: var(--muted); }
+  .cb {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px;
+    border: 1.5px solid rgba(255,255,255,0.2); border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; transition: all 0.15s;
+  }
+  .checklist li.done .cb { background: var(--green); border-color: var(--green); color: #000; }
+
+  /* KPI ROW */
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .kpi-june::before { background: var(--yellow); }
+  .kpi-july::before { background: var(--blue); }
+  .kpi-aug::before { background: var(--green); }
+  .kpi-month-name { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .kpi-big { font-size: 48px; font-weight: 900; line-height: 1; }
+  .kpi-unit { font-size: 14px; color: var(--muted); margin-top: 4px; }
+  .kpi-revenue { font-size: 16px; font-weight: 700; margin-top: 10px; }
+  .kpi-june .kpi-big { color: var(--yellow); }
+  .kpi-july .kpi-big { color: var(--blue); }
+  .kpi-aug .kpi-big { color: var(--green2); }
+
+  /* PHASE BLOCK */
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .phase-head {
+    display: flex; align-items: center; gap: 14px;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .phase-dot {
+    width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+  }
+  .phase-now { background: var(--green); box-shadow: 0 0 0 3px rgba(0,184,148,0.2); }
+  .phase-next { background: var(--yellow); }
+  .phase-future { background: var(--surface3); border: 2px solid var(--border); }
+  .phase-title { font-size: 15px; font-weight: 700; flex: 1; }
+  .phase-time { font-size: 12px; color: var(--muted); }
+  .phase-body { padding: 16px 20px; font-size: 13px; color: var(--muted); }
+  .phase-body ul { list-style: none; }
+  .phase-body li { display: flex; gap: 8px; margin-bottom: 6px; }
+  .phase-body li::before { content: '→'; color: var(--accent2); flex-shrink: 0; }
+
+  /* REPORT */
+  .report-wrap {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 16px 0;
+  }
+  .report-top {
+    background: rgba(108,92,231,0.12);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 18px;
+    font-size: 12px; font-weight: 700; color: var(--accent2);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .report-body { padding: 18px; font-size: 13px; line-height: 2.2; font-family: monospace; color: var(--muted); }
+  .report-body span { color: var(--text); }
+
+  /* RESPONSIVE */
+  @media(max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 60px; }
+    .do-dont { grid-template-columns: 1fr; }
+    .day-schedule { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .kpi-row { grid-template-columns: 1fr; }
+    .rm-month { grid-template-columns: 1fr; }
+    .rm-label { display: none; }
+    .rm-content { padding: 0 0 32px; }
+  }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+  p { color: var(--muted); margin-bottom: 12px; }
+  h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 22px 0 10px; }
+  strong { color: var(--text); font-weight: 600; }
+  ul.plain { list-style: none; }
+  ul.plain li { color: var(--muted); font-size: 13.5px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  ul.plain li:last-child { border-bottom: none; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <h2>Андрей × Кирилл</h2>
+    <p>Транскрибация + Роадмап</p>
+  </div>
+
+  <div class="nav-group-label">Голосовые Кирилла</div>
+  <a class="nav-link active" href="#transcription" onclick="nav(this)"><span class="nav-icon">🎙</span> Транскрибация</a>
+  <a class="nav-link" href="#role" onclick="nav(this)"><span class="nav-icon">👤</span> Роль и место</a>
+  <a class="nav-link" href="#philosophy" onclick="nav(this)"><span class="nav-icon">⚡</span> 0.8 / 1.0 / 1.2</a>
+  <a class="nav-link" href="#finance" onclick="nav(this)"><span class="nav-icon">💰</span> Деньги и цифры</a>
+
+  <div class="nav-group-label">Система работы</div>
+  <a class="nav-link" href="#daily" onclick="nav(this)"><span class="nav-icon">📅</span> День — структура</a>
+  <a class="nav-link" href="#weekly" onclick="nav(this)"><span class="nav-icon">📆</span> Неделя — ритм</a>
+  <a class="nav-link" href="#dodont" onclick="nav(this)"><span class="nav-icon">🎯</span> Делать / Нет</a>
+  <a class="nav-link" href="#report" onclick="nav(this)"><span class="nav-icon">📋</span> Шаблон отчёта</a>
+
+  <div class="nav-group-label">Роадмап</div>
+  <a class="nav-link" href="#kpi" onclick="nav(this)"><span class="nav-icon">📊</span> KPI на лето</a>
+  <a class="nav-link" href="#june" onclick="nav(this)"><span class="nav-icon">🌱</span> Июнь — план</a>
+  <a class="nav-link" href="#july" onclick="nav(this)"><span class="nav-icon">🔥</span> Июль — план</a>
+  <a class="nav-link" href="#august" onclick="nav(this)"><span class="nav-icon">🏆</span> Август — план</a>
+  <a class="nav-link" href="#phases" onclick="nav(this)"><span class="nav-icon">🚀</span> Большая карта</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Транскрибация + Роадмап</h1>
+    <p>Всё что сказал Кирилл в голосовых → система → пошаговый план чтобы стать операционным директором топового агентства</p>
+    <div class="hero-badges">
+      <span class="badge badge-purple">🎙 Голосовые Кирилла</span>
+      <span class="badge badge-green">📍 Июнь 2025</span>
+      <span class="badge badge-yellow">🎯 Цель: 1.2</span>
+      <span class="badge badge-blue">🏢 Агентство автоворонок</span>
+    </div>
+  </div>
+
+  <!-- ===== ТРАНСКРИБАЦИЯ ===== -->
+  <div class="section" id="transcription">
+    <div class="section-header">
+      <div class="section-icon">🎙</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 01</span>
+        <div class="section-title">Транскрибация голосовых</div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <span class="card-icon">🎓</span>
+        <div class="card-title">Направление 1 — Обучение</div>
+        <div class="card-body">Флагман. Курс 3 месяца по воронкам. Ведёт только Кирилл. Instagram, Telegram, запуски. Основной доход — онлайн-школа.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔧</span>
+        <div class="card-title">Направление 2 — Агентство</div>
+        <div class="card-body">Воронки как услуга. От 150к руб за проект. Команда: Кирилл + Никита. Фикс + % — признак топового агентства. В будущем — ты в команде.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">📬</span>
+        <div class="card-title">Как приходят клиенты</div>
+        <div class="card-body">Рассылки → отклик → бриф → созвон → продажа → реализация. Конверсия: ~1 продажа на 1000 сообщений.</div>
+      </div>
+    </div>
+
+    <h3>Дословные цитаты Кирилла</h3>
+
+    <div class="quote">
+      "По сути, сейчас во всей этой системе тебя нет. Ты не интегрирован в нашу систему воронок. Ты не знаешь, что надо делать, как надо делать."
+      <cite>— Кирилл</cite>
+    </div>
+
+    <div class="quote">
+      "Если бы ты был полноценным сотрудником — я бы тебя уволил. Но ты ещё не в команде, ты подаван. Это нормально."
+      <cite>— Кирилл</cite>
+    </div>
+
+    <div class="quote">
+      "Я говорю: это плохо, надо усилить. Задача: усилить. КАК — неважно. Важно чтобы было усилено."
+      <cite>— Кирилл</cite>
+    </div>
+
+    <div class="quote">
+      "Ничто не мешает нам стать самым топовым агентством по созданию автоворонок. Мы купим квартиру через 2–3 года. Но нужно для этого что-то делать."
+      <cite>— Кирилл</cite>
+    </div>
+
+    <div class="quote">
+      "Ничто не мешает тебе быть операционным директором топового агентства. Но просто нужно что-то делать."
+      <cite>— Кирилл</cite>
+    </div>
+
+    <div class="quote">
+      "Один человек 1.2 — и весь проект работает на 1.2. Один человек 0.8 — и весь проект работает на 0.8."
+      <cite>— Кирилл</cite>
+    </div>
+  </div>
+
+  <!-- ===== РОЛЬ ===== -->
+  <div class="section" id="role">
+    <div class="section-header">
+      <div class="section-icon">👤</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 02</span>
+        <div class="section-title">Роль и место в системе</div>
+      </div>
+    </div>
+
+    <p>Ты <strong>НЕ создаёшь воронки</strong>. Кирилл потратил полгода чтобы научиться собирать их и ещё полгода чтобы понять как они работают на практике. Это 6–12 месяцев обучения минимум.</p>
+    <p>Твоя роль — <strong>Операционный директор</strong>. Ты освобождаешь Кирилла от рутины, контролируешь команду и отвечаешь за результат.</p>
+
+    <h3>Как работает операционный директор</h3>
+    <pre>Кирилл ставит ЦЕЛЬ
+        ↓
+Ты сам придумываешь КАК → находишь решение → приходишь с готовым ответом
+        ↓
+Кирилл: "ок" или "передоговаривайся"
+        ↓
+Ты реализуешь → берёшь отчёт → анализируешь
+        ↓
+Докладываешь Кириллу с выводами и следующим шагом
+        ↓
+Если выхлоп мал → сам придумываешь как усилить</pre>
+
+    <h3>Пример из жизни</h3>
+    <div class="cards">
+      <div class="card" style="border-left: 3px solid var(--red2);">
+        <span class="card-icon">❌</span>
+        <div class="card-title">0.8 — так не надо</div>
+        <div class="card-body">Кирилл: "Найди рассыльщика"<br>→ Ты ищешь 3 дня<br>→ Нашёл, но не знаешь что делать дальше<br>→ Ждёшь пока Кирилл сам спросит</div>
+      </div>
+      <div class="card" style="border-left: 3px solid var(--green2);">
+        <span class="card-icon">✅</span>
+        <div class="card-title">1.2 — вот так</div>
+        <div class="card-body">Кирилл: "Найди рассыльщика"<br>→ Нашёл Семёна, объяснил условия<br>→ "Кирилл, Семён готов, условия такие, завтра выходит — ок?"<br>→ Семён вышел → вечером взял отчёт → доклад Кириллу</div>
+      </div>
+    </div>
+
+    <div class="quote" style="margin-top: 20px;">
+      "Слабее Никиты на 1.5 года опыта — это нормально. Но действовать только по задачам — это 0.8. Нет задачи — нет работы? Так не работает операционный директор."
+      <cite>— суть слов Кирилла</cite>
+    </div>
+  </div>
+
+  <!-- ===== ФИЛОСОФИЯ ===== -->
+  <div class="section" id="philosophy">
+    <div class="section-header">
+      <div class="section-icon">⚡</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 03</span>
+        <div class="section-title">Философия 0.8 / 1.0 / 1.2</div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card" style="border-top: 3px solid var(--red);">
+        <span class="card-icon">📉</span>
+        <div class="card-title" style="color:var(--red2)">0.8 — Слабое звено</div>
+        <div class="card-body">Задачи не выполняет в срок. Дедлайны переносит без предупреждения. Нет инициативы. Надо постоянно пинать. "Не смог 30 рассылок, только 25 — заблокировали". На взрослой работе нет слова "не сделал".</div>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--yellow);">
+        <span class="card-icon">➡️</span>
+        <div class="card-title" style="color:var(--yellow)">1.0 — Исполнитель</div>
+        <div class="card-body">Делает чётко что сказали — не больше, не меньше. Поставишь правильно задачу — сделает. 100% — плохой результат. Рост = ноль. Это базовый уровень, не цель.</div>
+      </div>
+      <div class="card" style="border-top: 3px solid var(--green);">
+        <span class="card-icon">🚀</span>
+        <div class="card-title" style="color:var(--green2)">1.2 — Проактивный</div>
+        <div class="card-body">На 20% больше чем задали. Нет задачи — сам видит что делать. Один такой человек поднимает весь проект до 1.2. Это и есть цель.</div>
+      </div>
+    </div>
+
+    <h3>Математика команды — запомни навсегда</h3>
+    <div class="formula">
+      <div class="formula-row">
+        <span class="formula-label">3 человека по 0.8</span>
+        <span class="formula-math">0.8 × 0.8 × 0.8</span>
+        <span class="formula-result fr-red">= 51%</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">2 единички + 1 человек 0.8</span>
+        <span class="formula-math">1.0 × 1.0 × 0.8</span>
+        <span class="formula-result fr-red">= 80%</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">3 единички — это плохо</span>
+        <span class="formula-math">1.0 × 1.0 × 1.0</span>
+        <span class="formula-result fr-yellow">= 100%</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">2 единички + 1 человек 1.2</span>
+        <span class="formula-math">1.0 × 1.0 × 1.2</span>
+        <span class="formula-result fr-green">= 120%</span>
+      </div>
+      <div class="formula-row">
+        <span class="formula-label">Ты 1.2 + команда 1.2 × 3</span>
+        <span class="formula-math">1.2 × 1.2 × 1.2 × 1.2</span>
+        <span class="formula-result fr-purple">= 207% 🔥</span>
+      </div>
+    </div>
+
+    <h3>Как стать 1.2 — конкретно</h3>
+    <ul class="checklist" id="cl1">
+      <li onclick="tick(this)"><span class="cb"></span>Задача: 20 рассылок → сделать 24</li>
+      <li onclick="tick(this)"><span class="cb"></span>Задача: найти рассыльщика → найти + объяснить + он вышел + взят первый отчёт</li>
+      <li onclick="tick(this)"><span class="cb"></span>Нет задачи → сам смотришь что делать (рассылки, поиск людей, метрики)</li>
+      <li onclick="tick(this)"><span class="cb"></span>Семён слабо справляется → ты уже думаешь о втором человеке и предлагаешь Кириллу</li>
+      <li onclick="tick(this)"><span class="cb"></span>Каждый вечер — отчёт Кириллу БЕЗ напоминания</li>
+      <li onclick="tick(this)"><span class="cb"></span>Каждое утро — план на день, отправить Кириллу</li>
+      <li onclick="tick(this)"><span class="cb"></span>Пришёл с проблемой → сразу предложи решение</li>
+    </ul>
+  </div>
+
+  <!-- ===== ФИНАНСЫ ===== -->
+  <div class="section" id="finance">
+    <div class="section-header">
+      <div class="section-icon">💰</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 04</span>
+        <div class="section-title">Деньги и цифры</div>
+      </div>
+    </div>
+
+    <h3>Твоя зарплата</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Результат в месяц</th><th>Выплата</th><th>Статус</th></tr></thead>
+        <tbody>
+          <tr><td>2 продажи</td><td>20 000 руб</td><td><span class="badge badge-red">страховой минимум</span></td></tr>
+          <tr><td>4 продажи</td><td>80–100 000 руб + %</td><td><span class="badge badge-yellow">план</span></td></tr>
+          <tr><td>5+ продаж</td><td>80–100к + повышенная премия</td><td><span class="badge badge-green">перевыполнение</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Расходы проекта</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Статья</th><th>Сумма</th></tr></thead>
+        <tbody>
+          <tr><td>Твоя зарплата</td><td>80–100 000 руб</td></tr>
+          <tr><td>Рассыльщики × 3 (по 20–30к)</td><td>60–90 000 руб</td></tr>
+          <tr><td>Налоги / ИП / прочее</td><td>~30 000 руб</td></tr>
+          <tr><td><strong>Итого расходов</strong></td><td><strong>~170–220 000 руб</strong></td></tr>
+          <tr><td>Ноль (2 продажи × 150к)</td><td>300 000 руб</td></tr>
+          <tr><td>Норма (4 продажи)</td><td>600 000 руб</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Математика рассылок</h3>
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-val" style="color:var(--accent2)">1000</div>
+        <div class="metric-label">рассылок на продажу</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" style="color:var(--yellow)">40</div>
+        <div class="metric-label">рассылок в день</div>
+        <div class="metric-sub">на 1 сотрудника</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" style="color:var(--blue)">4000</div>
+        <div class="metric-label">рассылок нужно/мес</div>
+        <div class="metric-sub">для 4 продаж</div>
+      </div>
+      <div class="metric">
+        <div class="metric-val" style="color:var(--green2)">4</div>
+        <div class="metric-label">рассыльщика нужно</div>
+        <div class="metric-sub">или 3 + ты сам</div>
+      </div>
+    </div>
+
+    <p>Цена воронки сейчас: <strong>150к</strong>. Когда станешь полноценным членом команды — <strong>180к</strong>. +30к = твой вклад как опдира. Рост чека = рост зарплаты.</p>
+  </div>
+
+  <!-- ===== СТРУКТУРА ДНЯ ===== -->
+  <div class="section" id="daily">
+    <div class="section-header">
+      <div class="section-icon">📅</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 05</span>
+        <div class="section-title">Структура каждого дня</div>
+      </div>
+    </div>
+
+    <p>Это не рекомендация — это обязательный ритм операционного директора. Каждый день, без исключений.</p>
+
+    <div class="day-schedule">
+      <div class="day-slot slot-morning">
+        <div class="slot-time">🌅 Утро (9:00–10:00)</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--yellow)"></span>Посмотреть что было вчера — результаты</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--yellow)"></span>Составить план на сегодня</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--yellow)"></span>Отправить план Кириллу (пн — план на неделю)</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--yellow)"></span>Написать Семёну задачу на день</div>
+      </div>
+      <div class="day-slot slot-day">
+        <div class="slot-time">☀️ День (10:00–18:00)</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--blue)"></span>Контроль рассыльщиков — промежуточный чекин</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--blue)"></span>Поиск новых людей в команду</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--blue)"></span>Сам делать рассылки если выхлоп мал</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--blue)"></span>Работа по проектам (Олеся, Юля)</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--blue)"></span>Изучение материалов по воронкам (Claude)</div>
+      </div>
+      <div class="day-slot slot-evening">
+        <div class="slot-time">🌙 Вечер (18:00–20:00)</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--accent2)"></span>Собрать отчёт с Семёна (и других)</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--accent2)"></span>Проанализировать цифры</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--accent2)"></span>Написать отчёт Кириллу по шаблону</div>
+        <div class="slot-item"><span class="slot-dot" style="color:var(--accent2)"></span>Зафиксировать что завтра</div>
+      </div>
+    </div>
+
+    <h3>Главный вопрос каждого утра</h3>
+    <div class="quote" style="font-size: 16px; font-style: normal; font-weight: 700;">
+      "Что я сегодня могу сделать чтобы проект вырос?"
+      <br><br>
+      <span style="font-size: 13px; font-weight: 400; color: var(--muted)">Не "что Кирилл мне дал" — а "что я сам вижу что надо сделать?"</span>
+    </div>
+  </div>
+
+  <!-- ===== РИТМ НЕДЕЛИ ===== -->
+  <div class="section" id="weekly">
+    <div class="section-header">
+      <div class="section-icon">📆</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 06</span>
+        <div class="section-title">Ритм недели</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>День</th><th>Фокус</th><th>Обязательно</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Понедельник</strong></td>
+            <td>Запуск недели</td>
+            <td>Написать план на всю неделю → отправить Кириллу. Поставить задачи каждому рассыльщику.</td>
+          </tr>
+          <tr>
+            <td><strong>Вторник</strong></td>
+            <td>Поиск людей</td>
+            <td>Активный поиск новых рассыльщиков. Первые переговоры с кандидатами.</td>
+          </tr>
+          <tr>
+            <td><strong>Среда</strong></td>
+            <td>Метрики</td>
+            <td>Промежуточный анализ недели: сколько рассылок, ответов, созвонов. Если отстаём — усиление.</td>
+          </tr>
+          <tr>
+            <td><strong>Четверг</strong></td>
+            <td>Усиление</td>
+            <td>Сам делать рассылки. Дожать кандидатов по найму. Проверить ТЗ по проектам.</td>
+          </tr>
+          <tr>
+            <td><strong>Пятница</strong></td>
+            <td>Итоги + план</td>
+            <td>Итоговый отчёт за неделю Кириллу. Набросать план на следующую. Фиксировать что было 0.8 — убрать.</td>
+          </tr>
+          <tr>
+            <td><strong>Сб/Вс</strong></td>
+            <td>Развитие</td>
+            <td>Изучение материалов по воронкам. Смотреть как работают конкуренты. Думать что улучшить.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Метрики которые отслеживаешь каждый день</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Метрика</th><th>Как мерить</th><th>Норма/день</th></tr></thead>
+        <tbody>
+          <tr><td>Рассылок отправлено</td><td>Отчёт от каждого рассыльщика</td><td>40+ на человека</td></tr>
+          <tr><td>Откликов / ответов</td><td>Считать входящие сообщения</td><td>зависит от базы</td></tr>
+          <tr><td>Созвонов назначено</td><td>Фиксировать в таблице</td><td>1–2 в неделю = норм</td></tr>
+          <tr><td>Новых кандидатов найдено</td><td>Пока не набрали 4 рассыльщика</td><td>1–3 контакта</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== ДЕЛАТЬ / НЕ ДЕЛАТЬ ===== -->
+  <div class="section" id="dodont">
+    <div class="section-header">
+      <div class="section-icon">🎯</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 07</span>
+        <div class="section-title">Делать / Не делать</div>
+      </div>
+    </div>
+
+    <div class="do-dont">
+      <div class="do-block">
+        <div class="block-head">✅ Делать</div>
+        <div class="block-item"><span class="bi">⚡</span>Каждый день — инициатива без напоминания</div>
+        <div class="block-item"><span class="bi">📊</span>Ежедневные отчёты Кириллу (вечер)</div>
+        <div class="block-item"><span class="bi">📅</span>Еженедельный план (утро понедельника)</div>
+        <div class="block-item"><span class="bi">📥</span>Запрашивать отчёты у рассыльщиков</div>
+        <div class="block-item"><span class="bi">💡</span>Приходить с решением, а не с проблемой</div>
+        <div class="block-item"><span class="bi">👁</span>Следить за метриками ежедневно</div>
+        <div class="block-item"><span class="bi">🔍</span>Самому видеть что улучшить</div>
+        <div class="block-item"><span class="bi">🤖</span>Работать с Claude для обучения воронкам</div>
+        <div class="block-item"><span class="bi">⚠️</span>Предупреждать Кирилла о проблеме ЗАРАНЕЕ</div>
+        <div class="block-item"><span class="bi">🔄</span>Если рассыльщик 0.8 — убирать быстро</div>
+      </div>
+      <div class="dont-block">
+        <div class="block-head">❌ Не делать</div>
+        <div class="block-item"><span class="bi">🚫</span>Лезть в создание воронок — не твоя задача сейчас</div>
+        <div class="block-item"><span class="bi">🚫</span>Ждать задач от Кирилла</div>
+        <div class="block-item"><span class="bi">🚫</span>Говорить "не получилось" без решения</div>
+        <div class="block-item"><span class="bi">🚫</span>Замолкать после выполнения задачи</div>
+        <div class="block-item"><span class="bi">🚫</span>Просить объяснить каждый шаг</div>
+        <div class="block-item"><span class="bi">🚫</span>Переносить дедлайны молча</div>
+        <div class="block-item"><span class="bi">🚫</span>Действовать только по чужим задачам</div>
+        <div class="block-item"><span class="bi">🚫</span>Терпеть 0.8 в команде</div>
+        <div class="block-item"><span class="bi">🚫</span>Скрывать проблемы от Кирилла</div>
+        <div class="block-item"><span class="bi">🚫</span>Ждать пока выхлоп сам улучшится</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ШАБЛОН ОТЧЁТА ===== -->
+  <div class="section" id="report">
+    <div class="section-header">
+      <div class="section-icon">📋</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 08</span>
+        <div class="section-title">Шаблон ежедневного отчёта</div>
+      </div>
+    </div>
+
+    <p>Отправлять <strong>каждый вечер без напоминания</strong>. Это автоматически переводит из 0.8 в 1.0. Добавь инициативу — и ты уже 1.2.</p>
+
+    <div class="report-wrap">
+      <div class="report-top">📊 Шаблон — копируй и заполняй каждый вечер</div>
+      <div class="report-body">
+        <span>📅 Дата:</span> [число, день недели]<br><br>
+        <span>📬 Рассылки сегодня:</span> [X] (план [Y])<br>
+        <span>💬 Откликов / ответов:</span> [Z]<br>
+        <span>📞 Созвонов назначено:</span> [N]<br><br>
+        <span>👤 Семён:</span> [норм — X рассылок / нужно усилить / проблема + моё решение]<br>
+        <span>🔍 Поиск новых людей:</span> [нашёл N кандидатов / провёл N переговоров / статус]<br><br>
+        <span>⚡ Моя инициатива сегодня:</span> [что сделал сверх задачи — конкретно]<br><br>
+        <span>📋 Завтра план:</span> [что буду делать — конкретно]<br><br>
+        <span>❓ Вопросы к тебе:</span> [если есть — конкретно, не "что делать?"]
+      </div>
+    </div>
+
+    <h3>Шаблон еженедельного отчёта (пятница)</h3>
+    <div class="report-wrap">
+      <div class="report-top">📊 Итоги недели — отправлять каждую пятницу</div>
+      <div class="report-body">
+        <span>📅 Неделя:</span> [даты]<br><br>
+        <span>📬 Рассылок за неделю:</span> [X] (план [Y])<br>
+        <span>💬 Откликов:</span> [Z]<br>
+        <span>📞 Созвонов:</span> [N]<br>
+        <span>💰 Продаж:</span> [K]<br><br>
+        <span>👥 Команда:</span> [кто работает, как справляются, кто 0.8]<br>
+        <span>🔍 Найм:</span> [сколько кандидатов, кто вышел, кто в процессе]<br><br>
+        <span>✅ Что было сделано хорошо:</span> [конкретно]<br>
+        <span>⚠️ Что пошло не так:</span> [конкретно + как буду исправлять]<br>
+        <span>⚡ Инициативы сверх задачи:</span> [что сделал по собственному решению]<br><br>
+        <span>📋 План на следующую неделю:</span> [конкретные задачи]
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== KPI ===== -->
+  <div class="section" id="kpi">
+    <div class="section-header">
+      <div class="section-icon">📊</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 09</span>
+        <div class="section-title">KPI на лето 2025</div>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card kpi-june">
+        <div class="kpi-month-name">Июнь</div>
+        <div class="kpi-big">2</div>
+        <div class="kpi-unit">продажи</div>
+        <div class="kpi-revenue" style="color:var(--yellow)">~300 000 ₽</div>
+      </div>
+      <div class="kpi-card kpi-july">
+        <div class="kpi-month-name">Июль</div>
+        <div class="kpi-big">4</div>
+        <div class="kpi-unit">продажи</div>
+        <div class="kpi-revenue" style="color:var(--blue)">~600 000 ₽</div>
+      </div>
+      <div class="kpi-card kpi-aug">
+        <div class="kpi-month-name">Август</div>
+        <div class="kpi-big">4</div>
+        <div class="kpi-unit">продажи</div>
+        <div class="kpi-revenue" style="color:var(--green2)">~600 000 ₽</div>
+      </div>
+    </div>
+
+    <div class="quote">
+      "Наша задача за лето — обернуть миллион рублей. Для того чтобы с осени полноценно сделать нормальную рабочую систему агентства."
+      <cite>— Кирилл</cite>
+    </div>
+  </div>
+
+  <!-- ===== ПЛАН ИЮНЬ ===== -->
+  <div class="section" id="june">
+    <div class="section-header">
+      <div class="section-icon">🌱</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 10</span>
+        <div class="section-title">Июнь — Пошаговый план</div>
+      </div>
+    </div>
+
+    <p>Главный фокус июня — <strong>собрать отдел рассылок и выдать 2 продажи</strong>. Пока ищешь людей — сам делаешь рассылки.</p>
+
+    <div class="roadmap">
+      <div class="rm-month">
+        <div class="rm-label"><div class="rm-label-text">Неделя 1<br>1–7 июня</div></div>
+        <div class="rm-content">
+          <div class="week-block">
+            <div class="week-head" onclick="toggleWeek(this)">
+              <div class="week-num">Нед. 1</div>
+              <div class="week-title">Старт. Структура. Семён. Первые рассылки.</div>
+              <div class="week-arrow">▶</div>
+            </div>
+            <div class="week-body">
+              <div class="day-task"><span class="dt-bullet">пн</span><div><div class="dt-text">Написать план на всю неделю → отправить Кириллу</div><div class="dt-meta">Первое действие в понедельник, до 10:00</div></div></div>
+              <div class="day-task"><span class="dt-bullet">пн</span><div><div class="dt-text">Поставить задачу Семёну на день. Вечером — взять отчёт.</div><div class="dt-meta">Контроль ежедневно, без исключений</div></div></div>
+              <div class="day-task"><span class="dt-bullet">пн</span><div><div class="dt-text">Самому начать делать рассылки — минимум 20–30 в день</div><div class="dt-meta">Не ждать пока наберётся команда</div></div></div>
+              <div class="day-task"><span class="dt-bullet">вт</span><div><div class="dt-text">Написать объявление о поиске рассыльщика</div><div class="dt-meta">HeadHunter / Avito / Telegram-каналы / ВКонтакте</div></div></div>
+              <div class="day-task"><span class="dt-bullet">вт</span><div><div class="dt-text">Начать переговоры с первыми кандидатами (условия: 20–30к, план 2 продажи/мес)</div></div></div>
+              <div class="day-task"><span class="dt-bullet">ср</span><div><div class="dt-text">Проверить ТЗ по Юле которое скинул Кирилл → дать фидбэк</div></div></div>
+              <div class="day-task"><span class="dt-bullet">чт</span><div><div class="dt-text">Промежуточный итог: сколько рассылок сделано, какой выхлоп у Семёна</div><div class="dt-meta">Если мало — придумать как усилить, не ждать</div></div></div>
+              <div class="day-task"><span class="dt-bullet">пт</span><div><div class="dt-text">Итоговый отчёт недели по шаблону → Кириллу</div></div></div>
+              <div class="day-task"><span class="dt-bullet">пт</span><div><div class="dt-text">Если нашёл кандидата — оформить: "Кирилл, вот Иван, условия такие, завтра выходит — ок?"</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-month">
+        <div class="rm-label"><div class="rm-label-text">Неделя 2<br>8–14 июня</div></div>
+        <div class="rm-content">
+          <div class="week-block">
+            <div class="week-head" onclick="toggleWeek(this)">
+              <div class="week-num">Нед. 2</div>
+              <div class="week-title">Команда растёт. Ускорение рассылок.</div>
+              <div class="week-arrow">▶</div>
+            </div>
+            <div class="week-body">
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Довести до 2–3 рассыльщиков. Каждый делает 40+/день = 80–120 рассылок совокупно.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Выстроить ежедневный ритм контроля: утро — задача, вечер — отчёт, доклад Кириллу.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Анализировать выхлоп: считать отклики, назначенные созвоны.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Если кто-то из рассыльщиков стабильно 0.8 — разговор, предупреждение, или замена.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">цель</span><div><div class="dt-text"><strong>Цель к концу 2-й недели:</strong> 1 продажа закрыта или в активной стадии.</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-month">
+        <div class="rm-label"><div class="rm-label-text">Неделя 3–4<br>15–30 июня</div></div>
+        <div class="rm-content">
+          <div class="week-block">
+            <div class="week-head" onclick="toggleWeek(this)">
+              <div class="week-num">Нед. 3–4</div>
+              <div class="week-title">Система работает. Закрыть 2 продажи июня.</div>
+              <div class="week-arrow">▶</div>
+            </div>
+            <div class="week-body">
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Система должна работать без твоих ежедневных пинков — рассыльщики знают что делать.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Твоя задача — метрики, анализ, корректировка. Ты менеджер, не исполнитель.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Подготовить план на июль: сколько людей нужно для 4 продаж, как найти.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">цель</span><div><div class="dt-text"><strong>Цель июня:</strong> 2 продажи = 300к оборот. Минимум принят.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">бонус</span><div><div class="dt-text"><strong>Если закрыл 3+ — ты уже 1.2 в июне.</strong> Доложить Кириллу.</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ПЛАН ИЮЛЬ ===== -->
+  <div class="section" id="july">
+    <div class="section-header">
+      <div class="section-icon">🔥</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 11</span>
+        <div class="section-title">Июль — Пошаговый план</div>
+      </div>
+    </div>
+
+    <p>Июль — первый полноценный месяц. Цель: <strong>4 продажи = 600к оборот</strong>. Для этого нужно 4000 рассылок = 4 рассыльщика на полную скорость.</p>
+
+    <div class="roadmap">
+      <div class="rm-month">
+        <div class="rm-label"><div class="rm-label-text">Нед. 1<br>Июль</div></div>
+        <div class="rm-content">
+          <div class="week-block">
+            <div class="week-head" onclick="toggleWeek(this)">
+              <div class="week-num">Нед. 1</div>
+              <div class="week-title">Доукомплектовать команду до 4 рассыльщиков</div>
+              <div class="week-arrow">▶</div>
+            </div>
+            <div class="week-body">
+              <div class="day-task"><span class="dt-bullet">задача</span><div><div class="dt-text">Довести команду до 4 человек если не сделано в июне</div></div></div>
+              <div class="day-task"><span class="dt-bullet">задача</span><div><div class="dt-text">Выстроить воронку найма: объявление → собеседование → испытательный → принятие решения (2–3 дня)</div></div></div>
+              <div class="day-task"><span class="dt-bullet">задача</span><div><div class="dt-text">Протестировать разные базы для рассылок — где конверсия выше</div></div></div>
+              <div class="day-task"><span class="dt-bullet">задача</span><div><div class="dt-text">Оптимизировать скрипт рассылки — если отклик меньше 5% — менять текст</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-month">
+        <div class="rm-label"><div class="rm-label-text">Нед. 2–4<br>Июль</div></div>
+        <div class="rm-content">
+          <div class="week-block">
+            <div class="week-head" onclick="toggleWeek(this)">
+              <div class="week-num">Нед. 2–4</div>
+              <div class="week-title">Система на максимуме. Закрыть 4 продажи.</div>
+              <div class="week-arrow">▶</div>
+            </div>
+            <div class="week-body">
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">160 рассылок в день (4 × 40) = 3200–4000 в месяц</div></div></div>
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Активно участвовать в брифах — слушать как Кирилл ведёт клиентов (обучение)</div></div></div>
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Каждую неделю — анализ: кто в команде 1.2, кто 0.8. Решать быстро.</div></div></div>
+              <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Начать понимать структуру автоворонок — изучать с Claude</div></div></div>
+              <div class="day-task"><span class="dt-bullet">цель</span><div><div class="dt-text"><strong>Цель июля:</strong> 4 продажи = 600к оборот. Зарплата 80–100к.</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ПЛАН АВГУСТ ===== -->
+  <div class="section" id="august">
+    <div class="section-header">
+      <div class="section-icon">🏆</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 12</span>
+        <div class="section-title">Август — Пошаговый план</div>
+      </div>
+    </div>
+
+    <p>Август — <strong>полноценный операционный директор</strong>. Кирилл всё меньше в операционке. Ты видишь проект целиком и управляешь им.</p>
+
+    <div class="week-block">
+      <div class="week-head" onclick="toggleWeek(this)">
+        <div class="week-num">Август</div>
+        <div class="week-title">Автономная работа. 4 продажи. Подготовка к осени.</div>
+        <div class="week-arrow">▶</div>
+      </div>
+      <div class="week-body">
+        <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Система рассылок работает без твоего ежедневного контроля каждого</div></div></div>
+        <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Ты уже понимаешь как продаётся воронка — можешь участвовать в подготовке брифа</div></div></div>
+        <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Подготовить предложение по масштабированию: что нужно для 6–8 продаж/мес с осени</div></div></div>
+        <div class="day-task"><span class="dt-bullet">фок</span><div><div class="dt-text">Знать все текущие проекты (Олеся, Юля и другие) — понимать статус каждого</div></div></div>
+        <div class="day-task"><span class="dt-bullet">цель</span><div><div class="dt-text"><strong>Цель августа:</strong> 4 продажи. Итого лета: 10 продаж = ~1 млн оборот.</div></div></div>
+        <div class="day-task"><span class="dt-bullet">цель</span><div><div class="dt-text"><strong>Готовность к осени:</strong> стабильная система, команда 1.2, Кирилл доверяет операционку тебе.</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== БОЛЬШАЯ КАРТА ===== -->
+  <div class="section" id="phases">
+    <div class="section-header">
+      <div class="section-icon">🚀</div>
+      <div class="section-meta">
+        <span class="section-num">Блок 13</span>
+        <div class="section-title">Большая дорожная карта</div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-dot phase-now"></div>
+        <div class="phase-title">Сейчас — Июнь 2025</div>
+        <div class="phase-time"><span class="badge badge-green">● Активная фаза</span></div>
+      </div>
+      <div class="phase-body">
+        <p style="margin-bottom: 12px; color:var(--accent2); font-weight: 700">Статус: Подаван операционного директора</p>
+        <ul>
+          <li>Собрать отдел рассылок (Семён + 2–3 человека)</li>
+          <li>Выдать 2 продажи = 300к оборот</li>
+          <li>Выстроить ежедневный ритм контроля и отчётов</li>
+          <li>Начать понимать как работает система воронок</li>
+          <li>Показать Кириллу что ты 1.2, а не 0.8</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-dot phase-next"></div>
+        <div class="phase-title">Июль — Август 2025</div>
+        <div class="phase-time"><span class="badge badge-yellow">Следующая фаза</span></div>
+      </div>
+      <div class="phase-body">
+        <p style="margin-bottom: 12px; color:var(--yellow); font-weight: 700">Статус: Операционный директор в процессе обучения</p>
+        <ul>
+          <li>4 продажи/мес = 600к/мес = 80–100к зарплата</li>
+          <li>Команда 4 рассыльщика, система работает автономно</li>
+          <li>Ты управляешь, а не делаешь рассылки сам</li>
+          <li>Участвуешь в брифах — обучаешься продавать воронки</li>
+          <li>Итого лета: 10 продаж = 1 млн оборот</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-dot phase-future"></div>
+        <div class="phase-title">Осень 2025</div>
+        <div class="phase-time"><span class="badge badge-blue">Будущая фаза</span></div>
+      </div>
+      <div class="phase-body">
+        <p style="margin-bottom: 12px; color:var(--blue); font-weight: 700">Статус: Полноценный операционный директор</p>
+        <ul>
+          <li>Кирилл выходит из операционки — ты ведёшь всё сам</li>
+          <li>Цена воронки растёт до 180к (+30к = твой вклад)</li>
+          <li>Стабильная зарплата + % от каждой продажи</li>
+          <li>4–6 продаж/мес как стабильный режим</li>
+          <li>Начинаешь участвовать в продажах клиентам</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-head">
+        <div class="phase-dot phase-future"></div>
+        <div class="phase-title">2026–2027</div>
+        <div class="phase-time"><span class="badge badge-purple">Цель</span></div>
+      </div>
+      <div class="phase-body">
+        <p style="margin-bottom: 12px; color:var(--accent2); font-weight: 700">Статус: Топовое агентство по автоворонкам</p>
+        <ul>
+          <li>Андрей = операционный директор топового агентства</li>
+          <li>Кирилл = только стратегия и онлайн-школа</li>
+          <li>Команда вся из 1.2 = рост 200%+</li>
+          <li>"Купим квартиру" — слова Кирилла</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="quote" style="margin-top: 32px; font-size: 15px; font-style: normal; font-weight: 600; color: var(--text);">
+      "Ничто не мешает нам стать самым топовым агентством по созданию автоворонок.<br>
+      Ничто не мешает тебе быть операционным директором этого топового агентства.<br>
+      <span style="color:var(--accent2)">Но просто нужно что-то делать.</span>"
+      <cite>— Кирилл Кузнецов</cite>
+    </div>
+
+    <div class="card" style="margin-top: 24px; border-color:rgba(108,92,231,0.4); background:rgba(108,92,231,0.08);">
+      <span class="card-icon">💡</span>
+      <div class="card-title">Главный принцип</div>
+      <div class="card-body" style="font-size:14px; line-height:1.9;">
+        Каждый день на 20% больше чем сказали = ты 1.2.<br>
+        Весь отдел по 1.2 = <strong style="color:var(--accent2)">207% эффективности команды</strong>.<br>
+        Это путь от подавана до операционного директора топового агентства.
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function nav(el) {
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function tick(el) {
+  el.classList.toggle('done');
+  el.querySelector('.cb').textContent = el.classList.contains('done') ? '✓' : '';
+}
+
+function toggleWeek(btn) {
+  const body = btn.nextElementSibling;
+  const arrow = btn.querySelector('.week-arrow');
+  const isClosed = body.classList.contains('closed');
+  body.classList.toggle('closed', !isClosed);
+  arrow.classList.toggle('open', isClosed);
+}
+
+// Auto-highlight nav on scroll
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) cur = s.id; });
+  navLinks.forEach(n => {
+    n.classList.remove('active');
+    if (n.getAttribute('href') === '#' + cur) n.classList.add('active');
+  });
+}, { passive: true });
+</script>
+</body>
+</html>
