@@ -201,6 +201,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
   border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;flex-shrink:0}
 @keyframes sp{to{transform:rotate(360deg)}}
 .fb{display:flex;align-items:center;justify-content:space-between}
+.npill{display:inline-flex;align-items:center;padding:6px 12px;border-radius:20px;
+  font-size:.75rem;font-weight:600;border:1px solid var(--bd);color:var(--tx2);
+  background:var(--sf);cursor:pointer;transition:all .15s;white-space:nowrap;
+  -webkit-tap-highlight-color:transparent}
+.npill:active{transform:scale(.95)}
+.npa{background:var(--ac);color:#fff;border-color:var(--ac)}
 </style>
 </head>
 <body>
@@ -272,6 +278,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
       <div class="ei" id="aei"></div>
       <div class="an" id="aname"></div>
       <div class="at" id="atag"></div>
+    </div>
+    <!-- Niche selector -->
+    <div id="niche-bar" style="padding:14px 20px 0;display:flex;flex-direction:column;gap:6px">
+      <div style="font-size:.68rem;font-weight:600;color:var(--tx3);letter-spacing:.05em;text-transform:uppercase">Ниша клиента</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="niche-pills"></div>
     </div>
     <div class="fw" id="aform"></div>
     <div style="height:8px"></div>
@@ -383,6 +394,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
         </div>
       </div>
       <div class="ss">
+        <div class="sst" style="display:flex;align-items:center;justify-content:space-between;padding-right:15px">
+          Ниши клиентов
+          <button onclick="openNicheModal(null)" style="background:var(--ac);border:none;color:#fff;border-radius:7px;padding:4px 10px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit">+ Добавить</button>
+        </div>
+        <div id="niches-list" style="padding:0 4px 8px"></div>
+      </div>
+      <div class="ss">
         <div class="sst">Мой контекст</div>
         <div style="padding:12px 15px;display:flex;flex-direction:column;gap:10px">
           <div style="font-size:.75rem;color:var(--tx2);line-height:1.5">Заполни один раз — агенты будут знать о тебе автоматически в каждом запросе</div>
@@ -446,6 +464,25 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
 </nav>
 
 <div id="toast"></div>
+
+<!-- NICHE MODAL -->
+<div id="nm" onclick="if(event.target===this)closeNicheModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;align-items:flex-end;justify-content:center">
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:24px 24px 0 0;padding:24px;width:100%;max-width:500px;padding-bottom:max(24px,calc(var(--sbi)+16px))">
+    <div style="font-size:1rem;font-weight:700;margin-bottom:14px" id="nm-title">Новая ниша</div>
+    <div class="field" style="margin-bottom:12px">
+      <label>Название</label>
+      <input type="text" id="nm-name" placeholder="Нутрициолог Оля, Фитнес-тренер Макс...">
+    </div>
+    <div class="field" style="margin-bottom:16px">
+      <label>Контекст (о клиенте)</label>
+      <textarea id="nm-ctx" rows="4" placeholder="Ниша, аудитория, продукт, цены, площадки, цели..."></textarea>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-s" style="flex:1" onclick="closeNicheModal()">Отмена</button>
+      <button class="btn btn-p" style="flex:1" onclick="saveNiche()">Сохранить</button>
+    </div>
+  </div>
+</div>
 </div>
 <script>
 // ── SYSTEM PROMPTS ─────────────────────────────────────────────
@@ -1212,6 +1249,9 @@ const S = {
   provider: localStorage.getItem('wk_prov')||'groq',
   ctx: localStorage.getItem('wk_ctx')||'',
   messages: [],
+  niches: JSON.parse(localStorage.getItem('wk_niches')||'[]'),
+  niche: null,
+  editingNicheId: null,
 };
 
 // ── INIT ────────────────────────────────────────────────────────
@@ -1250,7 +1290,7 @@ function go(name) {
     nav.classList.remove('v');
   }
   if (name === 'history') renderHist();
-  if (name === 'settings') { updateKprev(); updateModelSelect(); updateSettingsProvider(); loadCtx(); }
+  if (name === 'settings') { updateKprev(); updateModelSelect(); updateSettingsProvider(); loadCtx(); renderNichesList(); }
 }
 
 // ── API KEY ──────────────────────────────────────────────────────
@@ -1314,6 +1354,57 @@ function saveCtx() {
 function loadCtx() {
   const el = document.getElementById('ctx-input'); if (el) el.value = S.ctx;
 }
+// ── NICHES ────────────────────────────────────────────────────────
+function renderNichePills() {
+  const c = document.getElementById('niche-pills'); if (!c) return;
+  const none = `<div class="npill ${!S.niche?'npa':''}" onclick="selectNiche(null)">Без ниши</div>`;
+  const pills = S.niches.map(n=>`<div class="npill ${S.niche===n.id?'npa':''}" onclick="selectNiche('${n.id}')">${esc(n.name)}</div>`).join('');
+  c.innerHTML = none + pills + `<div class="npill" onclick="openNicheModal(null)" style="border-style:dashed;color:var(--tx3)">+ Новая</div>`;
+}
+function selectNiche(id) { S.niche=id; renderNichePills(); }
+function renderNichesList() {
+  const l = document.getElementById('niches-list'); if (!l) return;
+  if (!S.niches.length) { l.innerHTML=`<div style="padding:12px 15px;font-size:.8rem;color:var(--tx3)">Ниши не добавлены</div>`; return; }
+  l.innerHTML = S.niches.map(n=>`
+    <div class="sr" style="cursor:default">
+      <div style="flex:1">
+        <div style="font-size:.86rem;font-weight:600">${esc(n.name)}</div>
+        <div style="font-size:.72rem;color:var(--tx3);margin-top:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:200px">${esc(n.ctx.slice(0,60))}...</div>
+      </div>
+      <button onclick="openNicheModal('${n.id}')" style="background:var(--sf3);border:1px solid var(--bd);border-radius:7px;padding:5px 10px;color:var(--tx2);font-size:.72rem;cursor:pointer;font-family:inherit">Ред.</button>
+      <button onclick="deleteNiche('${n.id}')" style="background:none;border:none;color:#FF6B6B;cursor:pointer;padding:5px 8px;font-size:.9rem">✕</button>
+    </div>`).join('');
+}
+function openNicheModal(id) {
+  S.editingNicheId = id;
+  const n = id ? S.niches.find(x=>x.id===id) : null;
+  document.getElementById('nm-title').textContent = id ? 'Редактировать нишу' : 'Новая ниша';
+  document.getElementById('nm-name').value = n?.name||'';
+  document.getElementById('nm-ctx').value = n?.ctx||'';
+  document.getElementById('nm').style.display='flex';
+  setTimeout(()=>document.getElementById('nm-name').focus(),100);
+}
+function closeNicheModal() { document.getElementById('nm').style.display='none'; }
+function saveNiche() {
+  const name=(document.getElementById('nm-name').value||'').trim();
+  const ctx=(document.getElementById('nm-ctx').value||'').trim();
+  if (!name) { toast('Введите название ниши'); return; }
+  if (S.editingNicheId) {
+    const n=S.niches.find(x=>x.id===S.editingNicheId); if(n){n.name=name;n.ctx=ctx;}
+  } else {
+    S.niches.push({id:'n'+Date.now(),name,ctx});
+  }
+  localStorage.setItem('wk_niches',JSON.stringify(S.niches));
+  closeNicheModal(); renderNichesList(); renderNichePills();
+  toast('Ниша сохранена ✓');
+}
+function deleteNiche(id) {
+  if (!confirm('Удалить нишу?')) return;
+  S.niches=S.niches.filter(n=>n.id!==id);
+  if (S.niche===id) S.niche=null;
+  localStorage.setItem('wk_niches',JSON.stringify(S.niches));
+  renderNichesList(); renderNichePills(); toast('Ниша удалена');
+}
 function updateSetupHint(prov) {
   const kl = document.getElementById('su-klabel');
   const ph = document.getElementById('sk-input');
@@ -1357,6 +1448,8 @@ function openAgent(id) {
   document.getElementById('aei').textContent = a.emoji;
   document.getElementById('aname').textContent = a.name;
   document.getElementById('atag').textContent = a.tagline;
+  S.niche = null;
+  renderNichePills();
   document.getElementById('aform').innerHTML = a.fields.map(f => {
     if (f.type==='select') return `<div class="field"><label>${f.label}</label><select id="f_${f.id}">${f.opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
     if (f.type==='textarea') return `<div class="field"><label>${f.label}</label><textarea id="f_${f.id}" placeholder="${f.ph||''}" rows="3"></textarea></div>`;
@@ -1373,7 +1466,9 @@ function submit() {
   const first = S.agent.fields[0];
   if (first && !d[first.id]) { toast('Заполните: '+first.label); return; }
   let msg = S.agent.build(d);
-  if (S.ctx) msg = `О себе / мой бизнес:\n${S.ctx}\n\n---\n\n${msg}`;
+  const nicheCtx = S.niche ? S.niches.find(n=>n.id===S.niche)?.ctx : '';
+  const ctxBlock = nicheCtx || S.ctx;
+  if (ctxBlock) msg = `Контекст клиента / ниши:\n${ctxBlock}\n\n---\n\n${msg}`;
   beginResponse(msg);
 }
 
