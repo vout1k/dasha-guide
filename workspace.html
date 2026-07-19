@@ -309,6 +309,25 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
       <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
     </button>
   </div>
+  <!-- Follow-up bar -->
+  <div id="fubar" style="display:none;padding:10px 14px;border-top:1px solid var(--bd);background:var(--bg);
+    gap:8px;flex-direction:column;padding-bottom:max(10px,calc(var(--sbi)+4px))">
+    <div style="display:flex;gap:8px;align-items:flex-end">
+      <textarea id="fu-input" rows="1" placeholder="Уточни, попроси переделать, задай вопрос..."
+        style="flex:1;background:var(--sf);border:1px solid var(--bd);border-radius:12px;
+        color:var(--tx);font-size:.86rem;font-family:inherit;padding:11px 14px;outline:none;
+        resize:none;line-height:1.5;max-height:120px;overflow-y:auto;transition:border-color .2s"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';this.style.borderColor='var(--ac)'"
+        onblur="this.style.borderColor='var(--bd)'"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendFollowup()}"
+      ></textarea>
+      <button class="bti" onclick="sendFollowup()" style="background:var(--ac);border-color:var(--ac);color:#fff;flex-shrink:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>
+      </button>
+    </div>
+    <button onclick="resetConv()" style="background:none;border:none;color:var(--tx3);font-size:.7rem;
+      cursor:pointer;font-family:inherit;text-align:left;padding:0">↺ Новый разговор</button>
+  </div>
 </div>
 
 <!-- HISTORY -->
@@ -1192,6 +1211,7 @@ const S = {
   model: localStorage.getItem('wk_model')||'llama-3.3-70b-versatile',
   provider: localStorage.getItem('wk_prov')||'groq',
   ctx: localStorage.getItem('wk_ctx')||'',
+  messages: [],
 };
 
 // ── INIT ────────────────────────────────────────────────────────
@@ -1364,15 +1384,17 @@ function beginResponse(userMsg) {
   document.getElementById('ren').textContent = a.name;
   document.getElementById('rst').style.display = 'flex';
   document.getElementById('stpbtn').style.display = 'flex';
+  document.getElementById('fubar').style.display = 'none';
   const out = document.getElementById('mdo');
   out.innerHTML = ''; out.className = 'md sc';
   S.text = ''; S.streaming = true;
+  S.messages = [{role:'user', content: userMsg}];
   go('response');
   document.getElementById('rc').scrollTop = 0;
-  stream(a.sp, userMsg);
+  stream(a.sp);
 }
 
-async function stream(sysprompt, userMsg) {
+async function stream(sysprompt) {
   S.ctrl = new AbortController();
   const out = document.getElementById('mdo');
   const isGroq = S.provider === 'groq';
@@ -1384,8 +1406,8 @@ async function stream(sysprompt, userMsg) {
       ? {'Content-Type':'application/json','Authorization':'Bearer '+S.key}
       : {'Content-Type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true'};
     const body = isGroq
-      ? {model:S.model,max_tokens:8192,stream:true,messages:[{role:'system',content:sysprompt},{role:'user',content:userMsg}]}
-      : {model:S.model,max_tokens:8192,stream:true,system:sysprompt,messages:[{role:'user',content:userMsg}]};
+      ? {model:S.model,max_tokens:8192,stream:true,messages:[{role:'system',content:sysprompt},...S.messages]}
+      : {model:S.model,max_tokens:8192,stream:true,system:sysprompt,messages:S.messages};
 
     const r = await fetch(url, {method:'POST',headers,body:JSON.stringify(body),signal:S.ctrl.signal});
     if (!r.ok) {
@@ -1439,6 +1461,13 @@ function finalize() {
   out.className = 'md';
   document.getElementById('rst').style.display='none';
   document.getElementById('stpbtn').style.display='none';
+  if (S.text) {
+    S.messages.push({role:'assistant', content: S.text});
+    document.getElementById('fubar').style.display = 'flex';
+    document.getElementById('fubar').style.flexDirection = 'column';
+    const fi = document.getElementById('fu-input');
+    if (fi) { fi.value=''; fi.style.height='auto'; }
+  }
   if (S.text && S.agent) {
     const e = {id:Date.now(),agentId:S.agent.id,agentName:S.agent.name,agentEmoji:S.agent.emoji,resp:S.text,ts:Date.now()};
     S.hist.unshift(e);
@@ -1448,8 +1477,29 @@ function finalize() {
 }
 
 function stopStream() { if(S.ctrl){S.ctrl.abort();S.ctrl=null;} }
-function backFromResp() { if(S.streaming)stopStream(); go('agent'); }
-function newReq() { if(S.streaming)stopStream(); go('agent'); }
+function backFromResp() { if(S.streaming)stopStream(); S.messages=[]; go('agent'); }
+function newReq() { if(S.streaming)stopStream(); S.messages=[]; go('agent'); }
+function resetConv() {
+  S.messages=[]; S.text='';
+  document.getElementById('mdo').innerHTML='';
+  document.getElementById('fubar').style.display='none';
+  go('agent');
+}
+function sendFollowup() {
+  const fi = document.getElementById('fu-input');
+  const txt = fi?.value.trim();
+  if (!txt || S.streaming) return;
+  S.messages.push({role:'user', content: txt});
+  document.getElementById('rst').style.display='flex';
+  document.getElementById('stpbtn').style.display='flex';
+  document.getElementById('fubar').style.display='none';
+  const out = document.getElementById('mdo');
+  out.innerHTML += `<hr style="margin:20px 0;border-color:var(--bd)"><div style="font-size:.75rem;color:var(--tx3);margin-bottom:12px">↩ ${esc(txt)}</div>`;
+  S.text=''; S.streaming=true;
+  out.className='md sc';
+  document.getElementById('rc').scrollTop = document.getElementById('rc').scrollHeight;
+  stream(S.agent.sp);
+}
 async function copyResp() {
   try { await navigator.clipboard.writeText(S.text); toast('Скопировано ✓'); }
   catch { toast('Не удалось скопировать'); }
