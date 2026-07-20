@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Структура запуска — 9 этапов от 0 до результата</title>
+<title>Структура запуска — 12 этапов от 0 до результата</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -21,11 +21,11 @@ body{background:var(--bg);color:var(--ink);
 .top .sub{color:var(--mut);font-size:.96rem;max-width:560px;padding-bottom:26px}
 
 .toc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;margin-bottom:44px}
-.toc a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;
-  color:var(--ink);text-decoration:none;font-size:.9rem;font-weight:600;transition:background .12s}
+.toc a{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:11px;
+  color:var(--ink);text-decoration:none;font-size:.87rem;font-weight:600;transition:background .12s}
 .toc a:hover{background:var(--acc-soft)}
 .toc .n{display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex-shrink:0;
-  border-radius:7px;background:var(--acc);color:#fff;font-size:.7rem;font-weight:800}
+  border-radius:7px;background:var(--acc);color:#fff;font-size:.68rem;font-weight:800}
 
 .stage{margin:52px 0 0;scroll-margin-top:20px}
 .stage-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
@@ -57,25 +57,49 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="top">
   <div class="kicker">Структура запуска</div>
-  <h1>9 этапов от нуля до результата</h1>
-  <p class="sub">Что входит в каждый этап, зачем он нужен и что должно остаться на руках, когда этап закрыт. Порядок именно такой — каждый следующий этап опирается на предыдущий.</p>
+  <h1>12 этапов от нуля до результата</h1>
+  <p class="sub">Что входит в каждый этап, зачем он нужен и что должно остаться на руках, когда этап закрыт. Порядок именно такой — каждый следующий этап опирается на предыдущий. Результат — не первая продажа, а работающая система.</p>
 </div>
 
 <div class="toc">
-  <a href="#e0"><span class="n">0</span>Анализ ниши, аудитории и конкурентов</a>
-  <a href="#e1"><span class="n">1</span>Упаковка</a>
-  <a href="#e2"><span class="n">2</span>Оффер и продуктовая линейка</a>
-  <a href="#e3"><span class="n">3</span>Воронка</a>
-  <a href="#e4"><span class="n">4</span>Контент и прогрев</a>
-  <a href="#e5"><span class="n">5</span>Трафик</a>
-  <a href="#e6"><span class="n">6</span>Продажи</a>
-  <a href="#e7"><span class="n">7</span>Запуск (окно продаж)</a>
-  <a href="#e8"><span class="n">8</span>Аналитика и масштабирование</a>
+  <a href="#e0"><span class="n">0</span>Целеполагание и финансовая модель</a>
+  <a href="#e1"><span class="n">1</span>Анализ ниши, аудитории и конкурентов</a>
+  <a href="#e2"><span class="n">2</span>Упаковка</a>
+  <a href="#e3"><span class="n">3</span>Оффер и продуктовая линейка</a>
+  <a href="#e4"><span class="n">4</span>Техническая инфраструктура</a>
+  <a href="#e5"><span class="n">5</span>Воронка</a>
+  <a href="#e6"><span class="n">6</span>Контент и прогрев</a>
+  <a href="#e7"><span class="n">7</span>Трафик</a>
+  <a href="#e8"><span class="n">8</span>Продажи</a>
+  <a href="#e9"><span class="n">9</span>Запуск (окно продаж)</a>
+  <a href="#e10"><span class="n">10</span>Удержание, LTV и рефералы</a>
+  <a href="#e11"><span class="n">11</span>Аналитика и масштабирование</a>
 </div>
 
 <!-- 0 -->
 <div class="stage" id="e0">
   <div class="stage-head"><span class="n">ЭТАП 0</span></div>
+  <h2>Целеполагание и финансовая модель</h2>
+  <p class="why">«Хочу зарабатывать больше» ничего не определяет. Пока цель не разложена на конкретные числа — цену, количество клиентов, часы — весь план строится вслепую.</p>
+
+  <div class="block">
+    <div class="lbl">Что входит</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Целевой доход</b><span class="d">Конкретная сумма в месяц, а не «побольше»</span></div></li>
+      <li><span class="dot"></span><div><b>Финансовая модель</b><span class="d">Раскладка цели на количество клиентов/часов/продаж × цену — сколько именно единиц продукта нужно закрывать</span></div></li>
+      <li><span class="dot"></span><div><b>Целевая цена</b><span class="d">Цена, при которой модель сходится — часто выше текущей, и это нормально</span></div></li>
+      <li><span class="dot"></span><div><b>Реальные ресурсы</b><span class="d">Сколько часов в неделю есть на самом деле, сколько денег на старт (реклама, инструменты, дизайн)</span></div></li>
+      <li><span class="dot"></span><div><b>Горизонт</b><span class="d">За какой срок планируется выйти на цель — 1 месяц, 3, 6</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>На выходе:</b> формула вида «N клиентов/часов в неделю по цене X = целевой доход» — то, с чем можно сверяться на каждом следующем этапе.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 1 -->
+<div class="stage" id="e1">
+  <div class="stage-head"><span class="n">ЭТАП 1</span></div>
   <h2>Анализ ниши, аудитории и конкурентов</h2>
   <p class="why">Всё, что строится дальше, опирается на этот этап. Слабый анализ = слабый оффер = слабая воронка. Большинство провальных запусков ломаются именно здесь, просто это выясняется намного позже.</p>
 
@@ -96,9 +120,9 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="divider"></div>
 
-<!-- 1 -->
-<div class="stage" id="e1">
-  <div class="stage-head"><span class="n">ЭТАП 1</span></div>
+<!-- 2 -->
+<div class="stage" id="e2">
+  <div class="stage-head"><span class="n">ЭТАП 2</span></div>
   <h2>Упаковка</h2>
   <p class="why">Первое, что видит человек, прежде чем решить — доверять или закрыть профиль. Теперь, когда понятно, кому и что говорить, это превращается в конкретные формулировки, а не абстрактный «красивый профиль».</p>
 
@@ -118,9 +142,9 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="divider"></div>
 
-<!-- 2 -->
-<div class="stage" id="e2">
-  <div class="stage-head"><span class="n">ЭТАП 2</span></div>
+<!-- 3 -->
+<div class="stage" id="e3">
+  <div class="stage-head"><span class="n">ЭТАП 3</span></div>
   <h2>Оффер и продуктовая линейка</h2>
   <p class="why">Упаковка привлекает внимание, но продаёт оффер. Без чёткого обещания результата даже красивый профиль не конвертит.</p>
 
@@ -130,7 +154,7 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
       <li><span class="dot"></span><div><b>Формулировка оффера</b><span class="d">[Результат] за [срок] без [главное возражение]</span></div></li>
       <li><span class="dot"></span><div><b>Лид-магнит</b><span class="d">Бесплатно: гайд, чек-лист, мини-разбор — узкая боль, закрытая за 10 минут</span></div></li>
       <li><span class="dot"></span><div><b>Трипваер (опционально)</b><span class="d">Недорогой продукт-разогрев, переводит из «подписчик» в «покупатель»</span></div></li>
-      <li><span class="dot"></span><div><b>Основной продукт</b><span class="d">Что именно, формат, сроки, что входит в тариф</span></div></li>
+      <li><span class="dot"></span><div><b>Основной продукт</b><span class="d">Что именно, формат, сроки, что входит в тариф — цена сверяется с моделью из этапа 0</span></div></li>
       <li><span class="dot"></span><div><b>Апселл / продление</b><span class="d">Следующий шаг для тех, кто уже купил</span></div></li>
       <li><span class="dot"></span><div><b>Цены и гарантии</b><span class="d">Фиксированный прайс + снижение риска: гарантия, пробное занятие, первый модуль бесплатно</span></div></li>
     </ol>
@@ -140,9 +164,30 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="divider"></div>
 
-<!-- 3 -->
-<div class="stage" id="e3">
-  <div class="stage-head"><span class="n">ЭТАП 3</span></div>
+<!-- 4 -->
+<div class="stage" id="e4">
+  <div class="stage-head"><span class="n">ЭТАП 4</span></div>
+  <h2>Техническая инфраструктура</h2>
+  <p class="why">Без этого воронка физически не работает: заявки теряются, оплату некуда принять, а на вопрос «как записаться» нечем ответить кроме как вручную и медленно.</p>
+
+  <div class="block">
+    <div class="lbl">Что входит</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Приём оплаты</b><span class="d">Ссылка на оплату, реквизиты, статус самозанятости/ИП, чек клиенту</span></div></li>
+      <li><span class="dot"></span><div><b>Учёт лидов и клиентов</b><span class="d">Таблица или CRM — кто написал, на каком этапе, сколько заплатил</span></div></li>
+      <li><span class="dot"></span><div><b>Автоответ / бот</b><span class="d">ManyChat, SaleBot или аналог — чтобы выдача лид-магнита не зависела от того, онлайн ли ты сейчас</span></div></li>
+      <li><span class="dot"></span><div><b>Календарь записи</b><span class="d">Понятный способ забронировать время — вручную в директе или через сервис записи</span></div></li>
+      <li><span class="dot"></span><div><b>Документы</b><span class="d">Договор оферты/услуг, если требуется по нише и объёму</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>На выходе:</b> рабочая связка «заявка → запись → оплата → фиксация в базе» без ручных дыр, которые теряют деньги молча.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 5 -->
+<div class="stage" id="e5">
+  <div class="stage-head"><span class="n">ЭТАП 5</span></div>
   <h2>Воронка</h2>
   <p class="why">Путь человека от «впервые увидел» до «оплатил». Без воронки продажи случайны, с ней — управляемы и предсказуемы.</p>
 
@@ -161,9 +206,9 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="divider"></div>
 
-<!-- 4 -->
-<div class="stage" id="e4">
-  <div class="stage-head"><span class="n">ЭТАП 4</span></div>
+<!-- 6 -->
+<div class="stage" id="e6">
+  <div class="stage-head"><span class="n">ЭТАП 6</span></div>
   <h2>Контент и прогрев</h2>
   <p class="why">Контент — топливо воронки: приводит новых и греет доверие у тех, кто уже подписан.</p>
 
@@ -182,9 +227,9 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="divider"></div>
 
-<!-- 5 -->
-<div class="stage" id="e5">
-  <div class="stage-head"><span class="n">ЭТАП 5</span></div>
+<!-- 7 -->
+<div class="stage" id="e7">
+  <div class="stage-head"><span class="n">ЭТАП 7</span></div>
   <h2>Трафик</h2>
   <p class="why">Воронка без трафика — труба без воды. Сначала выжимаем бесплатное, платное включаем только когда воронка уже окупается.</p>
 
@@ -202,9 +247,9 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="divider"></div>
 
-<!-- 6 -->
-<div class="stage" id="e6">
-  <div class="stage-head"><span class="n">ЭТАП 6</span></div>
+<!-- 8 -->
+<div class="stage" id="e8">
+  <div class="stage-head"><span class="n">ЭТАП 8</span></div>
   <h2>Продажи</h2>
   <p class="why">Воронка приводит тёплого человека, но именно здесь решается — заплатит он или нет. Самое дорогое узкое место в системе.</p>
 
@@ -222,9 +267,9 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="divider"></div>
 
-<!-- 7 -->
-<div class="stage" id="e7">
-  <div class="stage-head"><span class="n">ЭТАП 7</span></div>
+<!-- 9 -->
+<div class="stage" id="e9">
+  <div class="stage-head"><span class="n">ЭТАП 9</span></div>
   <h2>Запуск (окно продаж)</h2>
   <p class="why">Момент, когда всё собранное включается одновременно и превращается в выручку.</p>
 
@@ -242,9 +287,30 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
 
 <div class="divider"></div>
 
-<!-- 8 -->
-<div class="stage" id="e8">
-  <div class="stage-head"><span class="n">ЭТАП 8</span></div>
+<!-- 10 -->
+<div class="stage" id="e10">
+  <div class="stage-head"><span class="n">ЭТАП 10</span></div>
+  <h2>Удержание, LTV и рефералы</h2>
+  <p class="why">Первая оплата — не финиш. Удержать существующего клиента в разы дешевле, чем привлечь нового, а рекомендация от довольного клиента — самый дешёвый трафик из всех.</p>
+
+  <div class="block">
+    <div class="lbl">Что входит</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Онбординг</b><span class="d">Что происходит сразу после оплаты — welcome-сообщение, ожидания, первый шаг</span></div></li>
+      <li><span class="dot"></span><div><b>Сопровождение</b><span class="d">Чек-ины в процессе, поддержка между занятиями/встречами, ощущение, что о клиенте не забыли</span></div></li>
+      <li><span class="dot"></span><div><b>Сбор отзыва</b><span class="d">Запрашивается в момент, когда результат максимально ощутим — не «когда-нибудь потом»</span></div></li>
+      <li><span class="dot"></span><div><b>Реферальная программа</b><span class="d">Понятный бонус за рекомендацию — клиенту и тому, кого он привёл</span></div></li>
+      <li><span class="dot"></span><div><b>Предложение продолжения</b><span class="d">Абонемент, новый уровень, апселл — предлагается тогда, когда ценность уже доказана</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>На выходе:</b> система, которая превращает разового клиента в постоянного и в источник новых клиентов без дополнительных затрат на трафик.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 11 -->
+<div class="stage" id="e11">
+  <div class="stage-head"><span class="n">ЭТАП 11</span></div>
   <h2>Аналитика и масштабирование</h2>
   <p class="why">Что не измеряется — не растёт. Каждый цикл запуска должен быть лучше предыдущего за счёт цифр, а не интуиции.</p>
 
@@ -252,8 +318,10 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
     <div class="lbl">Что входит</div>
     <ol class="steps">
       <li><span class="dot"></span><div><b>Метрики по каждому этапу</b><span class="d">Охват → лиды → дошли до диагностики → оплатили → выручка</span></div></li>
+      <li><span class="dot"></span><div><b>Сверка с финансовой моделью</b><span class="d">Соответствуют ли реальные цифры плану из этапа 0 — и если нет, то в чём разрыв</span></div></li>
       <li><span class="dot"></span><div><b>Поиск узкого места</b><span class="d">Самый большой % потерь между соседними шагами — чинится в первую очередь</span></div></li>
       <li><span class="dot"></span><div><b>Усиление рабочего</b><span class="d">Топ-контент и топ-каналы масштабируются, слабое — убирается</span></div></li>
+      <li><span class="dot"></span><div><b>Делегирование</b><span class="d">Когда нанимать первого помощника и что отдавать первым — монтаж, ответы в директ, ведение таблиц</span></div></li>
       <li><span class="dot"></span><div><b>Следующий цикл</b><span class="d">Новое окно продаж планируется с учётом выводов текущего</span></div></li>
     </ol>
   </div>
@@ -261,7 +329,7 @@ ol.steps li span.d{color:var(--mut);font-size:.85rem}
   <div class="note">Запуск — это не разовое событие, а цикл. Разбор → 2–3 недели улучшений → новое окно продаж. Каждый круг цифры становятся лучше.</div>
 </div>
 
-<div class="foot">Структура запуска · 9 этапов, от 0 до результата · универсальный каркас для персонального бренда и экспертных продаж</div>
+<div class="foot">Структура запуска · 12 этапов, от 0 до результата · универсальный каркас для персонального бренда и экспертных продаж</div>
 
 </div>
 </body>
