@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Хайлайты профиля — структура для репетитора английского</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FBFAF7;--card:#FFFFFF;--ink:#1A1A22;--mut:#6B6B78;--faint:#A5A5B0;
+  --line:#E7E5DE;--acc:#0F4C3A;--acc-soft:#EAF2EE;--amber:#B45309;--amber-soft:#FDF3E3;
+}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  line-height:1.65;font-size:16.5px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:0 22px 90px}
+
+.top{padding:56px 0 8px;border-bottom:1px solid var(--line);margin-bottom:32px}
+.top .kicker{font-size:.72rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);margin-bottom:14px}
+.top h1{font-size:clamp(1.5rem,5vw,2rem);font-weight:800;letter-spacing:-.025em;line-height:1.25;margin-bottom:12px}
+.top .sub{color:var(--mut);font-size:.96rem;max-width:540px;padding-bottom:26px}
+
+h2{font-size:1.15rem;font-weight:800;letter-spacing:-.02em;margin:38px 0 6px}
+h2 .idx{color:var(--faint);font-weight:700;margin-right:8px}
+p{margin:0 0 12px}
+p.mut{color:var(--mut);font-size:.92rem}
+strong{font-weight:700}
+
+.folder{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:14px 0;
+  display:flex;gap:16px;align-items:flex-start}
+.folder .ic{flex-shrink:0;width:44px;height:44px;border-radius:12px;background:var(--acc-soft);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.folder .body{flex:1}
+.folder .name{font-weight:800;font-size:.98rem;margin-bottom:5px}
+.folder .content{color:var(--mut);font-size:.88rem;margin-bottom:8px}
+.folder .why{font-size:.82rem;color:var(--acc);background:var(--acc-soft);border-radius:8px;padding:7px 11px;display:inline-block}
+
+.folder.special{border-color:var(--amber);background:var(--amber-soft)}
+.folder.special .ic{background:#F5E3C4}
+
+.order-tag{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+  border-radius:7px;background:var(--acc);color:#fff;font-size:.72rem;font-weight:800;margin-right:8px;flex-shrink:0}
+
+.note{border-left:3px solid var(--amber);background:var(--amber-soft);border-radius:0 12px 12px 0;padding:13px 16px;margin:16px 0;font-size:.88rem}
+.note.green{border-color:var(--acc);background:var(--acc-soft)}
+
+.check{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0}
+.check .t{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.check ul{margin:0;padding:0;list-style:none}
+.check li{display:flex;gap:10px;padding:6px 0;font-size:.88rem}
+.check li::before{content:'○';color:var(--acc);font-weight:700;flex-shrink:0}
+
+.foot{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-size:.78rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <div class="kicker">Гайд · оформление профиля</div>
+  <h1>Актуальное в Instagram: 6 папок, которые продают уроки за тебя</h1>
+  <p class="sub">Хайлайты — единственная часть профиля, которая работает 24/7 без твоего участия. Новый человек заходит, смотрит 20 секунд — и либо пишет в директ, либо уходит. Эта структура закрывает все его вопросы за эти 20 секунд.</p>
+</div>
+
+<h2><span class="idx">01</span>Порядок папок слева направо</h2>
+<p class="mut">Instagram показывает хайлайты в том порядке, в котором ты их создавала (последняя — крайняя слева). Идёт от «кто ты» к «как записаться» — это и есть путь холодного посетителя к заявке.</p>
+
+<div class="folder">
+  <div class="ic">👋</div>
+  <div class="body">
+    <div class="name"><span class="order-tag">1</span>Обо мне</div>
+    <div class="content">Кто ты, сколько лет преподаёшь (4 года), твой подход — сочетание живых материалов (аутентика) с системными учебниками Oxford и Pearson. 1–2 коротких сторис, лицо крупным планом.</div>
+    <div class="why">Зачем: новый человек за 10 секунд решает, доверять ли тебе</div>
+  </div>
+</div>
+
+<div class="folder special">
+  <div class="ic">🎯</div>
+  <div class="body">
+    <div class="name"><span class="order-tag">2</span>Для взрослых с нуля</div>
+    <div class="content">Отдельная папка именно про взрослых учеников: «не поздно начать», «без стеснения за ошибки», реальные истории таких учеников. Формат уроков под занятого взрослого.</div>
+    <div class="why">Зачем: снимает главное возражение — «а вдруг это только для детей / школьников»</div>
+  </div>
+</div>
+
+<div class="folder">
+  <div class="ic">⭐</div>
+  <div class="body">
+    <div class="name"><span class="order-tag">3</span>Отзывы и кейсы</div>
+    <div class="content">Скриншоты переписок с благодарностями, результаты учеников: победы на олимпиадах, хорошие баллы за ВПР, взрослые, которые заговорили. Каждый кейс — по схеме «было → стало → за сколько».</div>
+    <div class="why">Зачем: соцдоказательство убеждает сильнее любого текста о себе</div>
+  </div>
+</div>
+
+<div class="folder">
+  <div class="ic">📚</div>
+  <div class="body">
+    <div class="name"><span class="order-tag">4</span>Как проходят занятия</div>
+    <div class="content">Короткий отрывок реального урока или его имитация, структура занятия, что получает ученик: план, материалы, обратная связь. Показать сочетание аутентики и учебника на практике.</div>
+    <div class="why">Зачем: снимает неопределённость «а что вообще будет на уроке»</div>
+  </div>
+</div>
+
+<div class="folder">
+  <div class="ic">💬</div>
+  <div class="body">
+    <div class="name"><span class="order-tag">5</span>Вопрос-ответ</div>
+    <div class="content">Сохранённые ответы на вопросы из сторис-опросов: «сколько нужно занятий», «как быстро будет результат», «что если я совсем без базы». Пополняется каждую неделю.</div>
+    <div class="why">Зачем: показывает, что ты живой человек и отвечаешь, а не бот</div>
+  </div>
+</div>
+
+<div class="folder">
+  <div class="ic">💳</div>
+  <div class="body">
+    <div class="name"><span class="order-tag">6</span>Цены и запись</div>
+    <div class="content">Стоимость индивидуальных и групповых занятий, что входит, как записаться (кодовое слово / кнопка / директ). Обновляется при смене цен — не нужно искать в переписке.</div>
+    <div class="why">Зачем: убирает последний барьер перед заявкой — не нужно спрашивать цену в директе</div>
+  </div>
+</div>
+
+<h2><span class="idx">02</span>Оформление обложек</h2>
+<p>Единый стиль обложек — один цвет фона, одна иконка-стиль (линейные иконки или буквы), без разнобоя картинок из интернета. По данным исследований, аккуратно оформленные хайлайты повышают переходы в профиль на заметный процент — это первое, что формирует впечатление «профессионал» ещё до чтения текста.</p>
+<div class="note green"><b>Быстрый вариант:</b> сделать 6 обложек в Canva за один вечер — один шаблон, 6 разных иконок (👋 ⭐ 📚 💬 💳 🎯), свой фирменный цвет фона.</div>
+
+<h2><span class="idx">03</span>Что важно не нарушать</h2>
+<div class="check">
+  <div class="t">Правила, которые держат папки рабочими</div>
+  <ul>
+    <li>Не больше 6–8 папок — глаза разбегаются, до нужной не долистывают</li>
+    <li>Каждая папка — 3–7 сторис, не больше: это дайджест, а не архив всего подряд</li>
+    <li>«Вопрос-ответ» и «Отзывы» — обновлять регулярно, остальные можно раз в 1–2 месяца</li>
+    <li>Название папки — одно-два слова, видно целиком под кружком</li>
+    <li>Начинать смотреть профиль должно быть можно с любой папки — не нужен контекст извне</li>
+  </ul>
+</div>
+
+<div class="note">Порядок и состав можно менять как угодно под свой профиль — это шаблон под конкретную ситуацию (взрослые, старт с 260 подписчиков, упор на кейсы), а не жёсткая формула на все случаи.</div>
+
+<div class="foot">Структура хайлайтов · подготовлено под нишу «английский для взрослых»</div>
+
+</div>
+</body>
+</html>
