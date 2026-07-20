@@ -282,7 +282,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
     <!-- Niche selector -->
     <div id="niche-bar" style="padding:14px 20px 0;display:flex;flex-direction:column;gap:6px">
       <div style="font-size:.68rem;font-weight:600;color:var(--tx3);letter-spacing:.05em;text-transform:uppercase">Ниша клиента</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="niche-pills"></div>
+      <div class="niche-pills-c" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="niche-pills"></div>
     </div>
     <div class="fw" id="aform"></div>
     <div style="height:8px"></div>
@@ -338,6 +338,104 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
     </div>
     <button onclick="resetConv()" style="background:none;border:none;color:var(--tx3);font-size:.7rem;
       cursor:pointer;font-family:inherit;text-align:left;padding:0">↺ Новый разговор</button>
+  </div>
+</div>
+
+<!-- PIPELINE FORM -->
+<div id="screen-pipeline" class="screen">
+  <div class="hh fb">
+    <div>
+      <div class="ht" style="font-size:1.4rem">Конвейер</div>
+      <div class="hsub">Задача → пишет агент → дизайнер собирает файл</div>
+    </div>
+    <button class="bti" onclick="go('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+  <div class="sb">
+    <div style="padding:0 20px 24px;display:flex;flex-direction:column;gap:14px">
+      <div class="field">
+        <label>Кто пишет контент</label>
+        <select id="pipe-agent-sel"></select>
+      </div>
+      <div class="field">
+        <label>Задача</label>
+        <textarea id="pipe-task" rows="4" placeholder="Например: 5 сценариев рилсов про мифы о похудении для нутрициолога"></textarea>
+      </div>
+      <div class="field">
+        <label>Ниша клиента</label>
+        <div class="niche-pills-c" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="pipe-niche-pills"></div>
+      </div>
+      <div class="field">
+        <label>Формат файла на выходе</label>
+        <select id="pipe-format-sel">
+          <option value="landing">HTML-документ (структура, карточки)</option>
+          <option value="stories">HTML-карточки под сторис (мобильный формат)</option>
+          <option value="text">Простой читаемый текст в HTML</option>
+        </select>
+      </div>
+      <button class="btn btn-p" onclick="runPipeline()">Запустить конвейер →</button>
+      <div style="font-size:.72rem;color:var(--tx3);text-align:center;line-height:1.5">Сначала выбранный агент напишет контент, затем UI/UX Designer оформит его в готовый HTML-файл</div>
+    </div>
+  </div>
+</div>
+
+<!-- PIPELINE RESULT -->
+<div id="screen-pipe-result" class="screen">
+  <div class="sh">
+    <button class="bb" onclick="backFromPipeline()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <h1>Конвейер</h1>
+    <button class="bti" id="pipe-stop-btn" onclick="stopPipeline()" title="Стоп" style="display:none">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+    </button>
+  </div>
+  <div class="sb">
+    <div style="padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+
+      <div class="ss" id="pipe-s1-card">
+        <div class="sst" style="display:flex;align-items:center;gap:8px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:6px;background:var(--ac);color:#fff;font-size:.62rem;font-weight:800">1</span>
+          <span id="pipe-s1-agent-name">Агент</span>
+          <span id="pipe-s1-status" class="rs" style="margin-left:auto"><span class="sd"></span>Пишет...</span>
+        </div>
+        <div style="padding:2px 15px 14px">
+          <div class="md" id="pipe-s1-out"></div>
+        </div>
+      </div>
+
+      <div class="ss" id="pipe-s2-card" style="display:none">
+        <div class="sst" style="display:flex;align-items:center;gap:8px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:6px;background:#A855F7;color:#fff;font-size:.62rem;font-weight:800">2</span>
+          <span>UI/UX Designer</span>
+          <span id="pipe-s2-status" class="rs" style="margin-left:auto"><span class="sd"></span>Собирает файл...</span>
+        </div>
+        <div style="padding:2px 15px 14px">
+          <div style="font-size:.8rem;color:var(--tx2)" id="pipe-s2-progress">Оформляет контент в HTML…</div>
+        </div>
+      </div>
+
+      <div id="pipe-result-block" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="btn btn-s btn-sm" id="pipe-tab-preview" onclick="pipeShowTab('preview')" style="flex:1">Превью</button>
+          <button class="btn btn-s btn-sm" id="pipe-tab-code" onclick="pipeShowTab('code')" style="flex:1">Код</button>
+        </div>
+        <div id="pipe-preview-wrap" style="border:1px solid var(--bd);border-radius:14px;overflow:hidden;background:#fff;height:56vh">
+          <iframe id="pipe-iframe" style="width:100%;height:100%;border:none;display:block"></iframe>
+        </div>
+        <div id="pipe-code-wrap" style="display:none">
+          <pre style="background:var(--sf2);border:1px solid var(--bd);border-radius:14px;padding:14px;overflow:auto;max-height:56vh;font-size:.72rem;color:var(--tx2);margin:0"><code id="pipe-code-out"></code></pre>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn btn-p" onclick="downloadPipeHtml()" style="flex:1">⬇ Скачать HTML</button>
+          <button class="btn btn-s" onclick="copyPipeHtml()" style="flex:1">Копировать код</button>
+        </div>
+        <button class="btn btn-s" onclick="go('pipeline')" style="margin-top:8px">↺ Новая задача</button>
+      </div>
+
+      <div id="pipe-error" style="display:none;background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.3);border-radius:12px;padding:14px;color:#FF4D6A;font-size:.82rem"></div>
+    </div>
   </div>
 </div>
 
@@ -452,6 +550,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
   <div class="ni a" data-s="home" onclick="go('home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     Главная
+  </div>
+  <div class="ni" data-s="pipeline" onclick="go('pipeline')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+    Конвейер
   </div>
   <div class="ni" data-s="history" onclick="go('history')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1252,6 +1354,9 @@ const S = {
   niches: JSON.parse(localStorage.getItem('wk_niches')||'[]'),
   niche: null,
   editingNicheId: null,
+  pipeCtrl: null,
+  pipeStreaming: false,
+  pipeHtml: '',
 };
 
 // ── INIT ────────────────────────────────────────────────────────
@@ -1282,7 +1387,7 @@ function activate(name) {
 function go(name) {
   activate(name);
   const nav = document.getElementById('nav');
-  const navScreens = ['home','history','settings'];
+  const navScreens = ['home','history','settings','pipeline'];
   if (navScreens.includes(name)) {
     nav.classList.add('v');
     document.querySelectorAll('.ni').forEach(n => n.classList.toggle('a', n.dataset.s === name));
@@ -1291,6 +1396,7 @@ function go(name) {
   }
   if (name === 'history') renderHist();
   if (name === 'settings') { updateKprev(); updateModelSelect(); updateSettingsProvider(); loadCtx(); renderNichesList(); }
+  if (name === 'pipeline') renderPipelineForm();
 }
 
 // ── API KEY ──────────────────────────────────────────────────────
@@ -1356,10 +1462,10 @@ function loadCtx() {
 }
 // ── NICHES ────────────────────────────────────────────────────────
 function renderNichePills() {
-  const c = document.getElementById('niche-pills'); if (!c) return;
   const none = `<div class="npill ${!S.niche?'npa':''}" onclick="selectNiche(null)">Без ниши</div>`;
   const pills = S.niches.map(n=>`<div class="npill ${S.niche===n.id?'npa':''}" onclick="selectNiche('${n.id}')">${esc(n.name)}</div>`).join('');
-  c.innerHTML = none + pills + `<div class="npill" onclick="openNicheModal(null)" style="border-style:dashed;color:var(--tx3)">+ Новая</div>`;
+  const html = none + pills + `<div class="npill" onclick="openNicheModal(null)" style="border-style:dashed;color:var(--tx3)">+ Новая</div>`;
+  document.querySelectorAll('.niche-pills-c').forEach(c => c.innerHTML = html);
 }
 function selectNiche(id) { S.niche=id; renderNichePills(); }
 function renderNichesList() {
@@ -1597,6 +1703,166 @@ function sendFollowup() {
 }
 async function copyResp() {
   try { await navigator.clipboard.writeText(S.text); toast('Скопировано ✓'); }
+  catch { toast('Не удалось скопировать'); }
+}
+
+// ── PIPELINE (agent → agent → file) ─────────────────────────────────
+function renderPipelineForm() {
+  const sel = document.getElementById('pipe-agent-sel');
+  if (sel && !sel.dataset.filled) {
+    sel.innerHTML = AGENTS.filter(a=>a.id!=='designer').map(a=>`<option value="${a.id}">${a.emoji} ${a.name}</option>`).join('');
+    sel.dataset.filled = '1';
+  }
+  renderNichePills();
+}
+
+async function fetchStream(sysprompt, userText, onChunk) {
+  const ctrl = new AbortController();
+  S.pipeCtrl = ctrl;
+  const isGroq = S.provider === 'groq';
+  const url = isGroq ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.anthropic.com/v1/messages';
+  const headers = isGroq
+    ? {'Content-Type':'application/json','Authorization':'Bearer '+S.key}
+    : {'Content-Type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true'};
+  const messages = [{role:'user', content:userText}];
+  const body = isGroq
+    ? {model:S.model,max_tokens:8192,stream:true,messages:[{role:'system',content:sysprompt},...messages]}
+    : {model:S.model,max_tokens:8192,stream:true,system:sysprompt,messages};
+  const r = await fetch(url, {method:'POST',headers,body:JSON.stringify(body),signal:ctrl.signal});
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error?.message || 'HTTP '+r.status); }
+  const reader = r.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '', full = '';
+  while (true) {
+    const {done,value} = await reader.read();
+    if (done) break;
+    buf += dec.decode(value,{stream:true});
+    const lines = buf.split('\n'); buf = lines.pop()||'';
+    for (const ln of lines) {
+      if (!ln.startsWith('data: ')) continue;
+      const d = ln.slice(6).trim();
+      if (d==='[DONE]') continue;
+      try {
+        const p = JSON.parse(d);
+        let chunk = '';
+        if (isGroq) chunk = p.choices?.[0]?.delta?.content || '';
+        else { if (p.type==='content_block_delta' && p.delta?.type==='text_delta') chunk = p.delta.text; }
+        if (chunk) { full += chunk; onChunk(full); }
+      } catch(e){}
+    }
+  }
+  return full;
+}
+
+function extractHtml(text) {
+  let t = (text||'').trim();
+  const fence = t.match(/```(?:html)?\s*([\s\S]*?)```/i);
+  if (fence) t = fence[1].trim();
+  const idx = t.search(/<!doctype html>|<html[\s>]/i);
+  if (idx > 0) t = t.slice(idx);
+  return t;
+}
+
+const PIPE_FORMATS = {
+  landing: 'один цельный HTML-документ: понятные секции/карточки, заголовки, чёткая иерархия, премиальный визуальный стиль (в духе Linear/Notion), тёмная или светлая тема на выбор дизайнера, подходящая теме',
+  stories: 'HTML в формате мобильных карточек под сторис — каждая идея как отдельный "экран" в соотношении 9:16, крупный читаемый текст, вертикальная прокрутка между карточками',
+  text: 'аккуратно оформленный читаемый HTML-документ: заголовки, списки, отступы, без сложной вёрстки и лишних декоративных блоков',
+};
+
+async function runPipeline() {
+  if (!S.key) { toast('Настройте API ключ в настройках'); go('settings'); return; }
+  const task = (document.getElementById('pipe-task')?.value||'').trim();
+  if (!task) { toast('Опишите задачу'); return; }
+  const writer = AGENTS.find(a=>a.id === document.getElementById('pipe-agent-sel')?.value);
+  if (!writer) { toast('Выберите агента'); return; }
+  const formatKey = document.getElementById('pipe-format-sel')?.value || 'landing';
+  const nicheCtx = S.niche ? S.niches.find(n=>n.id===S.niche)?.ctx : '';
+  const ctxBlock = nicheCtx || S.ctx;
+
+  S.pipeStreaming = true; S.pipeHtml = '';
+  document.getElementById('pipe-s1-agent-name').textContent = writer.name;
+  document.getElementById('pipe-s1-status').innerHTML = '<span class="sd"></span><span>Пишет...</span>';
+  document.getElementById('pipe-s1-out').innerHTML = '';
+  document.getElementById('pipe-s1-out').className = 'md sc';
+  document.getElementById('pipe-s2-card').style.display = 'none';
+  document.getElementById('pipe-s2-status').innerHTML = '<span class="sd"></span><span>Собирает файл...</span>';
+  document.getElementById('pipe-s2-progress').textContent = 'Оформляет контент в HTML…';
+  document.getElementById('pipe-result-block').style.display = 'none';
+  document.getElementById('pipe-error').style.display = 'none';
+  document.getElementById('pipe-stop-btn').style.display = 'flex';
+  go('pipe-result');
+
+  let stage1Msg = task;
+  if (ctxBlock) stage1Msg = `Контекст клиента/ниши:\n${ctxBlock}\n\n---\n\nЗадача:\n${task}`;
+
+  try {
+    const writerText = await fetchStream(writer.sp, stage1Msg, (partial)=>{
+      const o = document.getElementById('pipe-s1-out');
+      o.innerHTML = marked.parse(partial);
+    });
+    document.getElementById('pipe-s1-out').innerHTML = marked.parse(writerText);
+    document.getElementById('pipe-s1-out').className = 'md';
+    document.getElementById('pipe-s1-status').innerHTML = '<span style="color:#3ECF8E">✓ Готово</span>';
+
+    document.getElementById('pipe-s2-card').style.display = 'block';
+
+    const designSys = SP.designer + `\n\nЗАДАЧА ЭТОГО ЗАПРОСА: ниже дан готовый контент от другого специалиста. Твоя работа — оформить его в законченный, самостоятельный HTML-файл: полный документ, начиная с <!DOCTYPE html>, со встроенным <style>, без внешних зависимостей и без JS-фреймворков, адаптивный под мобильный экран. Формат вывода: ${PIPE_FORMATS[formatKey]}. Структурируй по смыслу, сохрани весь контент по сути, ничего не выдумывай сверх присланного. Верни ТОЛЬКО HTML-код целиком, без пояснений до или после, без markdown-разметки тройными кавычками.`;
+    const stage2Msg = `Контент для оформления в HTML:\n\n${writerText}`;
+
+    const designText = await fetchStream(designSys, stage2Msg, (partial)=>{
+      document.getElementById('pipe-s2-progress').textContent = `Оформляет контент в HTML… ${partial.length} симв.`;
+    });
+
+    const html = extractHtml(designText);
+    S.pipeHtml = html;
+    document.getElementById('pipe-s2-status').innerHTML = '<span style="color:#3ECF8E">✓ Готово</span>';
+    document.getElementById('pipe-stop-btn').style.display = 'none';
+    document.getElementById('pipe-result-block').style.display = 'block';
+    document.getElementById('pipe-iframe').srcdoc = html;
+    document.getElementById('pipe-code-out').textContent = html;
+    pipeShowTab('preview');
+
+    S.hist.unshift({id:Date.now(),agentId:'pipeline',agentName:'Конвейер: '+writer.name+' → Designer',agentEmoji:'🔗',resp:'HTML-файл сгенерирован ('+html.length+' симв.)',ts:Date.now()});
+    if (S.hist.length>50) S.hist=S.hist.slice(0,50);
+    localStorage.setItem('wk_hist',JSON.stringify(S.hist));
+  } catch(e) {
+    document.getElementById('pipe-stop-btn').style.display = 'none';
+    if (e.name==='AbortError') {
+      document.getElementById('pipe-error').style.display='block';
+      document.getElementById('pipe-error').textContent = '⏹ Остановлено';
+    } else {
+      document.getElementById('pipe-error').style.display='block';
+      document.getElementById('pipe-error').textContent = '⚠️ Ошибка: '+e.message;
+    }
+  }
+  S.pipeStreaming = false;
+}
+
+function stopPipeline() { if (S.pipeCtrl) { S.pipeCtrl.abort(); S.pipeCtrl=null; } }
+function backFromPipeline() { if (S.pipeStreaming) stopPipeline(); go('pipeline'); }
+
+function pipeShowTab(tab) {
+  document.getElementById('pipe-preview-wrap').style.display = tab==='preview' ? 'block' : 'none';
+  document.getElementById('pipe-code-wrap').style.display = tab==='code' ? 'block' : 'none';
+  document.getElementById('pipe-tab-preview').style.background = tab==='preview' ? 'var(--ac)' : '';
+  document.getElementById('pipe-tab-preview').style.color = tab==='preview' ? '#fff' : '';
+  document.getElementById('pipe-tab-code').style.background = tab==='code' ? 'var(--ac)' : '';
+  document.getElementById('pipe-tab-code').style.color = tab==='code' ? '#fff' : '';
+}
+
+function downloadPipeHtml() {
+  if (!S.pipeHtml) return;
+  const blob = new Blob([S.pipeHtml], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'result.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  toast('Файл скачан ✓');
+}
+async function copyPipeHtml() {
+  if (!S.pipeHtml) return;
+  try { await navigator.clipboard.writeText(S.pipeHtml); toast('HTML скопирован ✓'); }
   catch { toast('Не удалось скопировать'); }
 }
 
