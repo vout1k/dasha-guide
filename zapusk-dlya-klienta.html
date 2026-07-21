@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Как проходит запуск — простыми словами</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FBFAF7;--card:#FFFFFF;--ink:#1A1A22;--mut:#6B6B78;--faint:#A5A5B0;
+  --line:#E7E5DE;--acc:#0F4C3A;--acc-soft:#EAF2EE;--amber:#B45309;--amber-soft:#FDF3E3;
+}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  line-height:1.62;font-size:16.5px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:700px;margin:0 auto;padding:0 22px 90px}
+
+.top{padding:60px 0 8px;border-bottom:1px solid var(--line);margin-bottom:30px}
+.top .kicker{font-size:.72rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);margin-bottom:14px}
+.top h1{font-size:clamp(1.6rem,5.5vw,2.2rem);font-weight:800;letter-spacing:-.025em;line-height:1.2;margin-bottom:12px}
+.top .sub{color:var(--mut);font-size:.96rem;max-width:560px;padding-bottom:26px}
+
+.toc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;margin-bottom:44px}
+.toc a{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:11px;
+  color:var(--ink);text-decoration:none;font-size:.87rem;font-weight:600;transition:background .12s}
+.toc a:hover{background:var(--acc-soft)}
+.toc .n{display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex-shrink:0;
+  border-radius:7px;background:var(--acc);color:#fff;font-size:.68rem;font-weight:800}
+
+.stage{margin:52px 0 0;scroll-margin-top:20px}
+.stage-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.stage-head .n{font-size:.85rem;font-weight:800;color:var(--acc);letter-spacing:.04em}
+.stage h2{font-size:1.32rem;font-weight:800;letter-spacing:-.02em}
+.stage .why{color:var(--mut);font-size:.92rem;margin:8px 0 18px;padding-left:2px}
+
+.block{margin:16px 0}
+.block .lbl{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+ol.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+ol.steps li{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:.9rem}
+ol.steps li .dot{flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--acc);margin-top:8px}
+
+.result{display:flex;gap:10px;align-items:flex-start;background:var(--acc-soft);
+  border:1px solid rgba(15,76,58,.18);border-radius:12px;padding:12px 15px;font-size:.87rem;margin-top:14px}
+.result b{color:var(--acc)}
+
+.note{border-left:3px solid var(--amber);background:var(--amber-soft);border-radius:0 12px 12px 0;padding:12px 16px;margin:20px 0;font-size:.88rem}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:44px 0 0}
+
+.foot{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-size:.78rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <div class="kicker">Для вас · без сложных терминов</div>
+  <h1>Как проходит запуск — по шагам, простыми словами</h1>
+  <p class="sub">Вот что будет происходить на каждом этапе нашей работы и зачем это нужно. Ничего запоминать не нужно — просто чтобы вы видели общую картину и понимали, почему мы делаем именно так и именно в таком порядке.</p>
+</div>
+
+<div class="toc">
+  <a href="#e0"><span class="n">1</span>Считаем, сколько хотим зарабатывать</a>
+  <a href="#e1"><span class="n">2</span>Разбираемся, кому вы помогаете</a>
+  <a href="#e2"><span class="n">3</span>Приводим профиль в порядок</a>
+  <a href="#e3"><span class="n">4</span>Формулируем понятное предложение</a>
+  <a href="#e4"><span class="n">5</span>Настраиваем техническую часть</a>
+  <a href="#e5"><span class="n">6</span>Собираем путь от подписчика до клиента</a>
+  <a href="#e6"><span class="n">7</span>Публикуем контент, который приводит людей</a>
+  <a href="#e7"><span class="n">8</span>Приводим новых людей</a>
+  <a href="#e8"><span class="n">9</span>Учимся продавать без неловкости</a>
+  <a href="#e9"><span class="n">10</span>Проводим сам запуск</a>
+  <a href="#e10"><span class="n">11</span>Заботимся о клиентах после покупки</a>
+  <a href="#e11"><span class="n">12</span>Смотрим на цифры и растём дальше</a>
+</div>
+
+<!-- 1 -->
+<div class="stage" id="e0">
+  <div class="stage-head"><span class="n">ШАГ 1</span></div>
+  <h2>Считаем, сколько хотим зарабатывать</h2>
+  <p class="why">Прежде чем что-то делать, договоримся о цифрах. От этого зависит всё остальное — сколько клиентов нужно, по какой цене и сколько времени на это уйдёт.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Обсуждаем, сколько денег вы хотите получать в месяц</li>
+      <li><span class="dot"></span>Считаем: сколько клиентов и по какой цене для этого понадобится</li>
+      <li><span class="dot"></span>Смотрим, сколько часов в неделю вы реально готовы уделять этому</li>
+      <li><span class="dot"></span>Договариваемся, за какой срок хотим прийти к этой цели</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> понятную цель в цифрах — например, «нужно 10 учеников по 2 500 ₽ в неделю», а не расплывчатое «хочу зарабатывать больше».</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 2 -->
+<div class="stage" id="e1">
+  <div class="stage-head"><span class="n">ШАГ 2</span></div>
+  <h2>Разбираемся, кому вы помогаете</h2>
+  <p class="why">Чтобы говорить с людьми так, чтобы это цепляло, сначала нужно понять — кто эти люди, что их беспокоит и почему они до сих пор не решили свою проблему.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Определяем вашего идеального клиента — не «все подряд», а конкретный человек в конкретной ситуации</li>
+      <li><span class="dot"></span>Разговариваем с несколькими вашими текущими или бывшими клиентами — что их волновало, что мешало решиться</li>
+      <li><span class="dot"></span>Записываем, какими словами они сами описывают свою проблему — это потом пригодится в текстах</li>
+      <li><span class="dot"></span>Смотрим, что делают похожие специалисты — что у них получается хорошо, что можно сделать иначе</li>
+      <li><span class="dot"></span>Формулируем, чем вы отличаетесь от других — и почему это важно именно клиенту</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> ясное понимание, кому вы пишете каждый пост и что именно должно их зацепить.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 3 -->
+<div class="stage" id="e2">
+  <div class="stage-head"><span class="n">ШАГ 3</span></div>
+  <h2>Приводим профиль в порядок</h2>
+  <p class="why">Человек за 10–15 секунд решает, остаться у вас в профиле или закрыть его. За это время профиль должен ответить на три вопроса: кто вы, кому помогаете и что делать дальше.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Обновляем фото и текст в шапке профиля</li>
+      <li><span class="dot"></span>Собираем «актуальное» — кружки сторис: о вас, отзывы, как проходит работа, ответы на частые вопросы, цены</li>
+      <li><span class="dot"></span>Закрепляем 2–3 поста-визитки наверху профиля</li>
+      <li><span class="dot"></span>Делаем всё в едином стиле — одни цвета, один почерк, чтобы выглядело собранно</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> профиль, который сам работает на вас — даже когда вы не в сети.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 4 -->
+<div class="stage" id="e3">
+  <div class="stage-head"><span class="n">ШАГ 4</span></div>
+  <h2>Формулируем понятное предложение</h2>
+  <p class="why">«Я репетитор английского» — это факт о вас, а не предложение. Предложение — это когда человек сразу понимает, что он получит и почему стоит попробовать именно у вас.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Формулируем предложение одной фразой: что получит клиент, за какой срок и без чего именно (например, без зубрёжки)</li>
+      <li><span class="dot"></span>Придумываем что-то бесплатное и полезное для нового подписчика</li>
+      <li><span class="dot"></span>Прописываем, что именно входит в платные занятия и сколько это стоит</li>
+      <li><span class="dot"></span>Продумываем, что предложить клиенту, когда первый этап закончится</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> предложение, которое можно произнести за 10 секунд — и на которое хочется ответить «да, хочу так же».</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 5 -->
+<div class="stage" id="e4">
+  <div class="stage-head"><span class="n">ШАГ 5</span></div>
+  <h2>Настраиваем техническую часть</h2>
+  <p class="why">Даже если всё остальное идеально, заявки будут теряться, если некуда принять оплату или некому их зафиксировать. Скучный, но обязательный шаг.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Подключаем удобный способ принимать оплату</li>
+      <li><span class="dot"></span>Заводим табличку, куда попадают все, кто написал</li>
+      <li><span class="dot"></span>Настраиваем автоматический ответ тем, кто написал кодовое слово — чтобы не пришлось отвечать вручную ночью</li>
+      <li><span class="dot"></span>Договариваемся, как человек записывается на занятие или консультацию</li>
+      <li><span class="dot"></span>Проверяем, нужны ли какие-то документы для приёма оплаты</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> всё работает само — человек написал → получил ответ → записался → оплатил, и вы это видите.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 6 -->
+<div class="stage" id="e5">
+  <div class="stage-head"><span class="n">ШАГ 6</span></div>
+  <h2>Собираем путь от подписчика до клиента</h2>
+  <p class="why">Это как дорожка от входной двери до кассы: понятная и без препятствий — человек по ней дойдёт. Дорожки нет — потеряется на полпути.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Придумываем, как человек попадёт на эту дорожку — например, напишет кодовое слово под роликом</li>
+      <li><span class="dot"></span>Настраиваем, что он получает сразу после этого</li>
+      <li><span class="dot"></span>Пишем несколько сообщений, которые постепенно знакомят его с вами и вашей работой</li>
+      <li><span class="dot"></span>Готовим, что вы скажете, когда дойдёт до разговора об оплате</li>
+      <li><span class="dot"></span>Продумываем, как мягко напомнить о себе тем, кто «думает»</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> готовый путь, который работает, даже пока вы спите или ведёте занятие.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 7 -->
+<div class="stage" id="e6">
+  <div class="stage-head"><span class="n">ШАГ 7</span></div>
+  <h2>Публикуем контент, который приводит людей</h2>
+  <p class="why">Контент — это то, что видят потенциальные клиенты ещё до знакомства с вами лично. От него зависит, захотят ли они узнать больше.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Составляем план публикаций на пару недель вперёд</li>
+      <li><span class="dot"></span>Снимаем короткие видео на темы, которые волнуют вашу аудиторию</li>
+      <li><span class="dot"></span>Публикуем истории каждый день — понемногу, в разных форматах</li>
+      <li><span class="dot"></span>Показываем отзывы и результаты клиентов прямо в контенте, а не только храним их «на полке»</li>
+      <li><span class="dot"></span>Готовим серию историй перед тем, как открыть продажи</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> план, по которому можно работать, не задумываясь каждый день, что публиковать.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 8 -->
+<div class="stage" id="e7">
+  <div class="stage-head"><span class="n">ШАГ 8</span></div>
+  <h2>Приводим новых людей</h2>
+  <p class="why">Даже лучшая дорожка ничего не даст, если по ней никто не идёт. Нужен постоянный приток новых людей.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>В первую очередь используем бесплатные способы — видео, знакомства с похожими специалистами</li>
+      <li><span class="dot"></span>Подключаем платную рекламу только тогда, когда точно знаем, что бесплатное уже работает</li>
+      <li><span class="dot"></span>Заводим отдельное место — например, канал — куда собираются все ваши подписчики</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> понятный план — откуда приходят новые люди и сколько это стоит времени или денег.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 9 -->
+<div class="stage" id="e8">
+  <div class="stage-head"><span class="n">ШАГ 9</span></div>
+  <h2>Учимся продавать без неловкости</h2>
+  <p class="why">Многие боятся называть цену или чувствуют себя навязчивыми. На деле продажа — это просто честный разговор о том, подходит ли услуга человеку.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Готовим структуру разговора: сначала узнаём ситуацию человека, потом рассказываем, как можем помочь</li>
+      <li><span class="dot"></span>Прописываем спокойные ответы на «дорого», «я подумаю», «посоветуюсь»</li>
+      <li><span class="dot"></span>Ведём табличку, чтобы никто не остался без ответа</li>
+      <li><span class="dot"></span>Учимся мягко напоминать о себе, если человек замолчал на день-два</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> уверенность в разговоре о деньгах и меньше клиентов, потерянных просто из-за молчания.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 10 -->
+<div class="stage" id="e9">
+  <div class="stage-head"><span class="n">ШАГ 10</span></div>
+  <h2>Проводим сам запуск</h2>
+  <p class="why">Момент, когда всё подготовленное включается одновременно — как открытие магазина после ремонта.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Назначаем даты: когда продажи открываются и когда закрываются</li>
+      <li><span class="dot"></span>Придумываем небольшой бонус за то, что оплатили быстро</li>
+      <li><span class="dot"></span>Расписываем по дням, что публикуем и кому пишем</li>
+      <li><span class="dot"></span>Честно закрываем набор в назначенный день</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> конкретные даты и понятный результат — сколько человек оплатили за это время.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 11 -->
+<div class="stage" id="e10">
+  <div class="stage-head"><span class="n">ШАГ 11</span></div>
+  <h2>Заботимся о клиентах после покупки</h2>
+  <p class="why">Продать один раз — только начало. Довольный клиент останется дольше и приведёт друзей — а это самый приятный и бесплатный способ роста.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Тепло встречаем человека сразу после оплаты</li>
+      <li><span class="dot"></span>Интересуемся, как у него дела, в процессе занятий</li>
+      <li><span class="dot"></span>Просим отзыв в тот момент, когда результат уже заметен</li>
+      <li><span class="dot"></span>Придумываем небольшой бонус тем, кто порекомендует вас другу</li>
+      <li><span class="dot"></span>Предлагаем продолжение, когда человек уже увидел результат</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> клиентов, которые остаются надолго и сами приводят новых — без лишних вложений в рекламу.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 12 -->
+<div class="stage" id="e11">
+  <div class="stage-head"><span class="n">ШАГ 12</span></div>
+  <h2>Смотрим на цифры и растём дальше</h2>
+  <p class="why">Через какое-то время смотрим, что сработало, а что нет — и на основе этого делаем следующий круг ещё лучше.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span>Считаем: сколько людей увидели контент, сколько написали, сколько оплатили</li>
+      <li><span class="dot"></span>Сравниваем с целью, которую поставили в самом первом шаге</li>
+      <li><span class="dot"></span>Смотрим, на каком шаге теряется больше всего людей, и исправляем именно его</li>
+      <li><span class="dot"></span>Делаем больше того, что сработало лучше всего</li>
+      <li><span class="dot"></span>Решаем, когда стоит взять помощника, чтобы не делать всё самостоятельно</li>
+    </ol>
+  </div>
+  <div class="result"><b>Получаем:</b> понимание, что улучшить в следующий раз — и постепенно всё меньше рутины на ваших плечах.</div>
+  <div class="note">Запуск — это не разовое событие, а цикл. Прошли круг → чуть улучшили → прошли снова, уже с лучшим результатом. Не нужно делать всё идеально с первого раза.</div>
+</div>
+
+<div class="foot">Как проходит запуск · 12 шагов, простыми словами · чтобы вы понимали, что происходит и зачем</div>
+
+</div>
+</body>
+</html>
