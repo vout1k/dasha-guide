@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Структура запуска — 12 этапов с объяснением терминов</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FBFAF7;--card:#FFFFFF;--ink:#1A1A22;--mut:#6B6B78;--faint:#A5A5B0;
+  --line:#E7E5DE;--acc:#0F4C3A;--acc-soft:#EAF2EE;--amber:#B45309;--amber-soft:#FDF3E3;
+}
+body{background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  line-height:1.62;font-size:16.5px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:700px;margin:0 auto;padding:0 22px 90px}
+
+.top{padding:60px 0 8px;border-bottom:1px solid var(--line);margin-bottom:30px}
+.top .kicker{font-size:.72rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--acc);margin-bottom:14px}
+.top h1{font-size:clamp(1.6rem,5.5vw,2.2rem);font-weight:800;letter-spacing:-.025em;line-height:1.2;margin-bottom:12px}
+.top .sub{color:var(--mut);font-size:.96rem;max-width:560px;padding-bottom:26px}
+
+.glossary{background:var(--acc);border-radius:16px;padding:20px 22px;margin-bottom:36px}
+.glossary .gt{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:12px}
+.gg{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+@media(max-width:520px){.gg{grid-template-columns:1fr}}
+.gg div b{color:#fff;font-size:.85rem;display:block;margin-bottom:1px}
+.gg div span{color:rgba(255,255,255,.72);font-size:.8rem;line-height:1.4}
+
+.toc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px;margin-bottom:44px}
+.toc a{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:11px;
+  color:var(--ink);text-decoration:none;font-size:.87rem;font-weight:600;transition:background .12s}
+.toc a:hover{background:var(--acc-soft)}
+.toc .n{display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex-shrink:0;
+  border-radius:7px;background:var(--acc);color:#fff;font-size:.68rem;font-weight:800}
+
+.stage{margin:52px 0 0;scroll-margin-top:20px}
+.stage-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.stage-head .n{font-size:.85rem;font-weight:800;color:var(--acc);letter-spacing:.04em}
+.stage h2{font-size:1.32rem;font-weight:800;letter-spacing:-.02em}
+.stage .why{color:var(--mut);font-size:.9rem;margin:8px 0 18px;padding-left:2px}
+
+.block{margin:16px 0}
+.block .lbl{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:9px}
+ol.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
+ol.steps li{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:.9rem}
+ol.steps li .dot{flex-shrink:0;width:6px;height:6px;border-radius:50%;background:var(--acc);margin-top:8px}
+ol.steps li b{display:block;margin-bottom:2px}
+ol.steps li .term{color:var(--acc);font-weight:700}
+ol.steps li span.d{color:var(--mut);font-size:.85rem}
+
+.result{display:flex;gap:10px;align-items:flex-start;background:var(--acc-soft);
+  border:1px solid rgba(15,76,58,.18);border-radius:12px;padding:12px 15px;font-size:.86rem;margin-top:14px}
+.result b{color:var(--acc)}
+
+.note{border-left:3px solid var(--amber);background:var(--amber-soft);border-radius:0 12px 12px 0;padding:12px 16px;margin:14px 0;font-size:.86rem}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:44px 0 0}
+
+.foot{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-size:.78rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <div class="kicker">Дорожная карта · термины объяснены</div>
+  <h1>Структура запуска: 12 этапов с расшифровкой терминов</h1>
+  <p class="sub">Та же дорожная карта вашего проекта, что и в профессиональной версии — но каждый термин расшифрован при первом упоминании. Ниже — краткий глоссарий для быстрой сверки, если по ходу чтения захочется что-то уточнить.</p>
+</div>
+
+<div class="glossary">
+  <div class="gt">Глоссарий — часто встречающиеся термины</div>
+  <div class="gg">
+    <div><b>MRR</b><span>Monthly Recurring Revenue — регулярный доход за месяц</span></div>
+    <div><b>AOV</b><span>Average Order Value — средний чек одной продажи</span></div>
+    <div><b>ICP</b><span>Ideal Customer Profile — портрет идеального клиента</span></div>
+    <div><b>JTBD</b><span>Jobs To Be Done — задача, которую человек решает продуктом</span></div>
+    <div><b>LTV</b><span>Lifetime Value — сколько денег приносит клиент за всё время</span></div>
+    <div><b>CAC</b><span>Customer Acquisition Cost — стоимость привлечения одного клиента</span></div>
+    <div><b>CRM</b><span>Customer Relationship Management — система учёта клиентов и сделок</span></div>
+    <div><b>Churn</b><span>Отток — доля клиентов, которые перестают покупать/пользоваться</span></div>
+  </div>
+</div>
+
+<div class="toc">
+  <a href="#e0"><span class="n">0</span>Целеполагание и юнит-экономика</a>
+  <a href="#e1"><span class="n">1</span>ICP, анализ ниши и конкурентов</a>
+  <a href="#e2"><span class="n">2</span>Упаковка / брендинг профиля</a>
+  <a href="#e3"><span class="n">3</span>Оффер и продуктовая линейка</a>
+  <a href="#e4"><span class="n">4</span>Техническая инфраструктура</a>
+  <a href="#e5"><span class="n">5</span>Воронка</a>
+  <a href="#e6"><span class="n">6</span>Контентная стратегия и прогрев</a>
+  <a href="#e7"><span class="n">7</span>Трафик</a>
+  <a href="#e8"><span class="n">8</span>Продажи</a>
+  <a href="#e9"><span class="n">9</span>Запуск (launch window)</a>
+  <a href="#e10"><span class="n">10</span>Retention, LTV и рефералы</a>
+  <a href="#e11"><span class="n">11</span>Аналитика и масштабирование</a>
+</div>
+
+<!-- 0 -->
+<div class="stage" id="e0">
+  <div class="stage-head"><span class="n">ЭТАП 0</span></div>
+  <h2>Целеполагание и юнит-экономика</h2>
+  <p class="why">Прежде чем проектировать воронку, фиксируем целевые показатели unit-экономики — экономики «на одного клиента» — иначе весь план строится без контрольных точек.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><span class="term">MRR</span> — <b>Monthly Recurring Revenue</b><span class="d">Месячный доход и горизонт его достижения — та цифра, вокруг которой строится весь план</span></div></li>
+      <li><span class="dot"></span><div><b>Обратный расчёт</b><span class="d">MRR ÷ <span class="term">AOV</span> (Average Order Value — средний чек) = сколько сделок нужно закрывать в месяц</span></div></li>
+      <li><span class="dot"></span><div><b>Целевая цена продукта</b><span class="d">Цена, при которой юнит-модель сходится — часто выше текущей</span></div></li>
+      <li><span class="dot"></span><div><b>Ресурсный аудит</b><span class="d">Ваше реальное время в неделю и бюджет на старт: реклама, инструменты, дизайн</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> юнит-модель вида «N сделок × средний чек (AOV) = целевой MRR» — контрольная точка для всех последующих этапов.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 1 -->
+<div class="stage" id="e1">
+  <div class="stage-head"><span class="n">ЭТАП 1</span></div>
+  <h2>ICP, анализ ниши и конкурентов</h2>
+  <p class="why">Позиционирование и оффер без валидированного портрета клиента — гипотеза, а не стратегия. Здесь она превращается в данные.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><span class="term">ICP</span> — <b>Ideal Customer Profile</b><span class="d">Портрет идеального клиента: демография + психография + контекст обращения, не абстрактный сегмент, а конкретный человек</span></div></li>
+      <li><span class="dot"></span><div><b>Customer development (кастдев)</b><span class="d">5–10 интервью с реальными клиентами, фиксация <span class="term">JTBD</span> (Jobs To Be Done) — что человек на самом деле «нанимает» продукт делать</span></div></li>
+      <li><span class="dot"></span><div><b>Карта болей и желаний</b><span class="d">В формулировках вашей аудитории — материал для будущего копирайтинга</span></div></li>
+      <li><span class="dot"></span><div><b>Реестр возражений</b><span class="d">Полный список причин не купить, даже если продукт подходит</span></div></li>
+      <li><span class="dot"></span><div><b>Конкурентная матрица</b><span class="d">5–7 игроков: оффер, ценообразование, воронка, точки дифференциации</span></div></li>
+      <li><span class="dot"></span><div><b>Awareness level</b><span class="d">Уровень осведомлённости аудитории (по классификации Шварца — от «не знает о проблеме» до «готов купить именно у вас») — определяет коммуникационную стратегию</span></div></li>
+      <li><span class="dot"></span><div><b>Unique mechanism</b><span class="d">Формулировка вашего отличия — не «звучит иначе», а объективно другой подход к результату</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> профиль ICP, карта JTBD, реестр возражений, конкурентная матрица — основа для оффера и контентной стратегии.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 2 -->
+<div class="stage" id="e2">
+  <div class="stage-head"><span class="n">ЭТАП 2</span></div>
+  <h2>Упаковка / брендинг профиля</h2>
+  <p class="why">Профиль — первая точка конверсии в воронке доверия, ещё до контакта с продуктом.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Визуальная айдентика</b><span class="d">Аватар, цветовая палитра, единый стиль обложек хайлайтов (закреплённых историй)</span></div></li>
+      <li><span class="dot"></span><div><b>Шапка профиля</b><span class="d">По формуле: идентичность + сегмент + результат + <span class="term">CTA</span> (Call To Action — призыв к действию)</span></div></li>
+      <li><span class="dot"></span><div><b>Структура highlights</b><span class="d">5–6 разделов: о вас, социальное доказательство (отзывы/кейсы), процесс работы, ответы на вопросы, цены</span></div></li>
+      <li><span class="dot"></span><div><b>Закреплённый контент</b><span class="d">Витрина для холодного трафика — работает без вашего участия</span></div></li>
+      <li><span class="dot"></span><div><b>Единая точка входа</b><span class="d">Один bio-link (ссылка в профиле), без распыления на несколько адресов</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> упакованный профиль с конверсией «просмотр → подписка/лид» выше среднего по нише.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 3 -->
+<div class="stage" id="e3">
+  <div class="stage-head"><span class="n">ЭТАП 3</span></div>
+  <h2>Оффер и продуктовая линейка</h2>
+  <p class="why">Оффер — точка, где ценность конвертируется в готовность платить. Слабый оффер не спасает даже идеальная воронка.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Формула оффера</b><span class="d">Результат + срок + снятие ключевого возражения</span></div></li>
+      <li><span class="dot"></span><div><b>Lead magnet</b><span class="d">Бесплатный продукт для входа в воронку — узкий, точный, ведущий к следующему шагу</span></div></li>
+      <li><span class="dot"></span><div><b>Tripwire</b><span class="d">Недорогой продукт-разогрев — первая монетизированная микроконверсия, переводит из «подписчика» в «покупателя» (опционально)</span></div></li>
+      <li><span class="dot"></span><div><b>Core offer</b><span class="d">Основной платный продукт: тарифная сетка, состав, чек — сверяется с юнит-моделью из этапа 0</span></div></li>
+      <li><span class="dot"></span><div><b>Upsell / downsell</b><span class="d">Предложение более дорогого или более дешёвого продукта после основной покупки — расширяет <span class="term">LTV</span></span></div></li>
+      <li><span class="dot"></span><div><b>Risk reversal</b><span class="d">Гарантии, снижающие воспринимаемый риск покупки — «не подойдёт — вернём деньги» и подобное</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> продуктовая линейка с прайсингом на каждом уровне и сформулированным core offer.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 4 -->
+<div class="stage" id="e4">
+  <div class="stage-head"><span class="n">ЭТАП 4</span></div>
+  <h2>Техническая инфраструктура</h2>
+  <p class="why">Даже конверсионная воронка не работает без операционного бэкенда — технической «начинки» за кулисами.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Payment stack</b><span class="d">Связка сервисов для приёма оплаты + юридическая форма (самозанятость/ИП)</span></div></li>
+      <li><span class="dot"></span><div><span class="term">CRM</span> — <b>Customer Relationship Management</b><span class="d">Система учёта клиентов и сделок — таблица или программа с фиксацией этапа воронки по каждому лиду</span></div></li>
+      <li><span class="dot"></span><div><b>Автоворонка</b><span class="d">Сервис автоматизации (например, ManyChat, SaleBot) — мгновенный отклик на триггер входа без вашего участия</span></div></li>
+      <li><span class="dot"></span><div><b>Booking-система</b><span class="d">Сервис для записи на диагностику/консультацию без ручного согласования времени</span></div></li>
+      <li><span class="dot"></span><div><b>Документы</b><span class="d">Договор оферты, если того требует объём и ниша</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> рабочая связка «захват лида → CRM → оплата» без ручных потерь на стыках.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 5 -->
+<div class="stage" id="e5">
+  <div class="stage-head"><span class="n">ЭТАП 5</span></div>
+  <h2>Воронка</h2>
+  <p class="why"><b>Воронка (funnel)</b> — структурированный путь клиента от первого контакта до оплаты, который можно измерять и оптимизировать по шагам.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Entry point</b><span class="d">Точка входа — триггер: кодовое слово, квиз, кнопка</span></div></li>
+      <li><span class="dot"></span><div><b>Auto-response</b><span class="d">Автоматический ответ: мгновенная выдача лид-магнита + первый вовлекающий вопрос</span></div></li>
+      <li><span class="dot"></span><div><b>Nurture-цепочка</b><span class="d">Последовательность «подогревающих» сообщений — 5–7 касаний с учётом awareness level из этапа 1</span></div></li>
+      <li><span class="dot"></span><div><b>Sales script / диагностика</b><span class="d">Выявление потребности → презентация решения → работа с возражениями</span></div></li>
+      <li><span class="dot"></span><div><b>Follow-up sequence</b><span class="d">Повторные касания для тех, кто «думает», без давления</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> полностью собранная и протестированная на себе воронка с измеримой конверсией на каждом шаге.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 6 -->
+<div class="stage" id="e6">
+  <div class="stage-head"><span class="n">ЭТАП 6</span></div>
+  <h2>Контентная стратегия и прогрев</h2>
+  <p class="why">Контент — актив на «входе» воронки (привлекает новых) и инструмент прогрева одновременно (удерживает внимание тех, кто уже подписан).</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Контент-план</b><span class="d">2–4 недели: рубрикатор, частота, распределение по форматам</span></div></li>
+      <li><span class="dot"></span><div><b>Short-form video</b><span class="d">Короткие видео (Reels) 3–5/нед — экспертные + личные + с призывом к действию</span></div></li>
+      <li><span class="dot"></span><div><b>Ежедневные Stories</b><span class="d">Истории, поддерживающие вовлечённость между крупными публикациями</span></div></li>
+      <li><span class="dot"></span><div><b>Social proof в потоке</b><span class="d">Отзывы и кейсы (социальное доказательство) интегрированы в постоянный контент, не только в хайлайтах</span></div></li>
+      <li><span class="dot"></span><div><b>Прогревная серия</b><span class="d">7–14 дней сторителлинга перед открытием продаж</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> контент-календарь и сценарий прогревной серии, синхронизированные с датой запуска.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 7 -->
+<div class="stage" id="e7">
+  <div class="stage-head"><span class="n">ЭТАП 7</span></div>
+  <h2>Трафик</h2>
+  <p class="why">Воронка без трафика не масштабируется. Приоритет: сначала валидация органикой, платный трафик — после подтверждения экономики.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Органический канал</b><span class="d">Reels как основной бесплатный источник трафика на старте</span></div></li>
+      <li><span class="dot"></span><div><b>Партнёрства</b><span class="d">Коллаборации с игроками смежного размера аудитории</span></div></li>
+      <li><span class="dot"></span><div><b>Paid traffic</b><span class="d">Платный трафик — включается после расчёта <span class="term">CAC</span> (Customer Acquisition Cost — стоимость привлечения клиента) на органике и подтверждения соотношения <span class="term">LTV</span>/CAC выше 3 (то есть клиент приносит минимум в 3 раза больше, чем стоило его привлечь)</span></div></li>
+      <li><span class="dot"></span><div><b>Retention-канал</b><span class="d">Telegram/рассылка — накопление аудитории в канале, который не зависит от алгоритмов соцсети</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> traffic mix (сочетание каналов) с распределением и условием масштабирования на платный трафик.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 8 -->
+<div class="stage" id="e8">
+  <div class="stage-head"><span class="n">ЭТАП 8</span></div>
+  <h2>Продажи</h2>
+  <p class="why">Конверсия «лид → клиент» определяется здесь — самая чувствительная к качеству исполнения точка воронки.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Sales script</b><span class="d">Установление контакта → выявление ситуации → показ разрыва между «сейчас» и «желаемым» → презентация → оффер → возражения</span></div></li>
+      <li><span class="dot"></span><div><span class="term">Objection handling</span> — <b>работа с возражениями</b><span class="d">Готовый ответ под каждое стандартное возражение — банк возражений</span></div></li>
+      <li><span class="dot"></span><div><b>Lead tracking</b><span class="d">Отслеживание лидов: статус, следующий шаг, вероятность закрытия сделки по каждому</span></div></li>
+      <li><span class="dot"></span><div><b>Follow-up cadence</b><span class="d">Ритм повторных касаний для сегмента «думаю» — 24–48 часов, без давления</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> работающий процесс продаж с предсказуемой конверсией «диагностика → оплата».</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 9 -->
+<div class="stage" id="e9">
+  <div class="stage-head"><span class="n">ЭТАП 9</span></div>
+  <h2>Запуск (launch window)</h2>
+  <p class="why"><b>Launch window</b> — концентрированное окно продаж, где весь актив (контент, воронка, продажи) работает синхронно.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Даты окна</b><span class="d">Открытие и закрытие продаж, зафиксированы заранее</span></div></li>
+      <li><span class="dot"></span><div><b>Launch-механика</b><span class="d"><span class="term">Early bird</span> (бонус за раннюю оплату), ограничение мест, дедлайн по цене</span></div></li>
+      <li><span class="dot"></span><div><b>План касаний</b><span class="d">День за днём: что публикуется и кому пишется лично на весь период окна</span></div></li>
+      <li><span class="dot"></span><div><b>Закрытие окна</b><span class="d">Финальный призыв к действию, честное закрытие набора точно в срок</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> launch-календарь и отчёт по факту: конверсия, выручка, стоимость привлечения за окно.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 10 -->
+<div class="stage" id="e10">
+  <div class="stage-head"><span class="n">ЭТАП 10</span></div>
+  <h2>Retention, LTV и рефералы</h2>
+  <p class="why"><span class="term">CAC</span> на новых клиентов почти всегда выше стоимости удержания текущих (<span class="term">retention</span>). Удержание — самый дешёвый источник роста LTV.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Onboarding</b><span class="d">Сценарий знакомства сразу после оплаты — что происходит дальше и чего ждать</span></div></li>
+      <li><span class="dot"></span><div><b>Touch points</b><span class="d">Контрольные точки касания в процессе работы — снижают <span class="term">churn</span> (отток)</span></div></li>
+      <li><span class="dot"></span><div><b>Сбор отзыва</b><span class="d">В момент пика удовлетворённости клиента, а не постфактум</span></div></li>
+      <li><span class="dot"></span><div><b>Реферальная программа</b><span class="d">Понятный бонус (incentive) для клиента и для приглашённого им человека</span></div></li>
+      <li><span class="dot"></span><div><b>Upsell / renewal</b><span class="d">Предложение продолжения — на пике уже доказанной ценности продукта</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> механика удержания, которая повышает LTV и снижает средний CAC за счёт рефералов.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 11 -->
+<div class="stage" id="e11">
+  <div class="stage-head"><span class="n">ЭТАП 11</span></div>
+  <h2>Аналитика и масштабирование</h2>
+  <p class="why">Что не измеряется — не растёт. Каждый цикл запуска должен улучшать юнит-экономику относительно предыдущего.</p>
+
+  <div class="block">
+    <div class="lbl">Что делаем</div>
+    <ol class="steps">
+      <li><span class="dot"></span><div><b>Воронка метрик</b><span class="d">Охват → лиды → диагностики → оплаты → выручка — цифры по каждому шагу</span></div></li>
+      <li><span class="dot"></span><div><b>Сверка с юнit-моделью</b><span class="d">Факт против плана из этапа 0 — где и почему разрыв</span></div></li>
+      <li><span class="dot"></span><div><span class="term">Bottleneck</span>-анализ — <b>узкое место</b><span class="d">Этап с максимальным % потерь исправляется в первую очередь</span></div></li>
+      <li><span class="dot"></span><div><b>Scaling decision</b><span class="d">Решение о масштабировании: усиление рабочих каналов и креативов, отказ от слабых</span></div></li>
+      <li><span class="dot"></span><div><b>Делегирование</b><span class="d">Момент, когда стоит нанять первого помощника — и что отдавать ему первым</span></div></li>
+    </ol>
+  </div>
+  <div class="result"><b>Результат этапа:</b> отчёт по циклу и один приоритетный вывод для следующей итерации.</div>
+  <div class="note">Запуск — не разовое событие, а цикл: запуск → разбор → 2–3 недели оптимизации → новый запуск с улучшенной юнит-экономикой.</div>
+</div>
+
+<div class="foot">Структура запуска · 12 этапов · профессиональная терминология с расшифровкой каждого термина</div>
+
+</div>
+</body>
+</html>
