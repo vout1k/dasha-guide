@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>AI Agents</title>
 <script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -209,6 +210,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
   -webkit-tap-highlight-color:transparent}
 .npill:active{transform:scale(.95)}
 .npa{background:var(--ac);color:#fff;border-color:var(--ac)}
+.fchip{display:inline-flex;align-items:center;gap:7px;background:var(--sf2);border:1px solid var(--bd);
+  border-radius:9px;padding:6px 9px;font-size:.76rem;max-width:100%}
+.fchip .ic{flex-shrink:0;font-size:.9rem}
+.fchip .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px;color:var(--tx)}
+.fchip .sz{color:var(--tx3);flex-shrink:0;font-size:.68rem}
+.fchip .rm{flex-shrink:0;cursor:pointer;color:var(--tx3);font-weight:800;padding:0 2px;font-size:.9rem}
+.fchip .rm:active{color:#FF6B6B}
+.fchip.warn{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
 </style>
 </head>
 <body>
@@ -294,6 +303,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
         <textarea id="quick-prompt" rows="4" placeholder="Вставь сюда готовый промпт целиком — агент сразу поймёт задачу, поля ниже заполнять не обязательно" oninput="toggleQuickPromptMode()"></textarea>
       </div>
       <div id="quick-prompt-hint" style="display:none;font-size:.72rem;color:var(--ac);background:var(--ach);border-radius:10px;padding:8px 12px;margin-top:8px">Поля ниже отключены — отправится только промпт выше</div>
+
+      <div style="margin-top:14px">
+        <input type="file" id="file-input" multiple style="display:none" accept=".txt,.md,.csv,.json,.log,.yaml,.yml,.html,.js,.ts,.xlsx,.xls,.pdf,image/*,audio/*,video/*" onchange="handleFilesSelected(event)">
+        <button type="button" class="btn btn-s" onclick="document.getElementById('file-input').click()" style="justify-content:flex-start;gap:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          Прикрепить файлы
+        </button>
+        <div style="font-size:.68rem;color:var(--tx3);margin-top:6px">Текст, таблицы, изображения, PDF, аудио/видео — по несколько сразу</div>
+        <div id="file-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px"></div>
+      </div>
+
       <div style="display:flex;align-items:center;gap:10px;margin:16px 0 4px">
         <div style="flex:1;height:1px;background:var(--bd)"></div>
         <span style="font-size:.68rem;color:var(--tx3);font-weight:600;letter-spacing:.05em;text-transform:uppercase">или заполни поля</span>
@@ -1530,6 +1550,8 @@ const S = {
   pipeChain: [],
   pipeOutput: '',
   pipeIsHtml: false,
+  attachedFiles: [],
+  pendingAttachments: [],
 };
 
 // ── INIT ────────────────────────────────────────────────────────
@@ -1736,6 +1758,8 @@ function openAgent(id) {
   }).join('');
   const qp = document.getElementById('quick-prompt'); if (qp) qp.value = '';
   toggleQuickPromptMode();
+  S.attachedFiles = [];
+  renderFileChips();
   go('agent');
 }
 
@@ -1746,6 +1770,113 @@ function toggleQuickPromptMode() {
   const hint = document.getElementById('quick-prompt-hint');
   if (form) { form.style.opacity = has ? '.35' : '1'; form.style.pointerEvents = has ? 'none' : 'auto'; }
   if (hint) hint.style.display = has ? 'block' : 'none';
+}
+
+// ── FILE ATTACHMENTS ─────────────────────────────────────────────
+const FILE_TEXT_MAXLEN = 15000;
+const FILE_ICONS = {text:'📄', xlsx:'📊', image:'🖼️', pdf:'📕', audio:'🎵', video:'🎬', other:'📎'};
+
+function classifyFile(file) {
+  const name = file.name.toLowerCase();
+  const type = file.type || '';
+  if (/\.(xlsx|xls)$/.test(name)) return 'xlsx';
+  if (type === 'application/pdf' || /\.pdf$/.test(name)) return 'pdf';
+  if (type.startsWith('image/')) return 'image';
+  if (type.startsWith('audio/') || /\.(mp3|wav|m4a|ogg|aac|flac)$/.test(name)) return 'audio';
+  if (type.startsWith('video/') || /\.(mp4|mov|webm|avi|mkv)$/.test(name)) return 'video';
+  if (type.startsWith('text/') || /\.(txt|md|csv|json|log|yaml|yml|html|js|ts|css)$/.test(name)) return 'text';
+  return 'other';
+}
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' Б';
+  if (bytes < 1024*1024) return Math.round(bytes/1024) + ' КБ';
+  return (bytes/1024/1024).toFixed(1) + ' МБ';
+}
+function readAsText(file) { return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsText(file); }); }
+function readAsDataURL(file) { return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file); }); }
+function readAsArrayBuffer(file) { return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsArrayBuffer(file); }); }
+
+async function handleFilesSelected(event) {
+  const files = Array.from(event.target.files || []);
+  event.target.value = '';
+  for (const file of files) {
+    const kind = classifyFile(file);
+    const entry = {name:file.name, size:file.size, kind, mediaType:file.type};
+    try {
+      if (kind === 'text') {
+        let t = await readAsText(file);
+        if (t.length > FILE_TEXT_MAXLEN) { t = t.slice(0,FILE_TEXT_MAXLEN) + '\n... [обрезано, файл больше лимита]'; }
+        entry.textContent = t;
+      } else if (kind === 'xlsx') {
+        const buf = await readAsArrayBuffer(file);
+        const wb = XLSX.read(buf, {type:'array'});
+        let combined = '';
+        wb.SheetNames.forEach(name => {
+          combined += `\n[Лист: ${name}]\n` + XLSX.utils.sheet_to_csv(wb.Sheets[name]);
+        });
+        if (combined.length > FILE_TEXT_MAXLEN) combined = combined.slice(0,FILE_TEXT_MAXLEN) + '\n... [обрезано]';
+        entry.textContent = combined.trim();
+      } else if (kind === 'image' || kind === 'pdf') {
+        entry.dataUrl = await readAsDataURL(file);
+      }
+      // audio/video/other — no content read, filename-only reference
+    } catch(e) {
+      entry.error = true;
+    }
+    S.attachedFiles.push(entry);
+  }
+  renderFileChips();
+}
+
+function removeAttachedFile(idx) { S.attachedFiles.splice(idx,1); renderFileChips(); }
+
+function renderFileChips() {
+  const c = document.getElementById('file-chips'); if (!c) return;
+  c.innerHTML = S.attachedFiles.map((f,i) => {
+    const warn = (f.kind==='audio'||f.kind==='video') || ((f.kind==='image'||f.kind==='pdf') && S.provider!=='anthropic');
+    return `<div class="fchip${warn?' warn':''}">
+      <span class="ic">${FILE_ICONS[f.kind]||FILE_ICONS.other}</span>
+      <span class="nm">${esc(f.name)}</span>
+      <span class="sz">${formatFileSize(f.size)}</span>
+      <span class="rm" onclick="removeAttachedFile(${i})">✕</span>
+    </div>`;
+  }).join('');
+}
+
+function buildAttachmentsText() {
+  if (!S.attachedFiles.length) return '';
+  const parts = [];
+  for (const f of S.attachedFiles) {
+    if (f.kind === 'text' || f.kind === 'xlsx') {
+      parts.push(`Файл «${f.name}»:\n${f.textContent||''}`);
+    } else if (f.kind === 'image' || f.kind === 'pdf') {
+      if (S.provider === 'anthropic') {
+        parts.push(`Файл «${f.name}» приложен ниже как ${f.kind==='image'?'изображение':'PDF-документ'} — проанализируй его содержимое.`);
+      } else {
+        parts.push(`Файл «${f.name}» (${f.kind}) приложен, но текущий провайдер (Groq) не может анализировать его содержимое напрямую — учти только название файла.`);
+      }
+    } else if (f.kind === 'audio' || f.kind === 'video') {
+      parts.push(`Файл «${f.name}» (${f.kind==='audio'?'аудио':'видео'}) приложен для контекста — прямой анализ аудио/видео пока недоступен, ориентируйся на остальной текст запроса.`);
+    } else {
+      parts.push(`Файл «${f.name}» приложен, но его формат не распознан для анализа.`);
+    }
+  }
+  return '--- ПРИЛОЖЕННЫЕ ФАЙЛЫ ---\n\n' + parts.join('\n\n') + '\n\n--- КОНЕЦ ФАЙЛОВ ---';
+}
+
+function buildAttachmentBlocks() {
+  if (S.provider !== 'anthropic') return [];
+  const blocks = [];
+  for (const f of S.attachedFiles) {
+    if (f.kind === 'image' && f.dataUrl) {
+      const m = f.dataUrl.match(/^data:(.+?);base64,(.*)$/);
+      if (m) blocks.push({type:'image', source:{type:'base64', media_type:m[1], data:m[2]}});
+    } else if (f.kind === 'pdf' && f.dataUrl) {
+      const m = f.dataUrl.match(/^data:(.+?);base64,(.*)$/);
+      if (m) blocks.push({type:'document', source:{type:'base64', media_type:'application/pdf', data:m[2]}});
+    }
+  }
+  return blocks;
 }
 
 function submit() {
@@ -1765,6 +1896,9 @@ function submit() {
   const nicheCtx = S.niche ? S.niches.find(n=>n.id===S.niche)?.ctx : '';
   const ctxBlock = nicheCtx || S.ctx;
   if (ctxBlock) msg = `Контекст клиента / ниши:\n${ctxBlock}\n\n---\n\n${msg}`;
+  const filesText = buildAttachmentsText();
+  if (filesText) msg = `${msg}\n\n${filesText}`;
+  S.pendingAttachments = buildAttachmentBlocks();
   beginResponse(msg);
 }
 
@@ -1796,9 +1930,19 @@ async function stream(sysprompt) {
     const headers = isGroq
       ? {'Content-Type':'application/json','Authorization':'Bearer '+S.key}
       : {'Content-Type':'application/json','x-api-key':S.key,'anthropic-version':'2023-06-01','anthropic-dangerous-allow-browser':'true'};
+    let messagesForApi = S.messages;
+    if (!isGroq && S.pendingAttachments.length) {
+      const blocks = S.pendingAttachments; S.pendingAttachments = [];
+      messagesForApi = S.messages.map((m,i) => (i===S.messages.length-1 && m.role==='user')
+        ? {role:'user', content:[{type:'text', text:m.content}, ...blocks]}
+        : m);
+    } else {
+      S.pendingAttachments = [];
+    }
+
     const body = isGroq
-      ? {model:S.model,max_tokens:8192,stream:true,messages:[{role:'system',content:sysprompt},...S.messages]}
-      : {model:S.model,max_tokens:8192,stream:true,system:sysprompt,messages:S.messages};
+      ? {model:S.model,max_tokens:8192,stream:true,messages:[{role:'system',content:sysprompt},...messagesForApi]}
+      : {model:S.model,max_tokens:8192,stream:true,system:sysprompt,messages:messagesForApi};
 
     const r = await fetch(url, {method:'POST',headers,body:JSON.stringify(body),signal:S.ctrl.signal});
     if (!r.ok) {
