@@ -286,6 +286,21 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);
       <div style="font-size:.68rem;font-weight:600;color:var(--tx3);letter-spacing:.05em;text-transform:uppercase">Ниша клиента</div>
       <div class="niche-pills-c" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" id="niche-pills"></div>
     </div>
+
+    <!-- Quick prompt -->
+    <div style="padding:16px 20px 0">
+      <div class="field">
+        <label>Быстрый промпт <span style="text-transform:none;color:var(--tx3);font-weight:500">(необязательно)</span></label>
+        <textarea id="quick-prompt" rows="4" placeholder="Вставь сюда готовый промпт целиком — агент сразу поймёт задачу, поля ниже заполнять не обязательно" oninput="toggleQuickPromptMode()"></textarea>
+      </div>
+      <div id="quick-prompt-hint" style="display:none;font-size:.72rem;color:var(--ac);background:var(--ach);border-radius:10px;padding:8px 12px;margin-top:8px">Поля ниже отключены — отправится только промпт выше</div>
+      <div style="display:flex;align-items:center;gap:10px;margin:16px 0 4px">
+        <div style="flex:1;height:1px;background:var(--bd)"></div>
+        <span style="font-size:.68rem;color:var(--tx3);font-weight:600;letter-spacing:.05em;text-transform:uppercase">или заполни поля</span>
+        <div style="flex:1;height:1px;background:var(--bd)"></div>
+      </div>
+    </div>
+
     <div class="fw" id="aform"></div>
     <div style="height:8px"></div>
   </div>
@@ -1719,17 +1734,34 @@ function openAgent(id) {
     if (f.type==='textarea') return `<div class="field"><label>${f.label}</label><textarea id="f_${f.id}" placeholder="${f.ph||''}" rows="3"></textarea></div>`;
     return `<div class="field"><label>${f.label}</label><input type="text" id="f_${f.id}" placeholder="${f.ph||''}"></div>`;
   }).join('');
+  const qp = document.getElementById('quick-prompt'); if (qp) qp.value = '';
+  toggleQuickPromptMode();
   go('agent');
+}
+
+function toggleQuickPromptMode() {
+  const qp = document.getElementById('quick-prompt');
+  const has = qp && qp.value.trim().length > 0;
+  const form = document.getElementById('aform');
+  const hint = document.getElementById('quick-prompt-hint');
+  if (form) { form.style.opacity = has ? '.35' : '1'; form.style.pointerEvents = has ? 'none' : 'auto'; }
+  if (hint) hint.style.display = has ? 'block' : 'none';
 }
 
 function submit() {
   if (!S.agent) return;
   if (!S.key) { toast('Настройте API ключ в настройках'); go('settings'); return; }
-  const d = {};
-  S.agent.fields.forEach(f => { const el=document.getElementById('f_'+f.id); d[f.id]=el?el.value.trim():''; });
-  const first = S.agent.fields[0];
-  if (first && !d[first.id]) { toast('Заполните: '+first.label); return; }
-  let msg = S.agent.build(d);
+  const qp = (document.getElementById('quick-prompt')?.value || '').trim();
+  let msg;
+  if (qp) {
+    msg = qp;
+  } else {
+    const d = {};
+    S.agent.fields.forEach(f => { const el=document.getElementById('f_'+f.id); d[f.id]=el?el.value.trim():''; });
+    const first = S.agent.fields[0];
+    if (first && !d[first.id]) { toast('Заполните: '+first.label+' — или используй быстрый промпт выше'); return; }
+    msg = S.agent.build(d);
+  }
   const nicheCtx = S.niche ? S.niches.find(n=>n.id===S.niche)?.ctx : '';
   const ctxBlock = nicheCtx || S.ctx;
   if (ctxBlock) msg = `Контекст клиента / ниши:\n${ctxBlock}\n\n---\n\n${msg}`;
